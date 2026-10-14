@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
+import { formatDateTime } from "../../i18n";
 import type {
   Changeset,
   CommitDetail,
@@ -24,6 +26,8 @@ import ChangesetList from "./ChangesetList.vue";
  * header (summary, hash with copy, ref chips, signature badge, author line),
  * the full message, then the changeset beside the selected file's diff.
  */
+const { t } = useI18n();
+
 const props = withDefaults(
   defineProps<{
     state: LoadState<CommitDetail>;
@@ -63,14 +67,24 @@ const refChips = computed<RefChip[]>(() => detail.value?.refs ?? []);
 
 const signature = computed(() => detail.value?.signature ?? null);
 
-const SIGNATURE: Record<SignatureState, { icon: string; tone: string; label: string }> = {
-  unsigned: { icon: "questionmark.circle", tone: "muted", label: "Not signed" },
-  present: { icon: "signature", tone: "muted", label: "Signed (not verified)" },
-  valid: { icon: "checkmark.circle.fill", tone: "positive", label: "Signature verified" },
-  untrusted: { icon: "exclamationmark.triangle", tone: "warning", label: "Signed by an untrusted key" },
-  invalid: { icon: "exclamationmark.circle", tone: "danger", label: "Signature invalid" },
-  expired: { icon: "clock", tone: "warning", label: "Signature expired" },
+/**
+ * Icon and tone are fixed per state; only the label is prose, so it comes from
+ * the catalogue. A function rather than a frozen record so a language switch
+ * re-labels the badge without re-reading the commit.
+ */
+const SIGNATURE: Record<SignatureState, { icon: string; tone: string; labelKey: string }> = {
+  unsigned: { icon: "questionmark.circle", tone: "muted", labelKey: "commit.signatureUnsigned" },
+  present: { icon: "signature", tone: "muted", labelKey: "commit.signaturePresent" },
+  valid: { icon: "checkmark.circle.fill", tone: "positive", labelKey: "commit.signatureValid" },
+  untrusted: { icon: "exclamationmark.triangle", tone: "warning", labelKey: "commit.signatureUntrusted" },
+  invalid: { icon: "exclamationmark.circle", tone: "danger", labelKey: "commit.signatureInvalid" },
+  expired: { icon: "clock", tone: "warning", labelKey: "commit.signatureExpired" },
 };
+
+function signatureBadge(state: SignatureState): { icon: string; tone: string; label: string } {
+  const badge = SIGNATURE[state];
+  return { icon: badge.icon, tone: badge.tone, label: t(badge.labelKey) };
+}
 
 function chipIcon(kind: RefChip["kind"]): string {
   if (kind === "head") return "arrow.triangle.branch";
@@ -82,10 +96,10 @@ function chipIcon(kind: RefChip["kind"]): string {
 const date = computed(() => {
   const time = commit.value?.author.time;
   if (!time) return null;
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(time * 1000));
+  // `Intl.DateTimeFormat(undefined, …)` would follow the *machine's* locale, so
+  // the app could speak Chinese while printing an English date. The shared
+  // formatter always follows the app's own language.
+  return formatDateTime(new Date(time * 1000));
 });
 </script>
 
@@ -94,21 +108,21 @@ const date = computed(() => {
     <EmptyState
       v-if="state.status === 'loading'"
       icon="clock"
-      title="Loading commit…"
+      :title="t('commit.loadingCommit')"
       compact
     />
     <EmptyState
       v-else-if="state.status === 'empty'"
       icon="empty.noCommitSelected"
-      title="No commit selected"
-      caption="Pick a commit from the history to see its details."
+      :title="t('commit.noCommitSelected')"
+      :caption="t('commit.pickCommitHint')"
     />
     <EmptyState
       v-else-if="state.status === 'error'"
       icon="exclamationmark.circle"
-      title="Could not load the commit"
+      :title="t('commit.loadFailed')"
       :caption="state.error.message"
-      action-label="Try again"
+      :action-label="t('common.retry')"
       compact
       @action="emit('diffRetry')"
     />
@@ -118,7 +132,12 @@ const date = computed(() => {
         <div class="commit-summary-row">
           <h2 class="commit-summary" :title="commit?.message">{{ commit?.summary }}</h2>
           <span class="commit-spacer" />
-          <button type="button" class="commit-verb" title="Copy summary" @click="emit('copySummary', commit?.summary ?? '')">
+          <button
+            type="button"
+            class="commit-verb"
+            :title="t('commit.copySummary')"
+            @click="emit('copySummary', commit?.summary ?? '')"
+          >
             <Icon name="doc.on.doc" :size="13" />
           </button>
         </div>
@@ -127,7 +146,7 @@ const date = computed(() => {
           <button
             type="button"
             class="commit-hash mono"
-            title="Copy the full hash"
+            :title="t('commit.copyHash')"
             @click="emit('copyHash', commit?.oid ?? '')"
           >
             {{ commit?.shortOid }}
@@ -141,9 +160,9 @@ const date = computed(() => {
 
           <span class="commit-spacer" />
 
-          <span v-if="signature" class="sig-badge" :class="`tone-${SIGNATURE[signature.state].tone}`">
-            <Icon :name="SIGNATURE[signature.state].icon" :size="12" />
-            {{ SIGNATURE[signature.state].label }}
+          <span v-if="signature" class="sig-badge" :class="`tone-${signatureBadge(signature.state).tone}`">
+            <Icon :name="signatureBadge(signature.state).icon" :size="12" />
+            {{ signatureBadge(signature.state).label }}
             <template v-if="signature.signer"> · {{ signature.signer }}</template>
           </span>
         </div>
@@ -158,16 +177,18 @@ const date = computed(() => {
             v-if="commit?.parents.length"
             type="button"
             class="commit-verb"
-            :title="`Browse the tree at ${parentLabel ?? 'this commit'}`"
+            :title="parentLabel ? t('commit.browseTreeAt', { ref: parentLabel }) : t('commit.browseTreeHere')"
             @click="emit('browseTree', commit.oid)"
           >
             <Icon name="folder" :size="13" />
-            Browse files
+            {{ t("commit.browseFiles") }}
           </button>
         </div>
 
         <div v-if="commit?.parents.length" class="commit-parents">
-          <span class="parents-label">{{ commit.parents.length > 1 ? "Parents" : "Parent" }}</span>
+          <span class="parents-label">
+            {{ commit.parents.length > 1 ? t("commit.parents", { count: commit.parents.length }) : t("commit.parent") }}
+          </span>
           <button
             v-for="parent in commit.parents"
             :key="parent"
@@ -199,7 +220,7 @@ const date = computed(() => {
           <EmptyState
             v-else-if="changeset.status === 'loading'"
             icon="hourglass"
-            title="Loading files…"
+            :title="t('commit.loadingFiles')"
             compact
           />
           <EmptyState
@@ -208,7 +229,7 @@ const date = computed(() => {
             :title="changeset.error.message"
             compact
           />
-          <EmptyState v-else icon="empty.multiSelection" title="No changed files" compact />
+          <EmptyState v-else icon="empty.multiSelection" :title="t('commit.noChangedFiles')" compact />
         </template>
 
         <template #detail>
@@ -228,14 +249,14 @@ const date = computed(() => {
           <EmptyState
             v-else-if="selectedPath"
             icon="empty.noFileSelected"
-            title="Commit diffs are not available yet"
-            caption="The command that loads one file's diff at a commit is not in this build; the changeset entry above is shown instead."
+            :title="t('commit.diffUnavailableTitle')"
+            :caption="t('commit.diffUnavailableCaption')"
           />
           <EmptyState
             v-else
             icon="empty.noFileSelected"
-            title="No file selected"
-            caption="Choose a file to see its diff."
+            :title="t('commit.noFileSelected')"
+            :caption="t('commit.noFileSelectedCaption')"
           />
         </template>
       </MasterDetail>

@@ -40,7 +40,7 @@ const ICONS: Record<ToastModel["kind"], string> = {
         <button
           type="button"
           class="toast-dismiss"
-          aria-label="Dismiss notification"
+          :aria-label="$t('screens.toast.dismissNotification')"
           @click="emit('dismiss', toast.id)"
         >
           <Icon name="xmark" :size="12" />

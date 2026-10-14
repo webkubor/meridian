@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { BranchFilter } from "../../bridges/bindings";
 import type { BranchReviewInfo, LoadState } from "../contracts";
@@ -14,6 +15,8 @@ import VirtualList from "../common/VirtualList.vue";
  * filter, search, and one row per branch with its tracking badges (ahead,
  * behind, fully-merged). Selection and every verb are reported upward.
  */
+const { t } = useI18n();
+
 const props = withDefaults(
   defineProps<{
     state: LoadState<BranchReviewInfo[]>;
@@ -43,9 +46,9 @@ const emit = defineEmits<{
 }>();
 
 const FILTERS: { id: BranchFilter; label: string }[] = [
-  { id: "local", label: "Local" },
-  { id: "remote", label: "Remote" },
-  { id: "all", label: "All" },
+  { id: "local", label: "branch.filterLocal" },
+  { id: "remote", label: "branch.filterRemote" },
+  { id: "all", label: "branch.filterAll" },
 ];
 
 const filtered = computed(() => {
@@ -62,7 +65,7 @@ function isCurrent(branch: BranchReviewInfo): boolean {
 }
 
 function symbolUpstream(branch: BranchReviewInfo): string {
-  return `Tracking ${branch.upstream ?? branch.name}`;
+  return t("branch.tracking", { ref: branch.upstream ?? branch.name });
 }
 </script>
 
@@ -70,17 +73,17 @@ function symbolUpstream(branch: BranchReviewInfo): string {
   <ListShell
     :status="state.status"
     empty-icon="empty.noBranchSelected"
-    empty-title="No branches"
-    empty-caption="Create a branch to start working."
-    empty-action-label="New branch…"
+    :empty-title="t('branch.emptyTitle')"
+    :empty-caption="t('branch.emptyCaption')"
+    :empty-action-label="t('branch.emptyAction')"
     :error-message="state.status === 'error' ? state.error.message : null"
-    loading-caption="Reading branches…"
+    :loading-caption="t('branch.loading')"
     @retry="emit('refresh')"
     @empty-action="emit('create')"
   >
     <template #toolbar>
       <div class="branch-toolbar">
-        <div class="branch-filter" role="radiogroup" aria-label="Branch scope">
+        <div class="branch-filter" role="radiogroup" :aria-label="t('branch.scopeLabel')">
           <button
             v-for="option in FILTERS"
             :key="option.id"
@@ -91,14 +94,14 @@ function symbolUpstream(branch: BranchReviewInfo): string {
             :class="{ active: filter === option.id }"
             @click="emit('update:filter', option.id)"
           >
-            {{ option.label }}
+            {{ t(option.label) }}
           </button>
         </div>
 
         <SearchField
           :model-value="search"
-          label="Search branches"
-          placeholder="Filter branches"
+          :label="t('branch.searchLabel')"
+          :placeholder="t('branch.searchPlaceholder')"
           class="branch-search"
           @update:model-value="emit('update:search', $event)"
         />
@@ -106,7 +109,7 @@ function symbolUpstream(branch: BranchReviewInfo): string {
         <span class="branch-spacer" />
         <button type="button" class="branch-new" @click="emit('create')">
           <Icon name="plus" :size="13" />
-          New branch
+          {{ t("branch.newBranch") }}
         </button>
       </div>
     </template>
@@ -130,6 +133,7 @@ function symbolUpstream(branch: BranchReviewInfo): string {
           <span class="branch-name">{{ filtered[index].name }}</span>
           <span v-if="isCurrent(filtered[index])" class="branch-head">
             <Icon name="checkmark.circle.fill" :size="11" />
+            <!-- HEAD is a git ref, not a word: it stays literal in every locale. -->
             HEAD
           </span>
           <span class="branch-spacer" />

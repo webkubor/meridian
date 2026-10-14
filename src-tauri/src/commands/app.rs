@@ -15,6 +15,7 @@ use std::env;
 
 use serde::Deserialize;
 use tauri::{AppHandle, Runtime};
+use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_updater::UpdaterExt;
 
 use crate::domain::app::{
@@ -292,6 +293,56 @@ pub fn app_relaunch<R: Runtime>(app: AppHandle<R>) {
     // be replaced, so a failure here has no one left to report to. The frontend
     // treats the call as fire-and-forget.
     app.restart();
+}
+
+// --- app_pick_directory ----------------------------------------------------
+
+/// Asks the user for a folder, and returns its path.
+///
+/// This is the command the whole "open a repository" flow hangs off. Without it
+/// the only way into a repository was typing its path by hand, and every
+/// browse-shaped control in the UI was drawn, enabled, and inert.
+///
+/// Three decisions worth stating:
+///
+///  * **It returns `Ok(None)` when the user cancels.** Cancelling a picker is
+///    not an error, and turning it into one is how a "choose folder" button
+///    ends up showing an error toast to someone who simply changed their mind.
+///  * **The dialog is opened on the main thread and awaited off it.** The
+///    plugin's blocking API is a deadlock when called from a command's own
+///    thread, and a sync command runs on the main thread — which would freeze
+///    the window behind a modal that has not opened yet. So: schedule the
+///    dialog where AppKit requires it, hand the answer back over a channel, and
+///    await the channel here.
+///  * **No capability entry.** The plugin is driven from Rust, so the webview
+///    is never granted a dialog permission — same reasoning as the updater.
+#[tauri::command]
+pub async fn app_pick_directory<R: Runtime>(
+    app: AppHandle<R>,
+) -> Result<Option<String>, ErrorPayload> {
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    let dialog_app = app.clone();
+
+    app.run_on_main_thread(move || {
+        dialog_app
+            .dialog()
+            .file()
+            .set_title("Choose a repository folder")
+            .pick_folder(move |picked| {
+                let answer = picked
+                    .and_then(|path| path.into_path().ok())
+                    .map(|path| path.to_string_lossy().into_owned());
+                let _ = tx.send(answer);
+            });
+    })
+    .map_err(|error| {
+        ErrorPayload::new(
+            ErrorCode::Io,
+            format!("Could not open the folder picker: {error}"),
+        )
+    })?;
+
+    Ok(rx.await.unwrap_or(None))
 }
 
 // --- app_feedback_compose --------------------------------------------------

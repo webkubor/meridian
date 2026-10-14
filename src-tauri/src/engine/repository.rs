@@ -50,6 +50,35 @@ pub struct InitOptions {
 /// Our own minimal default — deliberately small, and ours (docs/02 §16).
 const DEFAULT_GITIGNORE: &str = "/target\nnode_modules/\n.DS_Store\n";
 
+/// Clone `url` into `destination`.
+///
+/// Blocking: libgit2's transfer is synchronous, so callers run this on a
+/// blocking thread. Credentials come from the user-level chain (ssh-agent,
+/// `~/.ssh` keys, credential helpers) because the new repository has no
+/// configuration of its own yet.
+///
+/// `branch` names the branch to check out. libgit2 does **not** fall back to
+/// the remote HEAD when it is missing — the clone fails — so an empty string
+/// means "the remote's default" and a name means exactly that name.
+pub fn clone(
+    url: &str,
+    destination: &Path,
+    bare: bool,
+    branch: &str,
+) -> Result<git2::Repository, ErrorPayload> {
+    let mut callbacks = git2::RemoteCallbacks::new();
+    callbacks.credentials(super::credentials::callback_for_user());
+    let mut fetch = git2::FetchOptions::new();
+    fetch.remote_callbacks(callbacks);
+
+    let mut builder = git2::build::RepoBuilder::new();
+    builder.bare(bare).fetch_options(fetch);
+    if !bare && !branch.is_empty() {
+        builder.branch(branch);
+    }
+    Ok(builder.clone(url, destination)?)
+}
+
 pub fn init(path: &Path, opts: &InitOptions) -> Result<git2::Repository, ErrorPayload> {
     let mut init = git2::RepositoryInitOptions::new();
     init.bare(opts.bare)
@@ -1258,5 +1287,86 @@ mod tests {
         let written = std::fs::read_to_string(repo.path().join("description")).unwrap();
         assert_eq!(written, "Hello\n");
         std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // --- clone -------------------------------------------------------------
+
+    /// A source repository with one commit on `main` and one on `topic`.
+    fn clone_source(tag: &str) -> std::path::PathBuf {
+        let dir = temp_dir(tag);
+        let repo = init_repo(&dir);
+        let first = commit_file(&repo, "a.txt", "one", ("Ada", "ada@example.com"));
+        let commit = repo.find_commit(first).unwrap();
+        repo.branch("topic", &commit, false).unwrap();
+        dir
+    }
+
+    #[test]
+    fn clone_copies_the_history_and_checks_out_the_default_branch() {
+        let source = clone_source("clone-src");
+        let dest = temp_dir("clone-dest").join("copy");
+
+        let cloned = clone(source.to_str().unwrap(), &dest, false, "").expect("clone");
+
+        assert!(!cloned.is_bare());
+        assert_eq!(std::fs::read_to_string(dest.join("a.txt")).unwrap(), "one");
+        assert_eq!(cloned.head().unwrap().shorthand().unwrap(), "main");
+        assert!(
+            cloned
+                .find_branch("origin/topic", git2::BranchType::Remote)
+                .is_ok(),
+            "the other branches arrive as remote-tracking refs"
+        );
+        let _ = std::fs::remove_dir_all(&source);
+        let _ = std::fs::remove_dir_all(dest.parent().unwrap());
+    }
+
+    #[test]
+    fn clone_can_check_out_a_named_branch() {
+        let source = clone_source("clone-branch-src");
+        let dest = temp_dir("clone-branch-dest").join("copy");
+
+        let cloned = clone(source.to_str().unwrap(), &dest, false, "topic").expect("clone");
+
+        assert_eq!(cloned.head().unwrap().shorthand().unwrap(), "topic");
+        let _ = std::fs::remove_dir_all(&source);
+        let _ = std::fs::remove_dir_all(dest.parent().unwrap());
+    }
+
+    #[test]
+    fn clone_of_a_branch_the_remote_lacks_fails_rather_than_falling_back() {
+        // libgit2 does not quietly use the remote HEAD when the named branch is
+        // missing. The command's old comment claimed it did; this pins the truth.
+        let source = clone_source("clone-missing-src");
+        let dest = temp_dir("clone-missing-dest").join("copy");
+
+        let result = clone(source.to_str().unwrap(), &dest, false, "no-such-branch");
+
+        assert!(result.is_err());
+        let _ = std::fs::remove_dir_all(&source);
+        let _ = std::fs::remove_dir_all(dest.parent().unwrap());
+    }
+
+    #[test]
+    fn a_bare_clone_has_no_working_tree() {
+        let source = clone_source("clone-bare-src");
+        let dest = temp_dir("clone-bare-dest").join("copy.git");
+
+        let cloned = clone(source.to_str().unwrap(), &dest, true, "").expect("clone");
+
+        assert!(cloned.is_bare());
+        assert!(!dest.join("a.txt").exists());
+        let _ = std::fs::remove_dir_all(&source);
+        let _ = std::fs::remove_dir_all(dest.parent().unwrap());
+    }
+
+    #[test]
+    fn clone_from_a_path_that_is_not_a_repository_reports_an_error() {
+        let not_a_repo = temp_dir("clone-nothing");
+        let dest = temp_dir("clone-nothing-dest").join("copy");
+
+        assert!(clone(not_a_repo.to_str().unwrap(), &dest, false, "").is_err());
+        let _ = std::fs::remove_dir_all(&not_a_repo);
+        let _ = std::fs::remove_dir_all(dest.parent().unwrap());
     }
 }

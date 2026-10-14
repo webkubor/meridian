@@ -43,7 +43,7 @@ function choose(verbId: string, optionId: string): void {
 </script>
 
 <template>
-  <div class="toolbar" role="toolbar" aria-label="Repository actions">
+  <div class="toolbar" role="toolbar" :aria-label="$t('toolbar.ariaLabel')">
     <div class="verb-group">
       <SplitAction
         v-for="verb in globalVerbs"
@@ -58,7 +58,7 @@ function choose(verbId: string, optionId: string): void {
         @run="run(verb.id)"
         @choose="choose(verb.id, $event)"
       />
-      <span v-if="globalVerbs.length === 0" class="toolbar-empty">No repository actions available.</span>
+      <span v-if="globalVerbs.length === 0" class="toolbar-empty">{{ $t('toolbar.empty') }}</span>
     </div>
 
     <span class="toolbar-spacer" />
@@ -81,15 +81,15 @@ function choose(verbId: string, optionId: string): void {
         type="button"
         class="activity-chip"
         :class="{ stalled: activity.stalled }"
-        aria-label="Open the activity list"
-        :disabled="activity.unavailable"
-        :title="activity.unavailable ? activity.unavailableReason : 'Activity'"
+        :aria-label="$t('toolbar.activityOpen')"
+        :disabled="false"
+        :title="activity.unavailable ? activity.unavailableReason : $t('toolbar.activity')"
         @click="emit('openActivity')"
       >
         <ProgressTrack
           v-if="activity.busy"
           :state="activity.stalled ? 'stalled' : 'indeterminate'"
-          :phase="activity.stalled ? 'Stalled' : null"
+          :phase="activity.stalled ? $t('toolbar.stalled') : null"
           class="chip-progress"
         />
         <template v-else>

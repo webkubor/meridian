@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { SplitActionOption } from "../contracts";
 import type { StatusSummary } from "../../bridges/bindings";
@@ -15,6 +16,8 @@ import SwitchToggle from "../common/SwitchToggle.vue";
  * (Commit, with Commit & Push / Commit & … in the caret), and it stays
  * disabled — with a reason — until there is something staged and a subject.
  */
+const { t } = useI18n();
+
 const props = withDefaults(
   defineProps<{
     subject: string;
@@ -69,17 +72,22 @@ const canCommit = computed(
       : props.subject.trim() !== "" && stagedCount.value > 0),
 );
 
+/**
+ * The disabled button's explanation. These are catalogue keys rather than
+ * literals because they are the only thing a user learns about *why* the commit
+ * cannot be made — the sentence has to be in their language.
+ */
 const disabledReason = computed(() => {
-  if (props.busy) return "A commit is already running.";
+  if (props.busy) return t("commit.reasonBusy");
   if (props.amend) {
-    if (!props.canAmend) return "There is no commit to amend.";
+    if (!props.canAmend) return t("commit.reasonNoCommitToAmend");
     if (props.subject.trim() === "" && stagedCount.value === 0) {
-      return "Change the message or stage some changes to amend.";
+      return t("commit.reasonAmendNeedsChange");
     }
     return undefined;
   }
-  if (props.subject.trim() === "") return "Enter a commit subject.";
-  if (stagedCount.value === 0) return "Stage some changes to commit.";
+  if (props.subject.trim() === "") return t("commit.reasonEnterSubject");
+  if (stagedCount.value === 0) return t("commit.reasonStageToCommit");
   return undefined;
 });
 
@@ -95,21 +103,21 @@ function onBodyInput(event: Event): void {
 <template>
   <section class="composer">
     <header class="composer-head">
-      <span class="composer-title">{{ amend ? "Amend commit" : "Commit" }}</span>
+      <span class="composer-title">{{ amend ? t("commit.amendTitle") : t("commit.submit") }}</span>
       <span class="composer-scope">
         <span class="scope-chip staged">
           <Icon name="checkmark.circle" :size="11" />
-          {{ stagedCount }} staged
+          {{ t("commit.stagedCount", { count: stagedCount }) }}
         </span>
         <span v-if="unstagedCount > 0" class="scope-chip">
-          {{ unstagedCount }} unstaged
+          {{ t("commit.unstagedCount", { count: unstagedCount }) }}
         </span>
       </span>
       <span class="composer-spacer" />
       <span v-if="hooksEnabled" class="hook-chip" :class="{ running: hookRunning }">
         <Icon name="bolt" :size="11" />
-        <template v-if="hookRunning">{{ hookPhase ?? "Running hook" }}</template>
-        <template v-else>Hooks on</template>
+        <template v-if="hookRunning">{{ hookPhase ?? t("commit.runningHook") }}</template>
+        <template v-else>{{ t("commit.hooksOn") }}</template>
       </span>
     </header>
 
@@ -122,8 +130,8 @@ function onBodyInput(event: Event): void {
         class="composer-subject"
         type="text"
         :value="subject"
-        :placeholder="amend ? 'Amend the last commit' : 'Commit subject'"
-        aria-label="Commit subject"
+        :placeholder="amend ? t('commit.amendPlaceholder') : t('commit.subjectPlaceholder')"
+        :aria-label="t('commit.subjectLabel')"
         spellcheck="false"
         @input="onSubjectInput"
         @keydown.meta.enter="canCommit && emit('commit')"
@@ -133,8 +141,8 @@ function onBodyInput(event: Event): void {
         class="composer-body"
         :value="body"
         rows="4"
-        placeholder="Describe the change (optional)"
-        aria-label="Commit body"
+        :placeholder="t('commit.bodyPlaceholder')"
+        :aria-label="t('commit.bodyLabel')"
         @input="onBodyInput"
       />
       <button
@@ -144,13 +152,13 @@ function onBodyInput(event: Event): void {
         @click="bodyOpen = true"
       >
         <Icon name="text.alignleft" :size="12" />
-        Add a description
+        {{ t("commit.addDescription") }}
       </button>
     </div>
 
     <p v-if="unchangedMessage" class="composer-warn" role="status">
       <Icon name="exclamationmark.triangle" :size="12" />
-      The message is unchanged since the last attempt.
+      {{ t("commit.unchangedMessage") }}
     </p>
 
     <footer class="composer-foot">
@@ -158,19 +166,19 @@ function onBodyInput(event: Event): void {
         <SwitchToggle
           :model-value="amend"
           :disabled="!canAmend || busy"
-          label="Amend"
+          :label="t('commit.amend')"
           @update:model-value="emit('update:amend', $event)"
         />
         <SwitchToggle
           :model-value="signOff"
           :disabled="busy"
-          label="Sign-off"
+          :label="t('commit.signOff')"
           @update:model-value="emit('update:signOff', $event)"
         />
       </span>
       <span class="composer-spacer" />
       <SplitAction
-        :label="amend ? 'Amend' : 'Commit'"
+        :label="amend ? t('commit.amend') : t('commit.submit')"
         icon="checkmark.circle"
         :disabled="!canCommit"
         :reason="disabledReason"

@@ -68,13 +68,17 @@ const filteredGroups = computed(() => {
     .filter((group) => group.rows.length > 0);
 });
 
-const APPEARANCE_OPTIONS = [
-  { id: "auto", label: "Auto" },
-  { id: "light", label: "Light" },
-  { id: "dark", label: "Dark" },
-];
+/**
+ * Both switchers build their labels through `t`, so both have to be
+ * `computed`: a plain array would freeze the labels at mount and leave the
+ * control showing the language that was active when the window opened.
+ */
+const APPEARANCE_OPTIONS = computed(() => [
+  { id: "auto", label: t("screens.settings.appearanceAuto") },
+  { id: "light", label: t("screens.settings.appearanceLight") },
+  { id: "dark", label: t("screens.settings.appearanceDark") },
+]);
 
-/** `computed` so the switcher's own labels follow the language it switches. */
 const LANGUAGE_OPTIONS = computed(() =>
   LOCALES.map((locale) => ({
     id: locale,
@@ -103,7 +107,7 @@ function onEnum(row: SettingRowModel, event: Event): void {
 
 <template>
   <div class="settings">
-    <nav class="settings-tabs" aria-label="Settings sections">
+    <nav class="settings-tabs" :aria-label="$t('screens.settings.sectionsLabel')">
       <button
         v-for="tab in tabs"
         :key="tab.id"
@@ -115,20 +119,20 @@ function onEnum(row: SettingRowModel, event: Event): void {
       >
         <Icon :name="tab.icon" :size="14" />
         <span class="settings-tab-label">{{ tab.label }}</span>
-        <span v-if="tab.source === 'shell'" class="settings-shell-chip">Shell</span>
+        <span v-if="tab.source === 'shell'" class="settings-shell-chip">{{ $t('screens.settings.shellChip') }}</span>
       </button>
     </nav>
 
     <div class="settings-body">
       <header class="settings-head">
-        <h1 class="settings-title">{{ active?.label ?? "Settings" }}</h1>
+        <h1 class="settings-title">{{ active?.label ?? $t('screens.settings.title') }}</h1>
         <span class="settings-spacer" />
         <input
           class="settings-search"
           type="search"
           :value="search"
-          placeholder="Search settings"
-          aria-label="Search settings"
+          :placeholder="$t('screens.settings.searchPlaceholder')"
+          :aria-label="$t('screens.settings.searchLabel')"
           @input="emit('update:search', ($event.target as HTMLInputElement).value)"
         />
       </header>
@@ -136,36 +140,36 @@ function onEnum(row: SettingRowModel, event: Event): void {
       <EmptyState
         v-if="document.status === 'loading'"
         icon="hourglass"
-        title="Loading settings…"
+        :title="$t('screens.settings.loading')"
         compact
       />
       <EmptyState
         v-else-if="document.status === 'error'"
         icon="exclamationmark.circle"
         :title="document.error.message"
-        action-label="Try again"
+        :action-label="$t('screens.settings.tryAgain')"
         compact
         @action="emit('refresh')"
       />
       <EmptyState
         v-else-if="!active"
         icon="nav.settings"
-        title="Nothing to configure yet"
-        caption="Settings become available as the backend commands land."
+        :title="$t('screens.settings.emptyTitle')"
+        :caption="$t('screens.settings.emptyCaption')"
       />
 
       <div v-else class="settings-scroll">
         <section v-if="active.id === 'appearance'" class="settings-group">
-          <h2 class="group-title">Theme</h2>
+          <h2 class="group-title">{{ $t('screens.settings.theme') }}</h2>
           <div class="setting-row">
             <div class="row-labels">
-              <span class="row-label">Appearance</span>
-              <span class="row-help">Follows the system unless you pick a theme.</span>
+              <span class="row-label">{{ $t('screens.settings.appearance') }}</span>
+              <span class="row-help">{{ $t('screens.settings.appearanceHelp') }}</span>
             </div>
             <SegmentedControl
               :model-value="themeMode"
               :options="APPEARANCE_OPTIONS"
-              label="Appearance"
+              :label="$t('screens.settings.appearance')"
               @update:model-value="emit('update:themeMode', $event as AppearanceMode)"
             />
           </div>
@@ -194,7 +198,7 @@ function onEnum(row: SettingRowModel, event: Event): void {
             <div class="row-labels">
               <span class="row-label">
                 {{ row.label }}
-                <span v-if="row.shellOwned" class="settings-shell-chip">Shell</span>
+                <span v-if="row.shellOwned" class="settings-shell-chip">{{ $t('screens.settings.shellChip') }}</span>
               </span>
               <span v-if="row.help" class="row-help">{{ row.help }}</span>
             </div>
@@ -250,7 +254,7 @@ function onEnum(row: SettingRowModel, event: Event): void {
                   @change="onText(row, $event)"
                 />
                 <button type="button" class="control-browse" @click="emit('choosePath', row.key)">
-                  Choose…
+                  {{ $t('screens.choose') }}
                 </button>
               </span>
 
@@ -277,22 +281,22 @@ function onEnum(row: SettingRowModel, event: Event): void {
                 v-if="row.defaultValue !== undefined && row.value !== row.defaultValue"
                 type="button"
                 class="row-reset"
-                title="Reset to the default"
+                :title="$t('screens.settings.resetTitle')"
                 @click="emit('reset', row.key)"
               >
-                Reset
+                {{ $t('screens.settings.reset') }}
               </button>
             </div>
           </div>
 
-          <p v-if="group.rows.length === 0" class="group-empty">No matching settings.</p>
+          <p v-if="group.rows.length === 0" class="group-empty">{{ $t('screens.settings.noMatchingGroup') }}</p>
         </section>
 
         <EmptyState
           v-if="filteredGroups.length === 0 && active.id !== 'appearance'"
           icon="magnifyingglass"
-          title="No matching settings"
-          :caption="`Nothing matches “${search}”.`"
+          :title="$t('screens.settings.noMatchingTitle')"
+          :caption="$t('screens.settings.nothingMatches', { query: search })"
           compact
         />
       </div>

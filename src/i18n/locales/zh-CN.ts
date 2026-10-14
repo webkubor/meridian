@@ -8,9 +8,18 @@
  *      checkout 签出 · remote 远程 · release 版本发布 · issue 议题
  */
 
+import diffZh from "./parts/zh-CN/diff";
+import panesZh from "./parts/zh-CN/panes";
+import shellZh from "./parts/zh-CN/shell";
 import type { Catalog } from "./en";
 
 const zhCN: Catalog = {
+  // Slices, kept as their own files so three parts of the UI can be
+  // translated without three people editing the same object literal.
+  ...diffZh,
+  ...panesZh,
+  ...shellZh,
+
   app: {
     name: "Meridian",
     // The name's own meaning, not a translation of the English line: a meridian

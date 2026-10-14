@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { RepoSummaryModel } from "../contracts";
 import { WORKSPACE_TABS, type WorkspaceTab } from "../../router/routes";
@@ -24,22 +25,34 @@ const emit = defineEmits<{
   abortOperation: [];
 }>();
 
+const { t } = useI18n();
+
+/**
+ * Tab names come from `entry.labelKey`, not `entry.label`: the route table owns
+ * one id → catalogue-key map so the command switch and this tab bar cannot
+ * drift into two names for the same tab.
+ */
+
+/** Shared with `RepoSwitcher`: one word for "a git operation is running". */
 const stateLabel = computed<string | null>(() => {
   const state = props.summary?.state;
   if (!state || state === "clean") return null;
-  if (state === "merge") return "Merging";
-  if (state === "rebase" || state === "rebaseMerge" || state === "rebaseInteractive") return "Rebasing";
-  if (state === "cherryPick" || state === "cherryPickSequence") return "Cherry-picking";
-  if (state === "revert" || state === "revertSequence") return "Reverting";
-  if (state === "bisect") return "Bisecting";
-  if (state === "applyMailbox" || state === "applyMailboxOrRebase") return "Applying patches";
-  return "Operation in progress";
+  if (state === "merge") return t("screens.operation.state.merging");
+  if (state === "rebase" || state === "rebaseMerge" || state === "rebaseInteractive")
+    return t("screens.operation.state.rebasing");
+  if (state === "cherryPick" || state === "cherryPickSequence")
+    return t("screens.operation.state.cherryPicking");
+  if (state === "revert" || state === "revertSequence") return t("screens.operation.state.reverting");
+  if (state === "bisect") return t("screens.operation.state.bisecting");
+  if (state === "applyMailbox" || state === "applyMailboxOrRebase")
+    return t("screens.operation.state.applyingPatches");
+  return t("screens.operation.state.inProgress");
 });
 </script>
 
 <template>
   <div class="repo-screen">
-    <nav v-if="summary" class="workspace-tabs" role="tablist" aria-label="Repository view">
+    <nav v-if="summary" class="workspace-tabs" role="tablist" :aria-label="$t('screens.repository.tabsLabel')">
       <button
         v-for="entry in WORKSPACE_TABS"
         :key="entry.id"
@@ -51,16 +64,20 @@ const stateLabel = computed<string | null>(() => {
         @click="emit('update:tab', entry.id)"
       >
         <Icon :name="entry.icon" :size="13" />
-        {{ entry.label }}
+        {{ $t(entry.labelKey) }}
       </button>
     </nav>
 
     <div v-if="stateLabel" class="integration-banner" role="status">
       <Icon name="exclamationmark.triangle" :size="13" />
-      <span>{{ stateLabel }}. Finish or abort the operation to continue.</span>
+      <span>{{ $t('screens.operation.bannerHint', { state: stateLabel }) }}</span>
       <span class="banner-spacer" />
-      <button type="button" class="banner-verb" @click="emit('continueOperation')">Continue</button>
-      <button type="button" class="banner-verb danger" @click="emit('abortOperation')">Abort</button>
+      <button type="button" class="banner-verb" @click="emit('continueOperation')">
+        {{ $t('screens.operation.continue') }}
+      </button>
+      <button type="button" class="banner-verb danger" @click="emit('abortOperation')">
+        {{ $t('screens.operation.abort') }}
+      </button>
     </div>
 
     <div class="workspace-body">
@@ -74,8 +91,8 @@ const stateLabel = computed<string | null>(() => {
       <EmptyState
         v-else
         icon="empty.noRepositorySelected"
-        title="No repository open"
-        caption="Open a repository from the repository list."
+        :title="$t('screens.repository.noRepositoryOpen')"
+        :caption="$t('screens.repository.noRepositoryCaption')"
       />
     </div>
   </div>

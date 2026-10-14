@@ -10,10 +10,10 @@
  * chip and reports it back to the canvas as `hoveredChip`.
  */
 import { computed, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
 import { CommitGraphCell, hitTestStrip, type GraphDensity, type GraphMetrics, type GraphTheme } from "../graph";
 import { formatExact, formatWhen, type CommitDisplayRow, type RowGraph } from "./rows";
-import { commitListStrings } from "./strings";
 
 const props = defineProps<{
   row: CommitDisplayRow;
@@ -43,6 +43,8 @@ const emit = defineEmits<{
 const element = ref<HTMLElement | null>(null);
 const hoveredChip = ref(-1);
 
+const { t } = useI18n();
+
 watch(
   () => props.graph?.strip,
   () => {
@@ -68,11 +70,21 @@ const title = computed(() => chip.value?.badge.ref ?? chip.value?.badge.label ??
 
 const ariaLabel = computed(() => {
   if (!commit.value) return undefined;
-  return commitListStrings.rowLabel(
-    commit.value.summary,
-    commit.value.author.name,
-    formatExact(commit.value.committer.time),
-  );
+  const base = t("commitList.rowLabel", {
+    summary: commit.value.summary,
+    author: commit.value.author.name,
+    when: formatExact(commit.value.committer.time),
+  });
+  // The graph cell is `aria-hidden`, so a merge or a fork point is otherwise
+  // invisible to a screen reader: the row's label is the only place the row's
+  // position in the graph can be announced.
+  const shape =
+    props.row.kind === "merge"
+      ? t("graph.merge")
+      : props.row.kind === "forkPoint"
+        ? t("graph.forkPoint")
+        : null;
+  return shape === null ? base : `${base} (${shape})`;
 });
 
 const style = computed(() => ({
@@ -140,7 +152,7 @@ function onLeave(): void {
     role="presentation"
     aria-hidden="true"
     :style="style"
-    :aria-label="commitListStrings.skeletonAria"
+    :aria-label="t('commitList.skeletonAria')"
   >
     <span class="skeleton-bar bar-graph" />
     <span class="skeleton-bar bar-text" />
@@ -186,7 +198,7 @@ function onLeave(): void {
     />
     <div class="commit-text" :style="{ paddingLeft: `${graph ? graph.inset : 0}px` }">
       <span class="commit-summary">{{ commit?.summary }}</span>
-      <span v-if="row.kind === 'forkPoint'" class="fork-chip">{{ commitListStrings.forkPointBadge }}</span>
+      <span v-if="row.kind === 'forkPoint'" class="fork-chip">{{ t("graph.forkPoint") }}</span>
       <span class="commit-spacer" />
       <span class="commit-author">{{ commit?.author.name }}</span>
       <span class="commit-when">{{ when }}</span>

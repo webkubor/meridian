@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { PaletteItemModel } from "../contracts";
 import Icon from "../common/Icon.vue";
@@ -22,8 +23,11 @@ const props = withDefaults(
     heading?: string;
   }>(),
   {
-    placeholder: "Search…",
-    emptyText: "No matches",
+    // Left undefined on purpose: a `withDefaults` default is frozen at mount,
+    // and the palette is long-lived — it must relabel itself on a language
+    // switch. Resolved in computed props below.
+    placeholder: undefined,
+    emptyText: undefined,
     heading: "",
   },
 );
@@ -33,6 +37,11 @@ const emit = defineEmits<{
   select: [id: string];
   close: [];
 }>();
+
+const { t } = useI18n();
+
+const placeholderText = computed(() => props.placeholder ?? t("palette.placeholder"));
+const emptyMessage = computed(() => props.emptyText ?? t("palette.empty"));
 
 const input = ref<HTMLInputElement | null>(null);
 const active = ref(0);
@@ -113,7 +122,7 @@ onBeforeUnmount(() => {
 <template>
   <Teleport to="body">
     <div v-if="open" class="palette-backdrop" @pointerdown.self="emit('close')">
-      <div class="palette" role="dialog" aria-modal="true" aria-label="Quick open">
+      <div class="palette" role="dialog" aria-modal="true" :aria-label="$t('palette.label')">
         <div class="palette-search">
           <Icon name="magnifyingglass" :size="14" />
           <input
@@ -121,8 +130,8 @@ onBeforeUnmount(() => {
             type="text"
             class="palette-input"
             :value="query"
-            :placeholder="placeholder"
-            aria-label="Quick open query"
+            :placeholder="placeholderText"
+            :aria-label="$t('palette.queryLabel')"
             spellcheck="false"
             autocapitalize="off"
             autocorrect="off"
@@ -131,7 +140,7 @@ onBeforeUnmount(() => {
           <kbd class="palette-esc">esc</kbd>
         </div>
 
-        <div class="palette-results" role="listbox" :aria-label="heading || 'Results'">
+        <div class="palette-results" role="listbox" :aria-label="heading || $t('palette.resultsLabel')">
           <template v-for="entry in groups" :key="entry.group">
             <p class="palette-group">{{ entry.group }}</p>
             <button
@@ -152,7 +161,7 @@ onBeforeUnmount(() => {
               <span v-if="item.detail" class="palette-item-detail">{{ item.detail }}</span>
             </button>
           </template>
-          <p v-if="flat.length === 0" class="palette-empty">{{ emptyText }}</p>
+          <p v-if="flat.length === 0" class="palette-empty">{{ emptyMessage }}</p>
         </div>
       </div>
     </div>

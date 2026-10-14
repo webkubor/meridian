@@ -528,3 +528,70 @@ pub async fn history_file_history_load(
 ) -> Result<Vec<FileRevision>, ErrorPayload> {
     state.run(&app, args).await
 }
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HistoryMergeBase {
+    pub repo: RepoId,
+    pub left: Revision,
+    pub right: Revision,
+}
+
+/// The newest commit reachable from both revisions — `git merge-base`.
+///
+/// It exists because the compare screen has to be able to say the truth about
+/// where two branches diverged. Without it the pane has two honest options,
+/// both bad: show nothing, or show the newest commit of one side and imply it
+/// is the fork point, and how far each side is from it. git2 answers all three
+/// in one call, so there is no case for guessing any of them.
+///
+/// A `None` merge base is a real answer, not a failure: two unrelated histories
+/// have no fork point, and that is exactly what the user needs to be told.
+#[tauri::command]
+pub async fn history_merge_base(
+    state: State<'_, AppState>,
+    app: AppHandle,
+    args: HistoryMergeBase,
+) -> Result<HistoryCompareSummary, ErrorPayload> {
+    state.run(&app, args).await
+}
+
+#[derive(Clone, Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HistoryCompareSummary {
+    pub merge_base: Option<String>,
+    /// Commits reachable from `right` and not `left`.
+    pub ahead: usize,
+    /// Commits reachable from `left` and not `right`.
+    pub behind: usize,
+}
+
+impl Command for HistoryMergeBase {
+    type Output = HistoryCompareSummary;
+
+    fn repo_id(&self) -> RepoId {
+        self.repo.clone()
+    }
+
+    fn validate(&self, cx: &ValidateCx<'_>) -> Result<(), Violation> {
+        for revision in [&self.left, &self.right] {
+            engine::history::resolve(cx.repo, revision).map_err(|err| {
+                Violation::new(ErrorCode::UnknownRevision, err.message)
+                    .with_param("revision", revision_spec(revision))
+            })?;
+        }
+        Ok(())
+    }
+
+    fn execute(self, cx: &ExecCx<'_>) -> Result<Self::Output, ErrorPayload> {
+        let (merge_base, left_only, right_only) =
+            engine::history::compare(cx.repo, &self.left, &self.right)?;
+        Ok(HistoryCompareSummary {
+            merge_base,
+            // Ahead is what the *right* side has that the left lacks: the
+            // screen reads "left is the base, right is what is being compared".
+            ahead: right_only,
+            behind: left_only,
+        })
+    }
+}

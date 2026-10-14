@@ -141,6 +141,13 @@ export interface CommitPage {
   truncated: boolean;
 }
 
+/** Exact ahead/behind counts and merge base between two revisions. */
+export interface CompareSummary {
+  mergeBase: string | null;
+  ahead: number;
+  behind: number;
+}
+
 export type HistorySort = "date" | "topo";
 
 /** Which part of a row `history_commits_load`'s `search` matches (Rust `SearchMode`). */
@@ -173,6 +180,35 @@ export interface RepositoryInitOptions {
   bare?: boolean;
   initialBranch?: string;
   createGitignore?: boolean;
+}
+
+/**
+ * A repository found by `repository_discover` — one row of "found nearby".
+ *
+ * `RepoRoot` is deliberately not `RepoInfo`: nothing is open yet, so there is
+ * no `id` and nothing to run a command against. Opening it is what turns a
+ * root into a repository.
+ */
+export interface RepoRoot {
+  name: string;
+  path: string;
+  gitdir: string;
+  workdir: string | null;
+  isBare: boolean;
+  isWorktree: boolean;
+}
+
+export interface RepositoryDiscoverOptions {
+  /** Depth below the root to inspect; `0` means no limit. */
+  maxDepth?: number;
+  /** Directory names never entered, exact matches. */
+  ignored?: string[];
+}
+
+export interface RepositoryCloneOptions {
+  destination?: string;
+  bare?: boolean;
+  initialBranch?: string;
 }
 
 export interface WcStatusOptions {

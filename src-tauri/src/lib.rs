@@ -45,6 +45,7 @@ pub fn run() {
         // tauri.conf.json carries a public key.
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(state::AppState::new())
         .invoke_handler(tauri::generate_handler![
@@ -55,11 +56,14 @@ pub fn run() {
             commands::app_release_notes_load,
             commands::app_update_check,
             commands::app_update_install,
+            commands::app_pick_directory,
             commands::app_relaunch,
             commands::app_feedback_compose,
             // --- repository -------------------------------------------------
             commands::repository_open,
             commands::repository_init,
+            commands::repository_clone,
+            commands::repository_clone_suggest_destination,
             commands::repository_discover,
             commands::repository_validate_path,
             commands::repository_refresh,
@@ -99,6 +103,7 @@ pub fn run() {
             commands::history_commit_load,
             commands::history_commit_hashes_load,
             commands::history_count_load,
+            commands::history_merge_base,
             commands::history_graph_compute,
             commands::history_changeset_load,
             commands::history_contributors_load,

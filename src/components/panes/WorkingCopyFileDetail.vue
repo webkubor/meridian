@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
+
 import type { EntryStatus } from "../../bridges/bindings";
 import type {
   DiffDocument,
@@ -20,6 +22,8 @@ import StatusGlyph from "../common/StatusGlyph.vue";
  * diff itself is `<DiffViewer>`; this component only supplies it the document
  * and the entry context.
  */
+const { t } = useI18n();
+
 withDefaults(
   defineProps<{
     entry: EntryStatus | null;
@@ -61,20 +65,25 @@ function stagedFor(entry: EntryStatus | null): boolean {
           v-if="entry.code === 'unmerged'"
           type="button"
           class="bar-action"
-          title="Open the merge tool for this file"
+          :title="t('workingCopy.openMergeTool')"
           @click="emit('resolveConflict', entry.path)"
         >
           <Icon name="arrow.triangle.merge" :size="13" />
-          Resolve
-        </button>
-        <button type="button" class="bar-action" title="Blame this file" @click="emit('openBlame', entry.path)">
-          <Icon name="signature" :size="13" />
-          Blame
+          {{ t("workingCopy.resolve") }}
         </button>
         <button
           type="button"
           class="bar-action"
-          title="Open in the default editor"
+          :title="t('workingCopy.blameThisFile')"
+          @click="emit('openBlame', entry.path)"
+        >
+          <Icon name="signature" :size="13" />
+          {{ t("workingCopy.blame") }}
+        </button>
+        <button
+          type="button"
+          class="bar-action"
+          :title="t('workingCopy.openInEditor')"
           @click="emit('openInEditor', entry.path)"
         >
           <Icon name="arrow.up.forward.square" :size="13" />
@@ -87,11 +96,11 @@ function stagedFor(entry: EntryStatus | null): boolean {
           @click="emit('unstage', entry.path)"
         >
           <Icon name="minus.circle" :size="13" />
-          Unstage
+          {{ t("workingCopy.unstage") }}
         </button>
         <button v-else type="button" class="bar-action" @click="emit('stage', entry.path)">
           <Icon name="plus.circle" :size="13" />
-          Stage
+          {{ t("workingCopy.stage") }}
         </button>
         <button
           v-if="!stagedFor(entry) && entry.code !== 'unmerged'"
@@ -100,21 +109,21 @@ function stagedFor(entry: EntryStatus | null): boolean {
           @click="emit('discard', entry.path)"
         >
           <Icon name="arrow.uturn.backward" :size="12" />
-          Discard
+          {{ t("workingCopy.discard") }}
         </button>
       </header>
 
       <div v-if="entry.code === 'unmerged'" class="conflict-note" role="status">
         <Icon name="exclamationmark.triangle" :size="13" />
-        <span>This file has conflicts. Hunk staging is disabled until it is resolved.</span>
+        <span>{{ t("workingCopy.conflictNote") }}</span>
       </div>
     </template>
 
     <EmptyState
       v-else
       icon="empty.noFileSelected"
-      title="No file selected"
-      caption="Choose a file from the list to see its changes."
+      :title="t('workingCopy.noFileSelected')"
+      :caption="t('workingCopy.noFileSelectedCaption')"
     />
 
     <DiffViewer

@@ -59,7 +59,7 @@ function onContextMenu(event: MouseEvent): void {
       v-if="row.hasOptions"
       type="button"
       class="row-options"
-      :aria-label="`Options for ${row.label}`"
+      :aria-label="$t('sidebar.rowOptions', { name: row.label })"
       @click="emit('options', row.id)"
     >
       <Icon name="ellipsis" :size="14" />

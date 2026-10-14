@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { Changeset, ChangesetEntry } from "../contracts";
 import type { UiStatusView } from "../../bridges/bindings";
@@ -11,6 +12,8 @@ import VirtualList from "../common/VirtualList.vue";
  * A flat, virtualised list of `path  +A −D`, each row carrying its status
  * glyph. Renames show `old → new`; the row reports selection upward.
  */
+const { t } = useI18n();
+
 const props = withDefaults(
   defineProps<{
     changeset: Changeset;
@@ -27,16 +30,26 @@ const emit = defineEmits<{
   activate: [path: string];
 }>();
 
-const VIEW_BY_STATUS: Record<ChangesetEntry["status"], UiStatusView> = {
-  added: { short: "A", text: "Added", tone: "positive" },
-  copied: { short: "C", text: "Copied", tone: "positive" },
-  deleted: { short: "D", text: "Deleted", tone: "danger" },
-  modified: { short: "M", text: "Modified", tone: "info" },
-  renamed: { short: "R", text: "Renamed", tone: "positive" },
-  unmerged: { short: "U", text: "Unmerged", tone: "danger" },
-  untracked: { short: "?", text: "Untracked", tone: "muted" },
-  ignored: { short: "!", text: "Ignored", tone: "muted" },
+/**
+ * `short` stays the git porcelain letter in every language — it is the glyph
+ * users already read out of `git status` — while `text` is prose and therefore
+ * localised at render time.
+ */
+const VIEW_BY_STATUS: Record<ChangesetEntry["status"], Omit<UiStatusView, "text"> & { text: string }> = {
+  added: { short: "A", text: "commit.statusAdded", tone: "positive" },
+  copied: { short: "C", text: "commit.statusCopied", tone: "positive" },
+  deleted: { short: "D", text: "commit.statusDeleted", tone: "danger" },
+  modified: { short: "M", text: "commit.statusModified", tone: "info" },
+  renamed: { short: "R", text: "commit.statusRenamed", tone: "positive" },
+  unmerged: { short: "U", text: "commit.statusUnmerged", tone: "danger" },
+  untracked: { short: "?", text: "commit.statusUntracked", tone: "muted" },
+  ignored: { short: "!", text: "commit.statusIgnored", tone: "muted" },
 };
+
+function statusView(status: ChangesetEntry["status"]): UiStatusView {
+  const view = VIEW_BY_STATUS[status];
+  return { short: view.short, text: t(view.text), tone: view.tone };
+}
 
 const entries = computed(() => props.changeset.entries);
 
@@ -49,7 +62,7 @@ function labelOf(entry: ChangesetEntry): string {
 <template>
   <div class="changeset">
     <header v-if="showSummary" class="changeset-summary">
-      <span class="summary-files">{{ changeset.stats.files }} files</span>
+      <span class="summary-files">{{ t("commit.filesChanged", { count: changeset.stats.files }, changeset.stats.files) }}</span>
       <span class="summary-add">+{{ changeset.stats.additions }}</span>
       <span class="summary-del">−{{ changeset.stats.deletions }}</span>
     </header>
@@ -66,11 +79,11 @@ function labelOf(entry: ChangesetEntry): string {
           @contextmenu.prevent="emit('contextmenu', entries[index].path, $event)"
         >
           <StatusGlyph
-            :view="VIEW_BY_STATUS[entries[index].status]"
+            :view="statusView(entries[index].status)"
             :code="entries[index].status"
           />
           <span class="changeset-path" :title="labelOf(entries[index])">{{ labelOf(entries[index]) }}</span>
-          <span v-if="entries[index].binary" class="changeset-binary">binary</span>
+          <span v-if="entries[index].binary" class="changeset-binary">{{ t("commit.binary") }}</span>
           <span v-else class="changeset-counts">
             <span class="count-add">+{{ entries[index].additions }}</span>
             <span class="count-del">−{{ entries[index].deletions }}</span>

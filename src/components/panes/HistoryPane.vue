@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { CommitInfo } from "../../bridges/bindings";
 import type {
@@ -21,6 +22,8 @@ import { VirtualCommitList } from "../commit-list";
  * graph painting, paging) is the commit-list module's; this pane owns the
  * chrome, the filter model, and the four-state shell.
  */
+const { t } = useI18n();
+
 const props = withDefaults(
   defineProps<{
     state: LoadState<CommitInfo[]>;
@@ -70,49 +73,52 @@ const emit = defineEmits<{
   refresh: [];
 }>();
 
+// Option labels are held as catalogue keys, not resolved strings: the select
+// and the filter menu both read them inside render/computed context, so a
+// language switch has to pick them up without a reload.
 const TYPE_OPTIONS: { id: HistorySearchModel["type"]; label: string }[] = [
-  { id: "all", label: "All commits" },
-  { id: "merges", label: "Merge commits" },
-  { id: "nonMerges", label: "Non-merge commits" },
+  { id: "all", label: "history.typeAll" },
+  { id: "merges", label: "history.typeMerges" },
+  { id: "nonMerges", label: "history.typeNonMerges" },
 ];
 
 const filterSections = computed<FilterSectionModel[]>(() => [
   {
     id: "view",
-    label: "View",
+    label: t("history.sectionView"),
     kind: "check",
     options: [
-      { id: "showGraph", label: "Show graph", checked: props.view.showGraph },
-      { id: "firstParent", label: "First-parent only", checked: props.view.firstParent },
+      { id: "showGraph", label: t("history.showGraph"), checked: props.view.showGraph },
+      { id: "firstParent", label: t("history.firstParentOnly"), checked: props.view.firstParent },
     ],
   },
   {
     id: "density",
-    label: "Density",
+    label: t("history.sectionDensity"),
     kind: "radio",
     options: [
-      { id: "density:compact", label: "Compact", checked: props.view.density === "compact" },
-      { id: "density:regular", label: "Regular", checked: props.view.density === "regular" },
+      { id: "density:compact", label: t("history.densityCompact"), checked: props.view.density === "compact" },
+      { id: "density:regular", label: t("history.densityRegular"), checked: props.view.density === "regular" },
     ],
   },
   {
     id: "grouping",
-    label: "Group by date",
+    label: t("history.sectionGrouping"),
     kind: "radio",
     options: [
-      { id: "grouping:off", label: "Off", checked: props.view.dateGrouping === "off" },
-      { id: "grouping:day", label: "Day", checked: props.view.dateGrouping === "day" },
-      { id: "grouping:week", label: "Week", checked: props.view.dateGrouping === "week" },
-      { id: "grouping:month", label: "Month", checked: props.view.dateGrouping === "month" },
+      { id: "grouping:off", label: t("history.groupingOff"), checked: props.view.dateGrouping === "off" },
+      { id: "grouping:day", label: t("history.groupingDay"), checked: props.view.dateGrouping === "day" },
+      { id: "grouping:week", label: t("history.groupingWeek"), checked: props.view.dateGrouping === "week" },
+      { id: "grouping:month", label: t("history.groupingMonth"), checked: props.view.dateGrouping === "month" },
     ],
   },
   {
     id: "sort",
-    label: "Sort",
+    label: t("history.sectionSort"),
     kind: "radio",
     options: [
-      { id: "sort:date", label: "Date order", checked: props.view.sort === "date" },
-      { id: "sort:topo", label: "Topological", checked: props.view.sort === "topo" },
+      { id: "sort:date", label: t("history.sortDate"), checked: props.view.sort === "date" },
+      { id: "sort:topo", label: t("history.sortTopo"), checked: props.view.sort === "topo" },
     ],
   },
 ]);
@@ -147,25 +153,25 @@ function patchSearch(patch: Partial<HistorySearchModel>): void {
   <ListShell
     :status="state.status"
     empty-icon="empty.noCommitSelected"
-    empty-title="No commits"
-    empty-caption="This repository has no history yet."
+    :empty-title="t('history.emptyTitle')"
+    :empty-caption="t('history.emptyCaption')"
     :error-message="state.status === 'error' ? state.error.message : null"
     :error-detail="state.status === 'error' ? state.error.detail : null"
-    loading-caption="Reading history…"
+    :loading-caption="t('history.loading')"
     @retry="emit('refresh')"
   >
     <template #toolbar>
       <div class="history-toolbar">
         <SearchField
           :model-value="search.text"
-          label="Search commits"
-          placeholder="Search messages, authors, hashes"
+          :label="t('history.searchLabel')"
+          :placeholder="t('history.searchPlaceholder')"
           class="history-search"
           @update:model-value="patchSearch({ text: $event })"
         />
 
         <label class="search-type">
-          <span class="visually-hidden">Commit type</span>
+          <span class="visually-hidden">{{ t("history.typeLabel") }}</span>
           <select
             :value="search.type"
             :disabled="searchActive || !!typeFilterUnavailable"
@@ -173,7 +179,7 @@ function patchSearch(patch: Partial<HistorySearchModel>): void {
             @change="patchSearch({ type: ($event.target as HTMLSelectElement).value as HistorySearchModel['type'] })"
           >
             <option v-for="option in TYPE_OPTIONS" :key="option.id" :value="option.id">
-              {{ option.label }}
+              {{ t(option.label) }}
             </option>
           </select>
         </label>
@@ -184,12 +190,12 @@ function patchSearch(patch: Partial<HistorySearchModel>): void {
           class="history-clear"
           @click="patchSearch({ text: '', author: '' })"
         >
-          Clear
+          {{ t("history.clear") }}
         </button>
 
         <span class="history-spacer" />
         <FilterMenu
-          label="View settings"
+          :label="t('history.viewSettings')"
           :sections="filterSections"
           @toggle="toggleOption"
           @reset="resetView"

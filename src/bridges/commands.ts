@@ -20,6 +20,7 @@ import type {
   CommitOptions,
   CommitPage,
   CommitResult,
+  CompareSummary,
   DiffDocument,
   DiffOptionsWire,
   DiffPerspective,
@@ -41,7 +42,10 @@ import type {
   RemoteFetchMode,
   RepoId,
   RepoInfo,
+  RepoRoot,
   RepositoryInitOptions,
+  RepositoryCloneOptions,
+  RepositoryDiscoverOptions,
   RepositoryRemotes,
   Revision,
   SenderTag,
@@ -65,6 +69,39 @@ export function repositoryInit(
   return invoke<RepoInfo>("repository_init", { args: { path, ...options } });
 }
 
+/** Clones `url` and opens the result. Resolves once the transfer is done. */
+export function repositoryClone(url: string, options: RepositoryCloneOptions = {}): Promise<RepoInfo> {
+  return invoke<RepoInfo>("repository_clone", {
+    args: { url, destination: "", ...options },
+  });
+}
+
+/**
+ * The folder name a clone URL implies, computed by the same code that will
+ * perform the clone.
+ *
+ * Asked of Rust rather than reimplemented here because a suggestion the UI
+ * recomputes separately is a suggestion that eventually disagrees with the one
+ * the command acts on.
+ */
+export function repositoryCloneDestination(url: string): Promise<string> {
+  return invoke<string>("repository_clone_suggest_destination", { url });
+}
+
+/**
+ * Bounded walk for "found nearby". Returns roots, not open repositories —
+ * opening one is a separate step, so scanning a home directory never silently
+ * adds twenty repositories to the sidebar.
+ */
+export function repositoryDiscover(
+  root: string,
+  options: RepositoryDiscoverOptions = {},
+): Promise<RepoRoot[]> {
+  return invoke<RepoRoot[]>("repository_discover", {
+    args: { root, ...options },
+  });
+}
+
 export function wcStatusLoad(repo: RepoId, opts: WcStatusOptions = {}): Promise<StatusDelta> {
   return invoke<StatusDelta>("wc_status_load", { args: { repo, opts } });
 }
@@ -77,12 +114,22 @@ export function wcUnstagePaths(repo: RepoId, paths: string[]): Promise<StatusDel
   return invoke<StatusDelta>("wc_unstage_paths", { args: { repo, paths } });
 }
 
+/** Set or clear git's assume-unchanged bit on paths. */
+export function wcEntryAssumeUnchangedSet(
+  repo: RepoId,
+  paths: string[],
+  value: boolean,
+): Promise<StatusDelta> {
+  return invoke<StatusDelta>("wc_entry_assume_unchanged_set", { args: { repo, paths, value } });
+}
+
 export function historyCommitsLoad(
   repo: RepoId,
   options: HistoryCommitsOptions = {},
 ): Promise<CommitPage> {
   return invoke<CommitPage>("history_commits_load", { args: { repo, ...options } });
 }
+
 
 export function branchList(
   repo: RepoId,
@@ -108,6 +155,17 @@ export function branchCheckout(
   opts: CheckoutOptions = {},
 ): Promise<CheckoutResult> {
   return invoke<CheckoutResult>("branch_checkout", { args: { repo, name, opts } });
+}
+
+export function branchCheckoutRemote(
+  repo: RepoId,
+  remoteBranch: string,
+  localName?: string,
+  track = true,
+): Promise<BranchInfo> {
+  return invoke<BranchInfo>("branch_checkout_remote", {
+    args: { repo, remoteBranch, localName, track },
+  });
 }
 
 export function branchRename(
@@ -186,6 +244,20 @@ export function historyChangesetLoad(
   return invoke<Changeset>("history_changeset_load", {
     args: { repo, oid, opts: { detectRenames } },
   });
+}
+
+/**
+ * Exact ahead/behind counts and the fork point for two revisions.
+ *
+ * `mergeBase` is `null` when the two histories are unrelated — an answer, not a
+ * failure, and precisely the case where the user most needs telling.
+ */
+export function historyCompareSummary(
+  repo: RepoId,
+  left: Revision,
+  right: Revision,
+): Promise<CompareSummary> {
+  return invoke<CompareSummary>("history_merge_base", { args: { repo, left, right } });
 }
 
 export function historyGraphCompute(repo: RepoId, oids: string[]): Promise<GraphLayout> {
@@ -343,6 +415,17 @@ export function appFeedbackCompose(request: FeedbackRequest): Promise<FeedbackTa
  */
 export function relaunch(): Promise<void> {
   return invoke<void>("app_relaunch");
+}
+
+/**
+ * Asks the user for a folder. Resolves to `null` when they cancel.
+ *
+ * Cancellation is `null` rather than an error on purpose: a picker the user
+ * dismissed is a decision, not a failure, and reporting it as a failure is how
+ * "Choose…" ends up showing an error toast to someone who changed their mind.
+ */
+export function pickDirectory(): Promise<string | null> {
+  return invoke<string | null>("app_pick_directory");
 }
 
 export type { AppInfo, FeedbackTarget, ReleaseNotes, UpdateCheck, UpdateProgress, UpdateStatus };

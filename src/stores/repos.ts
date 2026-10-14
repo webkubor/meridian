@@ -1,7 +1,13 @@
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
 
-import type { ErrorPayload, RepoId, RepoInfo, RepositoryRemote } from "../bridges/bindings";
+import type {
+  ErrorPayload,
+  RepoId,
+  RepoInfo,
+  RepoRoot,
+  RepositoryRemote,
+} from "../bridges/bindings";
 import * as commands from "../bridges/commands";
 
 /**
@@ -86,6 +92,69 @@ export const useReposStore = defineStore("repos", () => {
     void loadRemotes(id);
   }
 
+  /**
+   * Clone `url` and open what comes back.
+   *
+   * The destination is resolved by Rust (`repository_clone_suggest_destination`)
+   * and then confirmed through the folder picker, so the user always sees where
+   * the clone is going before a single byte moves. Cloning straight to a
+   * guessed path is how you end up with a stray `meridian.git` in Downloads.
+   */
+  async function clone(
+    url: string,
+    destination?: string,
+  ): Promise<RepoInfo | null> {
+    const trimmed = url.trim();
+    if (!trimmed) return null;
+
+    let target = destination;
+    if (!target) {
+      const suggested = await commands.repositoryCloneDestination(trimmed);
+      const picked = await commands.pickDirectory();
+      // A cancelled picker is not a failed clone — it is the user changing
+      // their mind, and it must not leave an error on screen.
+      if (!picked) return null;
+      target = `${picked.replace(/\/+$/, "")}/${suggested}`;
+    }
+
+    busy.value = true;
+    lastError.value = null;
+    try {
+      const info = await commands.repositoryClone(trimmed, { destination: target });
+      upsert(info);
+      selectedId.value = info.id;
+      await loadRemotes(info.id);
+      return info;
+    } catch (error) {
+      lastError.value = error as ErrorPayload;
+      return null;
+    } finally {
+      busy.value = false;
+    }
+  }
+
+  /**
+   * Walk a root for repositories, for the "found nearby" list.
+   *
+   * Results are roots, not open repositories: scanning a home directory should
+   * offer rows to open, not silently add thirty entries to the sidebar.
+   */
+  const nearby = ref<RepoRoot[]>([]);
+  const nearbyState = ref<"idle" | "scanning" | "done" | "empty">("idle");
+
+  async function discoverNearby(root: string): Promise<void> {
+    nearbyState.value = "scanning";
+    try {
+      const found = await commands.repositoryDiscover(root);
+      nearby.value = found;
+      nearbyState.value = found.length === 0 ? "empty" : "done";
+    } catch (error) {
+      nearby.value = [];
+      nearbyState.value = "empty";
+      lastError.value = error as ErrorPayload;
+    }
+  }
+
   /** Drop a repository from the recent list (it is closed, not deleted on disk). */
   function remove(id: RepoId): void {
     repositories.value = repositories.value.filter((repo) => repo.id !== id);
@@ -116,8 +185,12 @@ export const useReposStore = defineStore("repos", () => {
     remotes,
     remotesLoading,
     defaultRemote,
+    nearby,
+    nearbyState,
     open,
     init,
+    clone,
+    discoverNearby,
     select,
     remove,
     reveal,

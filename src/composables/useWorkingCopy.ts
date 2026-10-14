@@ -52,11 +52,36 @@ export function useWorkingCopy() {
     return (await store.commit(id, request)) !== null;
   }
 
+  /**
+   * Clear or set git's assume-unchanged bit.
+   *
+   * A file carrying that bit is invisible to `git status`, so without a way to
+   * clear it a user can lose track of a file entirely — the flag was previously
+   * shown as a permanently greyed button.
+   */
+  async function setAssumeUnchanged(paths: string[], value: boolean): Promise<boolean> {
+    const id = repos.selectedId;
+    if (!id) return false;
+    return store.setAssumeUnchanged(id, paths, value);
+  }
+
   async function openInEditor(path: string): Promise<void> {
     const id = activeRepo();
     if (!id) return;
     await store.openEntry(id, path, "editor");
   }
 
-  return { state, entries, summary, lastError, refresh, stage, unstage, discard, commit, openInEditor };
+  return {
+    state,
+    entries,
+    summary,
+    lastError,
+    refresh,
+    stage,
+    unstage,
+    discard,
+    commit,
+    setAssumeUnchanged,
+    openInEditor,
+  };
 }

@@ -44,7 +44,7 @@ const emit = defineEmits<{
       @open-repositories="emit('openRepositories')"
     />
 
-    <nav class="sidebar-sections" role="tree" aria-label="Repository">
+    <nav class="sidebar-sections" role="tree" :aria-label="$t('sidebar.repositoryLabel')">
       <SidebarSection
         v-for="section in sections"
         :key="section.id"
@@ -61,8 +61,8 @@ const emit = defineEmits<{
     <footer class="sidebar-footer">
       <SearchField
         :model-value="filter"
-        label="Filter the sidebar"
-        placeholder="Filter"
+        :label="$t('sidebar.filterLabel')"
+        :placeholder="$t('sidebar.filterPlaceholder')"
         @update:model-value="emit('update:filter', $event)"
       />
     </footer>

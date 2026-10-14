@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { BranchInfo } from "../../bridges/bindings";
 import DialogueShell from "./DialogueShell.vue";
@@ -18,16 +19,24 @@ const props = withDefaults(
     subtitle?: string | null;
     branches: BranchInfo[];
     current: string | null;
+    /** Compare needs the full ref name so `main` and `origin/main` stay distinct. */
+    emitFullName?: boolean;
     confirmLabel?: string;
     busy?: boolean;
   }>(),
-  { subtitle: null, confirmLabel: "Choose", busy: false },
+  { subtitle: null, confirmLabel: undefined, busy: false },
 );
 
 const emit = defineEmits<{
   confirm: [name: string];
   cancel: [];
 }>();
+
+const { t } = useI18n();
+
+/** Resolved here, not in `withDefaults`: a default there cannot follow a
+ *  language change made while the dialogue was already mounted. */
+const confirmText = computed(() => props.confirmLabel ?? t("dialogues.chooseBranch.confirmLabel"));
 
 const filter = ref("");
 const selected = ref<string | null>(null);
@@ -43,13 +52,17 @@ const filtered = computed(() => {
   });
 });
 
+function valueOf(branch: BranchInfo): string {
+  return props.emitFullName ? branch.fullName : branch.name;
+}
+
 function canPick(branch: BranchInfo): boolean {
-  return !(branch.isHead && branch.name === props.current);
+  return !(branch.isHead && valueOf(branch) === props.current);
 }
 
 function pick(branch: BranchInfo): void {
   if (!canPick(branch)) return;
-  selected.value = branch.name;
+  selected.value = valueOf(branch);
 }
 
 function confirm(): void {
@@ -63,19 +76,19 @@ function confirm(): void {
     <div class="choose-toolbar">
       <SearchField
         v-model="filter"
-        label="Filter branches"
-        placeholder="Filter branches"
+        :label="$t('dialogues.chooseBranch.filterLabel')"
+        :placeholder="$t('dialogues.chooseBranch.filterPlaceholder')"
       />
     </div>
 
-    <ul class="branch-list" role="listbox" aria-label="Branches">
+    <ul class="branch-list" role="listbox" :aria-label="$t('dialogues.chooseBranch.listLabel')">
       <li v-for="branch in filtered" :key="branch.fullName">
         <button
           type="button"
           class="branch-row"
           role="option"
-          :aria-selected="selected === branch.name"
-          :class="{ selected: selected === branch.name, disabled: !canPick(branch) }"
+          :aria-selected="selected === valueOf(branch)"
+          :class="{ selected: selected === valueOf(branch), disabled: !canPick(branch) }"
           :disabled="!canPick(branch)"
           @click="pick(branch)"
           @dblclick="
@@ -98,13 +111,15 @@ function confirm(): void {
           </span>
         </button>
       </li>
-      <li v-if="filtered.length === 0" class="branch-empty">No branches match “{{ filter }}”.</li>
+      <li v-if="filtered.length === 0" class="branch-empty">
+        {{ $t('dialogues.chooseBranch.empty', { query: filter }) }}
+      </li>
     </ul>
 
     <template #footer>
-      <button type="button" class="btn" @click="emit('cancel')">Cancel</button>
+      <button type="button" class="btn" @click="emit('cancel')">{{ $t('common.cancel') }}</button>
       <button type="button" class="btn primary" :disabled="busy || selected === null" @click="confirm">
-        {{ confirmLabel }}
+        {{ confirmText }}
       </button>
     </template>
   </DialogueShell>

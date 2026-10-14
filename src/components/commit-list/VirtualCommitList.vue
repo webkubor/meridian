@@ -23,6 +23,7 @@
  * wraps this component in the history pane.
  */
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { CommitInfo } from "../../bridges/bindings";
 import {
@@ -128,8 +129,12 @@ const emit = defineEmits<{
   hover: [commit: CommitInfo | null];
   "ref-click": [payload: { commit: CommitInfo; ref: string; label: string }];
   "need-more": [];
-  "reach-end": [];
 }>();
+
+const { t } = useI18n();
+// A computed, not a constant: resolving the copy once at setup would freeze the
+// list's chrome in whatever language was active when the component mounted.
+const strings = computed(() => commitListStrings(t));
 
 const theme = useGraphTheme();
 const scroller = ref<HTMLElement | null>(null);
@@ -264,7 +269,7 @@ function payloadFor(commitIndex: number): RowGraph | null {
           gap: 4,
           maxWidth: Math.max(0, Math.min(props.badgeStripMax, viewport.value.width * 0.35)),
           maxChipWidth: props.badgeChipMax,
-          overflowLabel: commitListStrings.overflowBadge,
+          overflowLabel: strings.value.overflowBadge,
         });
 
   const stripOriginX = props.showGraph ? gutter.value : 0;
@@ -548,8 +553,10 @@ function scrollToCommit(oid: string): boolean {
 
 // --- Incremental paging ----------------------------------------------------
 
+// One request per loaded length: the watcher below also fires when the window
+// scrolls, and a naive "at the bottom" test would ask for the next page on
+// every scroll event.
 let requestedAtLength = -1;
-let reachedEnd = false;
 
 watch(
   [range, () => props.hasMore, () => props.loadingMore, () => rows.value.length],
@@ -570,15 +577,6 @@ watch(
     ) {
       requestedAtLength = list.length;
       emit("need-more");
-    }
-
-    if (!props.hasMore && lastVisible >= list.length - 1) {
-      if (!reachedEnd) {
-        reachedEnd = true;
-        emit("reach-end");
-      }
-    } else if (lastVisible < list.length - 2) {
-      reachedEnd = false;
     }
   },
 );
@@ -606,7 +604,7 @@ defineExpose({ scrollToCommit });
     ref="scroller"
     class="virtual-commit-list"
     role="listbox"
-    :aria-label="commitListStrings.listLabel"
+    :aria-label="strings.listLabel"
     :aria-activedescendant="activeDescendant"
     tabindex="0"
     @scroll.passive="onScroll"

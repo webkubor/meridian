@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type {
   DiffDocument,
@@ -15,6 +16,7 @@ import EmptyState from "../common/EmptyState.vue";
 import Icon from "../common/Icon.vue";
 import SegmentedControl from "../common/SegmentedControl.vue";
 import SwitchToggle from "../common/SwitchToggle.vue";
+import { formatBytes } from "../../i18n";
 import HunkControls from "./HunkControls.vue";
 import { createHighlighter, languageForPath, type HighlightToken } from "./highlight";
 
@@ -55,6 +57,13 @@ const emit = defineEmits<{
   retry: [];
   showAnyway: [];
 }>();
+
+const { t } = useI18n();
+
+/** The conflicted-file reason for the hunk buttons, in the active language. */
+const conflictedReason = computed(() =>
+  props.conflicted ? t("diff.controlsDisabledReasonHunks") : undefined,
+);
 
 const document = computed<DiffDocument | null>(() =>
   props.state.status === "data" ? props.state.data : null,
@@ -204,9 +213,23 @@ function onHunkAction(hunk: HunkRef, action: HunkAction): void {
 }
 
 function lineLabel(cell: Cell): string {
-  const which = cell.kind === "added" ? "added" : cell.kind === "removed" ? "removed" : "context";
+  const role =
+    cell.kind === "added"
+      ? t("diff.roleAdded")
+      : cell.kind === "removed"
+        ? t("diff.roleRemoved")
+        : t("diff.roleContext");
   const line = cell.kind === "added" ? cell.newLine : cell.oldLine;
-  return `Line ${line ?? "?"}, ${which}: ${cell.text}`;
+  const where =
+    line === null || line === undefined
+      ? t("diff.lineNumberUnknown")
+      : t("diff.lineNumber", { number: line });
+  return t("diff.lineLabel", { where, role, text: cell.text });
+}
+
+/** Byte counts go through the shared formatter so the unit follows the language. */
+function sizeLabel(bytes: number | null): string {
+  return bytes === null ? "" : ` · ${formatBytes(bytes)}`;
 }
 
 const errorPayload = computed(() => (props.state.status === "error" ? props.state.error : null));
@@ -224,15 +247,19 @@ const errorPayload = computed(() => (props.state.status === "error" ? props.stat
       <SegmentedControl
         :model-value="mode"
         :options="[
-          { id: 'unified', label: 'Unified' },
-          { id: 'split', label: 'Split' },
+          { id: 'unified', label: t('diff.viewUnified') },
+          { id: 'split', label: t('diff.viewSplit') },
         ]"
-        label="Diff layout"
+        :label="t('diff.layoutLabel')"
         @update:model-value="onMode"
       />
       <label class="context-picker">
-        <span>Context</span>
-        <select :value="options.contextLines" aria-label="Context lines" @change="onContextChange">
+        <span>{{ t("diff.contextLabel") }}</span>
+        <select
+          :value="options.contextLines"
+          :aria-label="t('diff.contextAria')"
+          @change="onContextChange"
+        >
           <option v-for="count in [0, 1, 3, 6, 12, 25]" :key="count" :value="count">
             {{ count }}
           </option>
@@ -240,27 +267,32 @@ const errorPayload = computed(() => (props.state.status === "error" ? props.stat
       </label>
       <SwitchToggle
         :model-value="options.ignoreWhitespace"
-        label="Whitespace"
-        aria-label="Ignore whitespace"
+        :label="t('diff.ignoreWhitespaceShort')"
+        :aria-label="t('diff.ignoreWhitespace')"
         @update:model-value="updateOption('ignoreWhitespace', $event)"
       />
       <SwitchToggle
         :model-value="options.fullFile"
-        label="Full file"
-        aria-label="Show full file"
+        :label="t('diff.showFullFileShort')"
+        :aria-label="t('diff.showFullFile')"
         @update:model-value="updateOption('fullFile', $event)"
       />
       <SwitchToggle
         :model-value="options.syntax"
-        label="Syntax"
-        aria-label="Syntax colouring"
+        :label="t('diff.syntaxShort')"
+        :aria-label="t('diff.syntaxColouring')"
         @update:model-value="updateOption('syntax', $event)"
       />
     </header>
 
     <div class="diff-body">
       <!-- Loading -->
-      <div v-if="state.status === 'loading'" class="diff-skeleton" role="status" aria-label="Loading diff">
+      <div
+        v-if="state.status === 'loading'"
+        class="diff-skeleton"
+        role="status"
+        :aria-label="t('diff.loadingAria')"
+      >
         <span v-for="row in 10" :key="row" class="skeleton-row" :style="{ width: `${40 + ((row * 17) % 55)}%` }" />
       </div>
 
@@ -269,53 +301,57 @@ const errorPayload = computed(() => (props.state.status === "error" ? props.stat
         <Icon name="exclamationmark.circle" :size="18" class="tone-danger" />
         <p class="diff-error-message">{{ errorPayload.message }}</p>
         <p v-if="errorPayload.detail" class="diff-error-detail mono">{{ errorPayload.detail }}</p>
-        <button type="button" @click="emit('retry')">Try again</button>
+        <button type="button" @click="emit('retry')">{{ t("diff.tryAgain") }}</button>
       </div>
 
       <!-- Empty / unchanged -->
       <EmptyState
         v-else-if="!document"
         icon="empty.unchangedFile"
-        :title="path ? 'No changes to show' : 'No file selected'"
-        :caption="
-          path
-            ? 'This file is unchanged between the two sides of the comparison.'
-            : 'Select a file to see its diff.'
-        "
+        :title="path ? t('diff.emptyPathTitle') : t('diff.emptyNoFileTitle')"
+        :caption="path ? t('diff.emptyPathCaption') : t('diff.emptySelectCaption')"
         compact
       />
 
       <!-- Too large: the gate (docs/04 §S8) -->
       <div v-else-if="document.tooLarge" class="diff-gate" role="status">
         <Icon name="exclamationmark.triangle" :size="20" class="tone-warning" />
-        <p class="diff-gate-title">This diff is large</p>
+        <p class="diff-gate-title">{{ t("diff.gateTitle") }}</p>
         <p class="diff-gate-caption">
-          {{ Math.round(document.tooLarge.bytes / 1024) }} KB —
-          above the {{ Math.round(document.tooLarge.gate / 1024) }} KB automatic limit.
+          {{
+            t("diff.gateCaption", {
+              size: formatBytes(document.tooLarge.bytes),
+              limit: formatBytes(document.tooLarge.gate),
+            })
+          }}
         </p>
-        <button type="button" @click="emit('showAnyway')">Show anyway</button>
+        <button type="button" @click="emit('showAnyway')">{{ t("diff.gateAction") }}</button>
       </div>
 
       <!-- Binary -->
       <EmptyState
         v-else-if="document.binary"
         icon="doc"
-        title="Binary file"
-        caption="There is no textual diff for this file."
+        :title="t('diff.binaryTitle')"
+        :caption="t('diff.binaryCaption')"
         compact
       />
 
       <!-- Image -->
       <div v-else-if="document.image" class="diff-image">
-        <p class="diff-image-title">Image diff</p>
+        <p class="diff-image-title">{{ t("diff.imageTitle") }}</p>
         <div class="diff-image-pair">
           <figure class="image-tile">
             <span class="checker" aria-hidden="true" />
-            <figcaption>Old{{ document.image.oldSize !== null ? ` · ${document.image.oldSize} B` : "" }}</figcaption>
+            <figcaption>
+              {{ t("diff.before") }}{{ sizeLabel(document.image.oldSize) }}
+            </figcaption>
           </figure>
           <figure class="image-tile">
             <span class="checker" aria-hidden="true" />
-            <figcaption>New{{ document.image.newSize !== null ? ` · ${document.image.newSize} B` : "" }}</figcaption>
+            <figcaption>
+              {{ t("diff.after") }}{{ sizeLabel(document.image.newSize) }}
+            </figcaption>
           </figure>
         </div>
       </div>
@@ -337,12 +373,12 @@ const errorPayload = computed(() => (props.state.status === "error" ? props.stat
                 :hunk="line.hunk"
                 :direction="direction"
                 :disabled="conflicted"
-                :disabled-reason="conflicted ? 'Resolve the conflict before staging hunks.' : undefined"
+                :disabled-reason="conflictedReason"
                 @action="onHunkAction(line.hunk, $event)"
               />
             </template>
             <template v-else-if="line.kind === 'note'">
-              <span class="diff-note">\ No newline at end of file</span>
+              <span class="diff-note">{{ t("diff.noNewline") }}</span>
             </template>
             <template v-else>
               <span class="gutter" aria-hidden="true">{{ line.cell.oldLine ?? "" }}</span>
@@ -389,12 +425,12 @@ const errorPayload = computed(() => (props.state.status === "error" ? props.stat
                 :hunk="line.hunk"
                 :direction="direction"
                 :disabled="conflicted"
-                :disabled-reason="conflicted ? 'Resolve the conflict before staging hunks.' : undefined"
+                :disabled-reason="conflictedReason"
                 @action="onHunkAction(line.hunk, $event)"
               />
             </template>
             <template v-else-if="line.kind === 'note'">
-              <span class="diff-note">\ No newline at end of file</span>
+              <span class="diff-note">{{ t("diff.noNewline") }}</span>
             </template>
             <template v-else>
               <span class="gutter" aria-hidden="true">{{ line.left?.oldLine ?? "" }}</span>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 
+import type { RepoRoot } from "../../bridges/bindings";
 import type { LoadState, RepoSummaryModel } from "../contracts";
 import EmptyState from "../common/EmptyState.vue";
 import Icon from "../common/Icon.vue";
@@ -18,8 +19,14 @@ const props = withDefaults(
   defineProps<{
     recents: RepoSummaryModel[];
     recentsState: LoadState<RepoSummaryModel[]>;
-    nearby: RepoSummaryModel[];
-    nearbyState: LoadState<RepoSummaryModel[]>;
+    /**
+     * Repositories found on disk but **not open** — hence `RepoRoot` rather
+     * than `RepoSummaryModel`. Typing them as open repositories made the row
+     * look clickable while the id it emitted was not one anything could open,
+     * so the whole nearby list was a row of buttons that did nothing.
+     */
+    nearby: RepoRoot[];
+    nearbyState: LoadState<RepoRoot[]>;
     pathInput: string;
     /** The recents filter — a separate model from `pathInput` (the Open/Create field). */
     filter?: string;
@@ -59,6 +66,7 @@ const emit = defineEmits<{
   removeRecent: [id: string];
   revealRecent: [id: string];
   refreshNearby: [];
+  openNearby: [path: string];
   openSettings: [];
 }>();
 
@@ -91,14 +99,14 @@ function labelOf(repo: RepoSummaryModel): string {
   <div class="launch">
     <div class="launch-column">
       <header class="launch-head">
-        <h1 class="launch-title">Meridian</h1>
+        <h1 class="launch-title">{{ $t('app.name') }}</h1>
         <span class="launch-spacer" />
-        <button type="button" class="launch-icon" title="Settings" @click="emit('openSettings')">
+        <button type="button" class="launch-icon" :title="$t('screens.settings.title')" @click="emit('openSettings')">
           <Icon name="nav.settings" :size="15" />
         </button>
       </header>
 
-      <div class="launch-modes" role="radiogroup" aria-label="Repository action">
+      <div class="launch-modes" role="radiogroup" :aria-label="$t('screens.repositories.modeGroupLabel')">
         <button
           type="button"
           role="radio"
@@ -108,7 +116,7 @@ function labelOf(repo: RepoSummaryModel): string {
           @click="mode = 'open'"
         >
           <Icon name="folder" :size="14" />
-          Open
+          {{ $t('screens.repositories.open') }}
         </button>
         <button
           type="button"
@@ -121,7 +129,7 @@ function labelOf(repo: RepoSummaryModel): string {
           @click="mode = 'clone'"
         >
           <Icon name="cloud" :size="14" />
-          Clone
+          {{ $t('screens.repositories.clone') }}
         </button>
         <button
           type="button"
@@ -132,7 +140,7 @@ function labelOf(repo: RepoSummaryModel): string {
           @click="mode = 'create'"
         >
           <Icon name="plus" :size="14" />
-          Create
+          {{ $t('screens.repositories.create') }}
         </button>
       </div>
 
@@ -143,7 +151,7 @@ function labelOf(repo: RepoSummaryModel): string {
           type="text"
           :value="cloneUrl"
           placeholder="https://github.com/owner/repository.git"
-          aria-label="Repository URL to clone"
+          :aria-label="$t('screens.repositories.urlLabel')"
           spellcheck="false"
           autocapitalize="off"
           autocorrect="off"
@@ -154,8 +162,16 @@ function labelOf(repo: RepoSummaryModel): string {
           class="launch-input"
           type="text"
           :value="pathInput"
-          :placeholder="mode === 'create' ? 'A folder for the new repository' : 'A folder that contains a repository'"
-          :aria-label="mode === 'create' ? 'Folder for the new repository' : 'Folder to open'"
+          :placeholder="
+            mode === 'create'
+              ? $t('screens.repositories.newFolderPlaceholder')
+              : $t('screens.repositories.existingFolderPlaceholder')
+          "
+          :aria-label="
+            mode === 'create'
+              ? $t('screens.repositories.newFolderLabel')
+              : $t('screens.repositories.openFolderLabel')
+          "
           spellcheck="false"
           autocapitalize="off"
           autocorrect="off"
@@ -166,19 +182,19 @@ function labelOf(repo: RepoSummaryModel): string {
           type="button"
           class="launch-browse"
           :disabled="!!unavailable?.browse"
-          :title="unavailable?.browse ?? 'Choose a folder'"
+          :title="unavailable?.browse ?? $t('screens.repositories.chooseFolder')"
           @click="emit('browse')"
         >
-          Choose…
+          {{ $t('screens.choose') }}
         </button>
         <button
           type="submit"
           class="launch-go"
           :disabled="busy || (mode === 'clone' ? cloneUrl.trim() === '' || !!unavailable?.clone : pathInput.trim() === '')"
         >
-          <template v-if="mode === 'open'">Open</template>
-          <template v-else-if="mode === 'clone'">Clone</template>
-          <template v-else>Create</template>
+          <template v-if="mode === 'open'">{{ $t('screens.repositories.open') }}</template>
+          <template v-else-if="mode === 'clone'">{{ $t('screens.repositories.clone') }}</template>
+          <template v-else>{{ $t('screens.repositories.create') }}</template>
         </button>
       </form>
 
@@ -190,12 +206,12 @@ function labelOf(repo: RepoSummaryModel): string {
 
       <div class="launch-recents">
         <div class="recents-head">
-          <span class="recents-title">Recent repositories</span>
+          <span class="recents-title">{{ $t('screens.repositories.recentsTitle') }}</span>
           <span class="launch-spacer" />
           <SearchField
             :model-value="filter"
-            label="Filter recent repositories"
-            placeholder="Filter"
+            :label="$t('screens.repositories.filterLabel')"
+            :placeholder="$t('screens.repositories.filterPlaceholder')"
             class="recents-filter"
             @update:model-value="emit('update:filter', $event)"
           />
@@ -204,7 +220,7 @@ function labelOf(repo: RepoSummaryModel): string {
         <EmptyState
           v-if="recentsState.status === 'loading'"
           icon="hourglass"
-          title="Loading recent repositories…"
+          :title="$t('screens.repositories.loadingRecents')"
           compact
         />
         <EmptyState
@@ -216,8 +232,8 @@ function labelOf(repo: RepoSummaryModel): string {
         <EmptyState
           v-else-if="filteredRecents.length === 0"
           icon="empty.noRepositorySelected"
-          title="No recent repositories"
-          caption="Open, clone or create a repository to get started."
+          :title="$t('screens.repositories.noRecents')"
+          :caption="$t('screens.repositories.noRecentsCaption')"
         />
         <ul v-else class="recents-list">
           <li v-for="repo in filteredRecents" :key="repo.info.id">
@@ -235,10 +251,10 @@ function labelOf(repo: RepoSummaryModel): string {
               <RowBadge v-if="repo.state !== 'clean'" icon="exclamationmark.triangle" tone="warning" />
             </button>
             <span class="recent-actions">
-              <button type="button" class="recent-action" title="Reveal in Finder" @click="emit('revealRecent', repo.info.id)">
+              <button type="button" class="recent-action" :title="$t('screens.repositories.reveal')" @click="emit('revealRecent', repo.info.id)">
                 <Icon name="action.reveal" :size="13" />
               </button>
-              <button type="button" class="recent-action" title="Remove from recents" @click="emit('removeRecent', repo.info.id)">
+              <button type="button" class="recent-action" :title="$t('screens.repositories.removeRecent')" @click="emit('removeRecent', repo.info.id)">
                 <Icon name="xmark" :size="13" />
               </button>
             </span>
@@ -248,33 +264,39 @@ function labelOf(repo: RepoSummaryModel): string {
 
       <section v-if="showNearby" class="launch-nearby">
         <div class="nearby-head">
-          <span class="recents-title">Nearby repositories</span>
+          <span class="recents-title">{{ $t('screens.repositories.nearbyTitle') }}</span>
           <span class="launch-spacer" />
           <button
             type="button"
             class="nearby-refresh"
             :disabled="!!unavailable?.nearby"
-            :title="unavailable?.nearby ?? 'Scan again'"
+            :title="unavailable?.nearby ?? $t('screens.repositories.scanAgain')"
             @click="emit('refreshNearby')"
           >
             <Icon name="arrow.clockwise" :size="12" />
-            Scan again
+            {{ $t('screens.repositories.scanAgain') }}
           </button>
         </div>
         <ListShell
           :status="nearbyState.status"
           empty-icon="empty.dropFolder"
-          empty-title="Nothing found nearby"
-          empty-caption="Repositories in the folders you have granted will appear here."
-          loading-caption="Scanning for repositories…"
+          :empty-title="$t('screens.repositories.nothingNearby')"
+          :empty-caption="$t('screens.repositories.nothingNearbyCaption')"
+          :loading-caption="$t('screens.repositories.scanning')"
           :error-message="nearbyState.status === 'error' ? nearbyState.error.message : null"
           @retry="emit('refreshNearby')"
         >
           <ul class="nearby-list">
-            <li v-for="repo in nearby" :key="repo.info.id">
-              <button type="button" class="nearby-row" @click="emit('openRecent', repo.info.id)">
+            <li v-for="repo in nearby" :key="repo.gitdir">
+              <button
+                type="button"
+                class="nearby-row"
+                :title="repo.path"
+                @click="emit('openNearby', repo.path)"
+              >
                 <Icon name="folder" :size="13" />
-                <span class="mono">{{ repo.info.gitdir }}</span>
+                <span class="nearby-name">{{ repo.name }}</span>
+                <span class="mono nearby-path">{{ repo.gitdir }}</span>
               </button>
             </li>
           </ul>
@@ -544,5 +566,22 @@ function labelOf(repo: RepoSummaryModel): string {
 .nearby-row:hover {
   background: var(--md-bg-hover);
   color: var(--md-fg);
+}
+
+/* Name first, path after it — the same shape as a recents row, so "nearby"
+   reads as the same kind of list rather than as a wall of paths. The path
+   truncates; the name is what identifies the repository. */
+.nearby-name {
+  flex: none;
+  font-weight: 500;
+}
+
+.nearby-path {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--md-fg-subtle);
+  font-size: var(--md-text-xs);
 }
 </style>

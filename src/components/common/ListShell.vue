@@ -24,7 +24,6 @@ withDefaults(
     loadingCaption?: string;
     /** Large-content gate (diff/list): shown as a banner above the content. */
     warning?: string | null;
-    warningActionLabel?: string;
   }>(),
   {
     emptyIcon: "empty.noFileSelected",
@@ -36,7 +35,6 @@ withDefaults(
 defineEmits<{
   retry: [];
   emptyAction: [];
-  warningAction: [];
 }>();
 </script>
 
@@ -46,9 +44,6 @@ defineEmits<{
     <div v-if="warning" class="list-warning" role="status">
       <Icon name="exclamationmark.triangle" :size="13" />
       <span class="list-warning-text">{{ warning }}</span>
-      <button v-if="warningActionLabel" type="button" class="ghost" @click="$emit('warningAction')">
-        {{ warningActionLabel }}
-      </button>
     </div>
 
     <div class="list-body">

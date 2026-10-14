@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { BranchReviewInfo, SplitActionOption } from "../contracts";
 import EmptyState from "../common/EmptyState.vue";
@@ -14,6 +15,8 @@ import SplitAction from "../common/SplitAction.vue";
  * need a dialogue — rename, delete — are opened by the shell, which owns the
  * confirm/prompt steps.
  */
+const { t } = useI18n();
+
 const props = withDefaults(
   defineProps<{
     branch: BranchReviewInfo | null;
@@ -46,13 +49,15 @@ const isCurrent = computed(() => props.branch?.isHead ?? false);
 const remote = computed(() => props.branch?.isRemote ?? false);
 
 const mergeLabel = computed(() =>
-  props.currentBranch ? `Merge into ${props.currentBranch}` : "Merge into current",
+  props.currentBranch
+    ? t("branch.mergeInto", { name: props.currentBranch })
+    : t("branch.mergeIntoCurrent"),
 );
 
 const deleteReason = computed(() => {
   if (!props.branch) return undefined;
-  if (isCurrent.value) return "You cannot delete the checked-out branch.";
-  if (!props.canDelete) return "This branch is protected.";
+  if (isCurrent.value) return t("branch.reasonCheckedOut");
+  if (!props.canDelete) return t("branch.reasonProtected");
   return undefined;
 });
 </script>
@@ -62,41 +67,46 @@ const deleteReason = computed(() => {
     <EmptyState
       v-if="!branch"
       icon="empty.noBranchSelected"
-      title="No branch selected"
-      caption="Pick a branch to see its actions."
+      :title="t('branch.noSelectionTitle')"
+      :caption="t('branch.noSelectionCaption')"
     />
 
     <template v-else>
       <header class="branch-header">
         <Icon :name="remote ? 'cloud' : 'arrow.triangle.branch'" :size="16" class="branch-kind" />
         <h2 class="branch-title">{{ branch.name }}</h2>
+        <!-- HEAD is a git ref; "Merged" is prose. -->
         <RowBadge v-if="isCurrent" label="HEAD" tone="info" />
-        <RowBadge v-if="branch.fullyMerged" label="Merged" icon="checkmark.circle" tone="muted" />
+        <RowBadge v-if="branch.fullyMerged" :label="t('branch.merged')" icon="checkmark.circle" tone="muted" />
         <span class="branch-spacer" />
-        <button type="button" class="verb ghost" title="Copy the branch name" @click="emit('copyName')">
+        <button type="button" class="verb ghost" :title="t('branch.copyName')" @click="emit('copyName')">
           <Icon name="doc.on.doc" :size="13" />
         </button>
       </header>
 
       <dl class="branch-facts">
         <div class="fact">
-          <dt>Tip</dt>
+          <dt>{{ t("branch.factTip") }}</dt>
           <dd class="mono">{{ branch.oid.slice(0, 7) }} · {{ branch.tipSummary }}</dd>
         </div>
         <div class="fact">
-          <dt>Upstream</dt>
+          <dt>{{ t("branch.factUpstream") }}</dt>
           <dd v-if="upstream" class="mono">{{ upstream }}</dd>
-          <dd v-else class="muted">Not tracking</dd>
+          <dd v-else class="muted">{{ t("branch.notTracking") }}</dd>
         </div>
         <div v-if="branch.lastAuthor" class="fact">
-          <dt>Last author</dt>
+          <dt>{{ t("branch.factLastAuthor") }}</dt>
           <dd>{{ branch.lastAuthor }}</dd>
         </div>
         <div class="fact">
-          <dt>Tracking</dt>
+          <dt>{{ t("branch.factTracking") }}</dt>
           <dd class="tracking">
-            <span class="track up"><Icon name="arrow.up" :size="11" />{{ branch.ahead }} ahead</span>
-            <span class="track down"><Icon name="arrow.down" :size="11" />{{ branch.behind }} behind</span>
+            <span class="track up">
+              <Icon name="arrow.up" :size="11" />{{ t("branch.aheadBy", { count: branch.ahead }) }}
+            </span>
+            <span class="track down">
+              <Icon name="arrow.down" :size="11" />{{ t("branch.behindBy", { count: branch.behind }) }}
+            </span>
           </dd>
         </div>
       </dl>
@@ -110,11 +120,11 @@ const deleteReason = computed(() => {
           @click="emit('checkout')"
         >
           <Icon name="arrow.triangle.branch" :size="13" />
-          Check out
+          {{ t("branch.checkout") }}
         </button>
         <span v-else class="verb current-flag">
           <Icon name="checkmark.circle.fill" :size="13" />
-          Checked out
+          {{ t("branch.checkedOut") }}
         </span>
 
         <template v-if="!remote">
@@ -124,13 +134,13 @@ const deleteReason = computed(() => {
           </button>
           <button type="button" class="verb" :disabled="busy" @click="emit('rebaseOnto')">
             <Icon name="arrow.triangle.2.circlepath" :size="13" />
-            Rebase onto
+            {{ t("branch.rebaseOnto") }}
           </button>
         </template>
 
         <SplitAction
           v-if="!remote"
-          label="Push"
+          :label="t('branch.push')"
           icon="arrow.up.circle"
           :busy="busy"
           :options="pushOptions"
@@ -139,22 +149,22 @@ const deleteReason = computed(() => {
         />
         <button v-else type="button" class="verb" :disabled="busy" @click="emit('pull')">
           <Icon name="tray.and.arrow.down" :size="13" />
-          Fetch into local
+          {{ t("branch.fetchIntoLocal") }}
         </button>
 
         <span class="branch-spacer" />
 
         <button type="button" class="verb" @click="emit('showInHistory')">
           <Icon name="clock" :size="13" />
-          Show in history
+          {{ t("branch.showInHistory") }}
         </button>
         <button type="button" class="verb" @click="emit('openCompare')">
           <Icon name="arrow.left.arrow.right" :size="13" />
-          Compare…
+          {{ t("branch.compare") }}
         </button>
         <button type="button" class="verb" :disabled="busy" @click="emit('rename')">
           <Icon name="pencil" :size="13" />
-          Rename
+          {{ t("branch.rename") }}
         </button>
         <button
           type="button"
@@ -164,7 +174,7 @@ const deleteReason = computed(() => {
           @click="emit('remove')"
         >
           <Icon name="trash" :size="13" />
-          Delete
+          {{ t("branch.delete") }}
         </button>
       </div>
     </template>

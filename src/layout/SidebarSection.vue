@@ -43,7 +43,7 @@ const emit = defineEmits<{
       <button
         type="button"
         class="section-add"
-        :aria-label="`Add to ${section.title}`"
+        :aria-label="$t('sidebar.addToSection', { name: section.title })"
         @click="emit('add', section.id)"
       >
         <Icon name="plus" :size="12" />

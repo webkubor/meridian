@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { DialogueRequest } from "../contracts";
 import DialogueShell from "./DialogueShell.vue";
@@ -31,7 +32,7 @@ const props = withDefaults(
     helpText: "",
     validate: undefined,
     option: undefined,
-    confirmLabel: "Create",
+    confirmLabel: undefined,
     busy: false,
   },
 );
@@ -41,32 +42,37 @@ const emit = defineEmits<{
   cancel: [];
 }>();
 
+const { t } = useI18n();
+
 const value = ref(props.initialValue);
 const optionChecked = ref(props.option?.checked ?? false);
 const touched = ref(false);
 
 const INVALID_CHARS = /[\s~^:?*[\\\x00-\x1f\x7f]/;
-const REFNAME_REASON = "Names cannot contain spaces, ~ ^ : ? * [ \\ or control characters.";
 
 function refnameError(text: string): string | null {
-  if (text === "") return "Enter a name.";
-  if (text === "@") return "A name cannot be just \"@\".";
-  if (text.startsWith("-")) return "Names cannot start with \"-\".";
-  if (text.startsWith("/") || text.endsWith("/")) return "Names cannot start or end with \"/\".";
-  if (text.startsWith(".") || text.endsWith(".")) return "Names cannot start or end with \".\".";
-  if (text.endsWith(".lock")) return "Names cannot end with \".lock\".";
-  if (text.includes("..")) return "Names cannot contain \"..\".";
-  if (text.includes("//")) return "Names cannot contain \"//\".";
-  if (text.includes("@{")) return "Names cannot contain \"@{\".";
-  if (INVALID_CHARS.test(text)) return REFNAME_REASON;
+  if (text === "") return t("dialogues.prompt.errors.nameRequired");
+  if (text === "@") return t("dialogues.prompt.errors.nameAt");
+  if (text.startsWith("-")) return t("dialogues.prompt.errors.nameStartsWithDash");
+  if (text.startsWith("/") || text.endsWith("/")) return t("dialogues.prompt.errors.nameSlash");
+  if (text.startsWith(".") || text.endsWith(".")) return t("dialogues.prompt.errors.nameDot");
+  if (text.endsWith(".lock")) return t("dialogues.prompt.errors.nameLock");
+  if (text.includes("..")) return t("dialogues.prompt.errors.nameDoubleDot");
+  if (text.includes("//")) return t("dialogues.prompt.errors.nameDoubleSlash");
+  if (text.includes("@{")) return t("dialogues.prompt.errors.nameAtBrace");
+  if (INVALID_CHARS.test(text)) return t("dialogues.prompt.errors.nameInvalidChars");
   return null;
 }
 
 const error = computed<string | null>(() => {
-  if (props.validate === "required") return value.value.trim() === "" ? "Enter a value." : null;
+  if (props.validate === "required")
+    return value.value.trim() === "" ? t("dialogues.prompt.errors.valueRequired") : null;
   if (props.validate === "refname") return refnameError(value.value);
   return null;
 });
+
+/** Resolved here rather than in `withDefaults` so it follows the live locale. */
+const confirmText = computed(() => props.confirmLabel ?? t("dialogues.prompt.confirmLabel"));
 
 const showError = computed(() => touched.value && error.value !== null);
 
@@ -114,9 +120,9 @@ function confirm(): void {
     </label>
 
     <template #footer>
-      <button type="button" class="btn" @click="emit('cancel')">Cancel</button>
+      <button type="button" class="btn" @click="emit('cancel')">{{ $t('common.cancel') }}</button>
       <button type="button" class="btn primary" :disabled="busy || !canConfirm" @click="confirm">
-        {{ confirmLabel }}
+        {{ confirmText }}
       </button>
     </template>
   </DialogueShell>

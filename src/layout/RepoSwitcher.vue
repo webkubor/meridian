@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { RepoSummaryModel } from "../components/contracts";
 import Icon from "../components/common/Icon.vue";
@@ -28,22 +29,32 @@ const emit = defineEmits<{
 
 const open = ref(false);
 
+const { t } = useI18n();
+
 const others = computed(() =>
   props.recents.filter((repo) => repo.info.id !== props.current?.info.id),
 );
 
 const currentState = computed(() => props.current?.state ?? "clean");
 
+/**
+ * `computed`, not a plain function: the label must follow the language the user
+ * switches to while the repository sits mid-operation. The keys are shared with
+ * `RepositoryScreen`'s banner — one word, one place to edit it.
+ */
 const stateLabel = computed(() => {
   const state = currentState.value;
   if (state === "clean") return null;
-  if (state === "merge") return "Merging";
-  if (state === "rebase" || state === "rebaseMerge" || state === "rebaseInteractive") return "Rebasing";
-  if (state === "cherryPick" || state === "cherryPickSequence") return "Cherry-picking";
-  if (state === "revert" || state === "revertSequence") return "Reverting";
-  if (state === "bisect") return "Bisecting";
-  if (state === "applyMailbox" || state === "applyMailboxOrRebase") return "Applying patches";
-  return "Operation in progress";
+  if (state === "merge") return t("screens.operation.state.merging");
+  if (state === "rebase" || state === "rebaseMerge" || state === "rebaseInteractive")
+    return t("screens.operation.state.rebasing");
+  if (state === "cherryPick" || state === "cherryPickSequence")
+    return t("screens.operation.state.cherryPicking");
+  if (state === "revert" || state === "revertSequence") return t("screens.operation.state.reverting");
+  if (state === "bisect") return t("screens.operation.state.bisecting");
+  if (state === "applyMailbox" || state === "applyMailboxOrRebase")
+    return t("screens.operation.state.applyingPatches");
+  return t("screens.operation.state.inProgress");
 });
 
 function choose(id: string): void {
@@ -58,7 +69,7 @@ function browse(): void {
 </script>
 
 <template>
-  <Popover :open="open && !locked" align="start" label="Switch repository" @close="open = false">
+  <Popover :open="open && !locked" align="start" :label="$t('sidebar.switchRepository')" @close="open = false">
     <template #trigger>
       <button
         type="button"
@@ -66,12 +77,12 @@ function browse(): void {
         :disabled="locked"
         :aria-expanded="open"
         aria-haspopup="menu"
-        :title="current?.info.gitdir ?? 'No repository open'"
+        :title="current?.info.gitdir ?? $t('sidebar.noRepositoryOpen')"
         @click="open = !open"
       >
         <Icon name="shippingbox" :size="15" class="switcher-icon" />
         <span class="switcher-names">
-          <span class="switcher-name">{{ current?.headLabel ?? current?.info.gitdir ?? "Choose repository" }}</span>
+          <span class="switcher-name">{{ current?.headLabel ?? current?.info.gitdir ?? $t('sidebar.chooseRepository') }}</span>
           <span v-if="stateLabel" class="switcher-state">
             <Icon name="exclamationmark.triangle" :size="11" />
             {{ stateLabel }}
@@ -81,8 +92,8 @@ function browse(): void {
       </button>
     </template>
 
-    <p class="popover-heading">Recent repositories</p>
-    <p v-if="others.length === 0" class="popover-empty">No other repositories.</p>
+    <p class="popover-heading">{{ $t('sidebar.recentRepositories') }}</p>
+    <p v-if="others.length === 0" class="popover-empty">{{ $t('sidebar.noOtherRepositories') }}</p>
     <button
       v-for="repo in others"
       :key="repo.info.id"
@@ -100,7 +111,7 @@ function browse(): void {
 
     <button type="button" class="popover-item" role="menuitem" @click="browse">
       <Icon name="square.grid.2x2" :size="13" />
-      <span class="popover-item-label">All repositories…</span>
+      <span class="popover-item-label">{{ $t('sidebar.allRepositories') }}</span>
     </button>
   </Popover>
 </template>

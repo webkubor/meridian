@@ -5,11 +5,18 @@
  * Display rows are derived from the flat `commits` array the history engine
  * returns, so the graph layout's row space (indices into `commits`) maps 1:1
  * onto the rows that carry a commit — `commitIndex` is that mapping.
+ *
+ * Copy comes from the catalogue through the i18n runtime rather than through a
+ * `t` argument: `buildDisplayRows` is called from a computed inside
+ * `VirtualCommitList.vue`, and reading `i18n.global.t` inside that computed is
+ * what makes the rows re-label themselves when the user switches language.
+ * Passing `t` in by hand would put that burden on every caller and still need
+ * each one to remember it.
  */
 
 import type { CommitInfo } from "../../bridges/bindings";
+import { currentLocale, i18n } from "../../i18n";
 import type { BadgeStrip, GraphDensity, GraphLaneSegment } from "../graph";
-import { commitListStrings } from "./strings";
 
 export type DateGrouping = "off" | "day" | "week" | "month";
 
@@ -170,20 +177,36 @@ export function isCommitRow(row: CommitDisplayRow): boolean {
 
 // --- Date formatting -------------------------------------------------------
 
-const weekdayDate = new Intl.DateTimeFormat(undefined, {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-});
-const dayMonthYear = new Intl.DateTimeFormat(undefined, {
-  day: "numeric",
-  month: "short",
-  year: "numeric",
-});
-const dayMonth = new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short" });
-const monthYear = new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" });
-const timeOfDay = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" });
+/**
+ * Dates are formatted for the *app's* language, not the system's. The app
+ * ships Chinese by default whatever the Mac is set to, and a commit list that
+ * mixes Chinese copy with English month names reads as half-translated.
+ *
+ * The formatters are cached per locale because constructing an
+ * `Intl.DateTimeFormat` is the expensive part, and the locale only changes
+ * when the user switches language.
+ */
+const DATE_FORMATS = {
+  weekdayDate: { weekday: "long", day: "numeric", month: "long", year: "numeric" },
+  dayMonthYear: { day: "numeric", month: "short", year: "numeric" },
+  dayMonth: { day: "numeric", month: "short" },
+  monthYear: { month: "long", year: "numeric" },
+  timeOfDay: { hour: "2-digit", minute: "2-digit" },
+} as const satisfies Record<string, Intl.DateTimeFormatOptions>;
+
+type DateFormat = keyof typeof DATE_FORMATS;
+
+const formatters = new Map<string, Intl.DateTimeFormat>();
+
+function formatter(kind: DateFormat): Intl.DateTimeFormat {
+  const locale = currentLocale();
+  const key = `${locale}|${kind}`;
+  const cached = formatters.get(key);
+  if (cached) return cached;
+  const built = new Intl.DateTimeFormat(locale, DATE_FORMATS[kind]);
+  formatters.set(key, built);
+  return built;
+}
 
 /** Period bucket a timestamp falls into, per grouping mode (local time). */
 export function groupKeyFor(seconds: number, mode: DateGrouping): string {
@@ -201,27 +224,32 @@ export function groupKeyFor(seconds: number, mode: DateGrouping): string {
 
 export function formatGroupLabel(seconds: number, mode: DateGrouping, nowSeconds: number): string {
   const date = new Date(seconds * 1000);
-  if (mode === "month") return monthYear.format(date);
-  if (mode === "week") return commitListStrings.weekOf(dayMonth.format(weekStart(date)));
+  if (mode === "month") return formatter("monthYear").format(date);
+  if (mode === "week") {
+    return i18n.global.t("commitList.weekOf", {
+      date: formatter("dayMonth").format(weekStart(date)),
+    });
+  }
   const now = new Date(nowSeconds * 1000);
-  if (isSameDay(date, now)) return commitListStrings.today;
+  if (isSameDay(date, now)) return i18n.global.t("commitList.today");
   const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  if (isSameDay(date, yesterday)) return commitListStrings.yesterday;
-  return weekdayDate.format(date);
+  if (isSameDay(date, yesterday)) return i18n.global.t("commitList.yesterday");
+  return formatter("weekdayDate").format(date);
 }
 
 /** The row's date column: time for today, day+month for this year, full date otherwise. */
 export function formatWhen(seconds: number, nowSeconds: number): string {
   const date = new Date(seconds * 1000);
   const now = new Date(nowSeconds * 1000);
-  if (isSameDay(date, now)) return timeOfDay.format(date);
-  if (date.getFullYear() === now.getFullYear()) return dayMonth.format(date);
-  return dayMonthYear.format(date);
+  if (isSameDay(date, now)) return formatter("timeOfDay").format(date);
+  if (date.getFullYear() === now.getFullYear()) return formatter("dayMonth").format(date);
+  return formatter("dayMonthYear").format(date);
 }
 
 /** Exact timestamp for tooltips/aria labels. */
 export function formatExact(seconds: number): string {
-  return `${dayMonthYear.format(new Date(seconds * 1000))}, ${timeOfDay.format(new Date(seconds * 1000))}`;
+  const date = new Date(seconds * 1000);
+  return `${formatter("dayMonthYear").format(date)}, ${formatter("timeOfDay").format(date)}`;
 }
 
 function isSameDay(a: Date, b: Date): boolean {

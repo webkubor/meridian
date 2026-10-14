@@ -102,7 +102,7 @@ onBeforeUnmount(() => {
           <button
             type="button"
             class="dialogue-close"
-            aria-label="Cancel"
+            :aria-label="$t('common.cancel')"
             :disabled="busy || blocked"
             @click="emit('close')"
           >

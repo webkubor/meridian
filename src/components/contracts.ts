@@ -478,6 +478,8 @@ export type DialogueRequest =
       subtitle?: string;
       branches: BranchInfo[];
       current: string | null;
+      /** Return `fullName` so remote refs stay distinct from same-named locals. */
+      emitFullName?: boolean;
     };
 
 export interface DialogueResult {

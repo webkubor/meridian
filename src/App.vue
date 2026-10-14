@@ -1,7 +1,18 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
-import type { BranchInfo, CommitInfo, EntryStatus, ErrorPayload, DiffPerspective, FeedbackKind, HistoryCommitsOptions } from "./bridges/bindings";
+import type {
+  BranchInfo,
+  CommitInfo,
+  DiffPerspective,
+  EntryStatus,
+  ErrorPayload,
+  FeedbackKind,
+  HistoryCommitsOptions,
+  RepoInfo,
+  RepoRoot,
+} from "./bridges/bindings";
 import type {
   DiffViewMode,
   DialogueRequest,
@@ -23,15 +34,18 @@ import type {
   SplitActionOption,
   ToolbarVerbModel,
 } from "./components/contracts";
+import { useActivity } from "./composables/useActivity";
 import { useAppEvents } from "./composables/useAppEvents";
 import { useApp } from "./composables/useApp";
 import { useBranches } from "./composables/useBranches";
+import { toRefChoice, useCompare } from "./composables/useCompare";
 import { useDiff } from "./composables/useDiff";
 import { useGit } from "./composables/useGit";
 import { useHistory } from "./composables/useHistory";
 import { useRepositories } from "./composables/useRepositories";
 import { useWorkingCopy } from "./composables/useWorkingCopy";
 import AboutScreen from "./components/screens/AboutScreen.vue";
+import ActivityScreen from "./components/screens/ActivityScreen.vue";
 import AccountScreen from "./components/screens/AccountScreen.vue";
 import BlamePane from "./components/panes/BlamePane.vue";
 import BranchDetailPane from "./components/panes/BranchDetailPane.vue";
@@ -53,17 +67,19 @@ import ToastHost from "./layout/ToastHost.vue";
 import {
   aboutPath,
   accountPath,
+  activityPath,
   blamePath,
   isWorkspaceTab,
   repositoriesPath,
   repositoryPath,
   settingsPath,
+  WORKSPACE_TAB_LABEL_KEYS,
   type WorkspaceTab,
 } from "./router/routes";
 import { navigate, useRoute } from "./router";
 import { currentLocale, setLocale, type Locale } from "./i18n";
 import { openExternal } from "./bridges/external";
-import { relaunch } from "./bridges/commands";
+import { pickDirectory, relaunch } from "./bridges/commands";
 import {
   askDialogue,
   cancelDialogue,
@@ -82,6 +98,13 @@ import {
 
 useAppEvents();
 
+/**
+ * The composition root's own copy comes from the catalogue too: everything it
+ * shows before a pane takes over (the window subtitle, the sidebar, the
+ * toolbar, the command switch, the dialogues and their toasts) is `shell.*`.
+ */
+const { t } = useI18n();
+
 const shell = useShell();
 const route = useRoute();
 
@@ -99,6 +122,8 @@ const {
   feedbackBusy,
 } = app;
 const repositories = useRepositories();
+const activity = useActivity();
+const compare = useCompare();
 const workingCopy = useWorkingCopy();
 const branches = useBranches();
 const history = useHistory();
@@ -134,7 +159,7 @@ async function restartToUpdate(): Promise<void> {
 
 async function openExternalLink(url: string): Promise<void> {
   if (!(await openExternal(url))) {
-    shell.pushToast({ kind: "danger", text: "Could not open that link." });
+    shell.pushToast({ kind: "danger", text: t("shell.toast.linkFailed") });
   }
 }
 
@@ -148,7 +173,7 @@ async function onFeedback(kind: FeedbackKind, title: string): Promise<void> {
   // The browser is already open; this is the record of what went with it.
   shell.pushToast({
     kind: "info",
-    text: `Opened GitHub with ${target.prefilled.length} detail${target.prefilled.length === 1 ? "" : "s"} filled in.`,
+    text: t("shell.toast.feedbackOpened", { count: target.prefilled.length }),
   });
 }
 
@@ -193,12 +218,12 @@ const windowTitle = computed(() => {
 });
 
 const windowSubtitle = computed(() => {
-  if (routeName.value === "settings") return "Settings";
-  if (routeName.value === "account") return "Accounts";
-  if (routeName.value === "about") return "About Meridian";
-  if (routeName.value === "repositories") return "Repositories";
+  if (routeName.value === "settings") return t("shell.subtitle.settings");
+  if (routeName.value === "account") return t("shell.subtitle.account");
+  if (routeName.value === "about") return t("shell.subtitle.about");
+  if (routeName.value === "repositories") return t("shell.subtitle.repositories");
   const head = selectedRepo.value?.headBranch;
-  return head ? `On ${head}` : selectedRepo.value?.gitdir ?? null;
+  return head ? t("shell.subtitle.on", { branch: head }) : selectedRepo.value?.gitdir ?? null;
 });
 
 /* ---- sidebar ------------------------------------------------------------- */
@@ -255,15 +280,15 @@ const sidebarSections = computed<SidebarSectionModel[]>(() => {
   return [
     {
       id: "working-copy",
-      title: "Working copy",
+      title: t("shell.sidebar.workingCopy"),
       icon: "nav.workingCopy",
       pseudo: true,
       collapsed: false,
-      emptyCaption: "No local changes",
+      emptyCaption: t("shell.sidebar.emptyWorkingCopy"),
       rows: [
         {
           id: "sidebar:working-copy",
-          label: "Local changes",
+          label: t("shell.sidebar.rowWorkingCopy"),
           icon: "doc.text",
           badges:
             workingCopyTotal.value > 0
@@ -282,16 +307,18 @@ const sidebarSections = computed<SidebarSectionModel[]>(() => {
     },
     {
       id: "history",
-      title: "History",
+      title: t("shell.sidebar.history"),
       icon: "nav.history",
       collapsed: false,
-      emptyCaption: "No commits",
+      emptyCaption: t("shell.sidebar.emptyHistory"),
+      // The filter matches what the section is *called* on screen, not an
+      // English literal — otherwise typing 中文 in the filter finds nothing.
       rows:
-        history.commits.value.length > 0 && keep("history")
+        history.commits.value.length > 0 && keep(t("shell.sidebar.history"))
           ? [
               {
                 id: "sidebar:history",
-                label: "All commits",
+                label: t("shell.sidebar.rowHistory"),
                 icon: "clock",
                 detail: String(history.commits.value.length),
                 badges: [],
@@ -303,34 +330,34 @@ const sidebarSections = computed<SidebarSectionModel[]>(() => {
     },
     {
       id: "branches",
-      title: "Branches",
+      title: t("shell.sidebar.branches"),
       icon: "nav.branch",
       collapsed: false,
-      emptyCaption: "No branches",
+      emptyCaption: t("shell.sidebar.emptyBranches"),
       rows: branchRows,
     },
     {
       id: "remotes",
-      title: "Remotes",
+      title: t("shell.sidebar.remotes"),
       icon: "cloud",
       collapsed: true,
-      emptyCaption: "No remote branches",
+      emptyCaption: t("shell.sidebar.emptyRemotes"),
       rows: remoteRows,
     },
     {
       id: "tags",
-      title: "Tags",
+      title: t("shell.sidebar.tags"),
       icon: "nav.tags",
       collapsed: true,
-      emptyCaption: "No tags",
+      emptyCaption: t("shell.sidebar.emptyTags"),
       rows: [],
     },
     {
       id: "stashes",
-      title: "Stashes",
+      title: t("shell.sidebar.stashes"),
       icon: "nav.stashes",
       collapsed: true,
-      emptyCaption: "No stashes",
+      emptyCaption: t("shell.sidebar.emptyStashes"),
       rows: [],
     },
   ];
@@ -369,7 +396,7 @@ function onRemoveRecent(id: string): void {
 
 /** Reveal a repository's working directory in the OS file manager. */
 function onRevealRecent(id: string): void {
-  void runVerb(() => repositories.reveal(id), "Revealed in the file manager.");
+  void runVerb(() => repositories.reveal(id), t("shell.toast.revealed"));
 }
 
 function onSelectSidebarRow(id: string): void {
@@ -399,13 +426,121 @@ function goTab(tab: WorkspaceTab): void {
   navigate(repositoryPath(id, tab));
 }
 
+/**
+ * Fill a `path`-kind setting from the folder picker.
+ *
+ * A cancelled picker leaves the setting exactly as it was — the row keeps its
+ * old value and no error appears, because nothing went wrong.
+ */
+async function onChooseSettingPath(key: string): Promise<void> {
+  const picked = await pickDirectory();
+  if (picked) setSetting(key, picked);
+}
+
+/**
+ * Seed the compare tab the first time it is opened in a repository: the
+ * checked-out branch against what it tracks, else against `main`/`master`.
+ *
+ * Opening the tab onto two empty pickers makes the empty state the first thing
+ * everyone sees and the useful one something you have to discover. Only seeds
+ * when nothing is chosen, so it never overrides the user's own pick.
+ */
+function seedCompareDefaults(): void {
+  if (activeTab.value !== "compare" || routeName.value !== "repository") return;
+  if (compare.left.value !== null || compare.right.value !== null) return;
+  const all = branches.allBranches.value;
+  const head = all.find((entry) => entry.isHead);
+  if (!head) return;
+  const base =
+    (head.upstream ? all.find((entry) => entry.isRemote && entry.name === head.upstream) : undefined) ??
+    all.find((entry) => !entry.isRemote && !entry.isHead && (entry.name === "main" || entry.name === "master"));
+  if (!base) return;
+  compare.setBoth(toRefChoice(base), toRefChoice(head));
+}
+
+watch([activeTab, () => branches.allBranches.value], seedCompareDefaults);
+
+/** Pick one side of the comparison. */
+async function pickCompareRef(side: "left" | "right"): Promise<void> {
+  const result = await askDialogue({
+    kind: "chooseBranch",
+    id: dialogueId(),
+    title:
+      side === "left"
+        ? t("shell.dialogue.compareBaseTitle")
+        : t("shell.dialogue.compareTargetTitle"),
+    branches: branches.allBranches.value,
+    current: side === "left" ? compare.left.value?.id ?? null : compare.right.value?.id ?? null,
+    emitFullName: true,
+  });
+  if (result?.kind !== "chooseBranch") return;
+  const branch = branches.allBranches.value.find((entry) => entry.fullName === result.value);
+  if (!branch) return;
+  compare.choose(side, toRefChoice(branch));
+}
+
+/**
+ * Push the branch this pane is showing.
+ *
+ * The bare `git.push()` publishes whatever HEAD is on, so pressing Push while
+ * reading another branch's pane pushes the wrong ref — silently, and to a
+ * remote. The pane's own branch is the one the user is looking at.
+ */
+async function pushSelectedBranch(): Promise<void> {
+  const branch = selectedBranchInfo.value;
+  const name = branch?.name ?? null;
+  if (!name) {
+    shell.pushToast({ kind: "warning", text: t("shell.toast.noBranchSelected") });
+    return;
+  }
+  await runVerb(
+    () => git.push(name),
+    t("shell.toast.pushed", { branch: name }),
+  );
+}
+
+/** The remote-only branch pane's verb: create the local branch and check it out. */
+async function checkoutSelectedBranch(): Promise<void> {
+  const branch = selectedBranchInfo.value;
+  if (!branch?.isRemote) return;
+  if (!(await confirmDirtyCheckout())) return;
+  const ok = await branches.checkoutRemote(branch.fullName);
+  if (ok) {
+    shell.pushToast({ kind: "success", text: t("shell.toast.checkedOut", { branch: branch.name }) });
+  } else if (branches.lastError.value) {
+    reportError(branches.lastError.value, t("shell.toast.checkoutFailed"));
+  }
+}
+
+function onOpenCommitFromCompare(oid: string): void {
+  void history.select(oid);
+}
+
+/** Compare is repository-scoped: it must not answer for the previous repo. */
+watch(
+  activeRepoId,
+  (id) => compare.forRepo(id ?? null),
+  { immediate: true },
+);
+
 function openRepository(id: string): void {
   repositories.select(id);
   navigate(repositoryPath(id));
 }
 
+/**
+ * Leave the launch screen for a repository that just opened.
+ *
+ * Opening is only half of it: staying put afterwards is the difference between
+ * "it worked" and "did anything happen?".
+ */
+async function openAfter(opened: Promise<RepoInfo | null>): Promise<void> {
+  const info = await opened;
+  if (info) navigate(repositoryPath(info.id));
+}
+
 function onOpenRequested(path: string): void {
-  void repositories.open(path);
+  void openAfter(repositories.open(path));
 }
 
 /* ---- shell helpers ------------------------------------------------------- */
@@ -423,17 +558,34 @@ async function copyText(text: string): Promise<void> {
   if (!text) return;
   try {
     await navigator.clipboard.writeText(text);
-    shell.pushToast({ kind: "success", text: "Copied to the clipboard." });
+    shell.pushToast({ kind: "success", text: t("shell.toast.copied") });
   } catch {
-    shell.pushToast({ kind: "danger", text: "Could not copy to the clipboard." });
+    shell.pushToast({ kind: "danger", text: t("shell.toast.copyFailed") });
   }
 }
 
-/** Run a repo-level git verb, surfacing the engine's own error or a success note. */
-async function runVerb(action: () => Promise<ErrorPayload | null>, success: string): Promise<void> {
+/**
+ * Run a repo-level git verb, surfacing the engine's own error or a success note
+ * — and recording it in the activity list.
+ *
+ * `labelKey` is passed rather than the rendered text so the entry re-labels
+ * itself when the language changes, and so the list holds a name instead of a
+ * snapshot of one taken a moment before the user switched.
+ */
+async function runVerb(
+  action: () => Promise<ErrorPayload | null>,
+  success: string,
+  labelKey = "shell.activity.genericOperation",
+): Promise<void> {
+  const id = activity.start(labelKey);
   const error = await action();
-  if (error) reportError(error, "The action failed.");
-  else shell.pushToast({ kind: "success", text: success });
+  if (error) {
+    activity.finish(id, "failed", error.message);
+    reportError(error, t("shell.toast.actionFailed"));
+  } else {
+    activity.finish(id, "done");
+    shell.pushToast({ kind: "success", text: success });
+  }
 }
 
 /* ---- toolbar ------------------------------------------------------------- */
@@ -443,55 +595,66 @@ const toolbarVerbs = computed<ToolbarVerbModel[]>(() => {
   const hasRemote = repositories.defaultRemote.value !== null;
   const hasHead = selectedRepo.value?.headBranch != null;
 
-  const repoReason = hasRepo ? undefined : "Open a repository first.";
+  const repoReason = hasRepo ? undefined : t("shell.toolbar.noRepository");
   const remoteReason = !hasRepo
-    ? "Open a repository first."
+    ? t("shell.toolbar.noRepository")
     : hasRemote
       ? undefined
-      : "This repository has no remote configured.";
+      : t("shell.toolbar.noRemote");
   const pushReason = !hasRepo
-    ? "Open a repository first."
+    ? t("shell.toolbar.noRepository")
     : !hasRemote
-      ? "This repository has no remote configured."
+      ? t("shell.toolbar.noRemote")
       : !hasHead
-        ? "HEAD is detached — check out a branch to push."
+        ? t("shell.toolbar.detachedHead")
         : undefined;
 
   const branchOptions: SplitActionOption[] = [
-    { id: "branch.new", label: "New branch…", disabled: !hasRepo },
-    { id: "branch.checkout", label: "Check out branch…", disabled: !hasRepo },
-    { id: "branch.rename", label: "Rename branch…", disabled: !hasRepo },
+    { id: "branch.new", label: t("shell.toolbar.newBranch"), disabled: !hasRepo },
+    { id: "branch.checkout", label: t("shell.toolbar.checkoutBranch"), disabled: !hasRepo },
+    { id: "branch.rename", label: t("shell.toolbar.renameBranch"), disabled: !hasRepo },
   ];
 
   return [
     {
       id: "branch",
-      label: "Branch",
+      label: t("shell.toolbar.branch"),
       icon: "action.branch",
       group: "global",
       disabled: !hasRepo,
       reason: repoReason,
       options: branchOptions,
     },
-    { id: "fetch", label: "Fetch", icon: "action.fetch", group: "global", disabled: remoteReason !== undefined, reason: remoteReason },
-    { id: "pull", label: "Pull", icon: "action.pull", group: "global", disabled: remoteReason !== undefined, reason: remoteReason },
-    { id: "push", label: "Push", icon: "action.push", group: "global", disabled: pushReason !== undefined, reason: pushReason },
-    { id: "stash", label: "Stash", icon: "action.stash", group: "global", disabled: !hasRepo, reason: repoReason },
+    { id: "fetch", label: t("shell.toolbar.fetch"), icon: "action.fetch", group: "global", disabled: remoteReason !== undefined, reason: remoteReason },
+    { id: "pull", label: t("shell.toolbar.pull"), icon: "action.pull", group: "global", disabled: remoteReason !== undefined, reason: remoteReason },
+    { id: "push", label: t("shell.toolbar.push"), icon: "action.push", group: "global", disabled: pushReason !== undefined, reason: pushReason },
+    { id: "stash", label: t("shell.toolbar.stash"), icon: "action.stash", group: "global", disabled: !hasRepo, reason: repoReason },
 
-    { id: "quickOpen", label: "Quick open", icon: "action.quickOpen", group: "utility", disabled: false },
-    { id: "quickActions", label: "Quick actions", icon: "action.quickActions", group: "utility", disabled: false },
-    { id: "settings", label: "Settings", icon: "nav.settings", group: "utility", disabled: false },
-    { id: "account", label: "Accounts", icon: "nav.services", group: "utility", disabled: false },
-    { id: "about", label: "About Meridian", icon: "info.circle", group: "utility", disabled: false },
+    { id: "quickOpen", label: t("shell.toolbar.quickOpen"), icon: "action.quickOpen", group: "utility", disabled: false },
+    { id: "quickActions", label: t("shell.toolbar.quickActions"), icon: "action.quickActions", group: "utility", disabled: false },
+    { id: "settings", label: t("shell.toolbar.settings"), icon: "nav.settings", group: "utility", disabled: false },
+    { id: "account", label: t("shell.toolbar.account"), icon: "nav.services", group: "utility", disabled: false },
+    { id: "about", label: t("shell.toolbar.about"), icon: "info.circle", group: "utility", disabled: false },
   ];
 });
 
+/**
+ * The chip counts what is actually running.
+ *
+ * It used to be hardcoded to `unavailable: true` with a "not in this build"
+ * reason, which left a permanently greyed-out control in the toolbar — the
+ * clearest single example of a button that looks like part of the app and
+ * isn't. There is now a real list behind it; see `useActivity`.
+ */
 const activitySummary = computed(() => ({
-  count: 0,
-  busy: false,
+  count: activity.running.value.length,
+  busy: activity.running.value.length > 0,
+  // "Stalled" is not knowable from here: nothing reports per-operation
+  // progress, and a guessed threshold would fire on slow networks and quiet
+  // the user for a fetch that was about to finish.
   stalled: false,
-  unavailable: true,
-  unavailableReason: "Activity tracking is not available in this build.",
+  unavailable: false,
+  unavailableReason: undefined as string | undefined,
 }));
 
 async function onToolbarRun(id: string): Promise<void> {
@@ -500,16 +663,16 @@ async function onToolbarRun(id: string): Promise<void> {
       await newBranchFlow();
       return;
     case "fetch":
-      await runVerb(() => git.fetch(), "Fetched.");
+      await runVerb(() => git.fetch(), t("shell.toast.fetched"));
       return;
     case "pull":
-      await runVerb(() => git.pull(), "Pulled.");
+      await runVerb(() => git.pull(), t("shell.toast.pulled"));
       return;
     case "push":
-      await runVerb(() => git.push(), "Pushed.");
+      await runVerb(() => git.push(), t("shell.toast.pushed"));
       return;
     case "stash":
-      await runVerb(() => git.stash(), "Stashed the working copy.");
+      await runVerb(() => git.stash(), t("shell.toast.stashed"));
       return;
     case "quickOpen":
       openPalette("open");
@@ -525,6 +688,9 @@ async function onToolbarRun(id: string): Promise<void> {
       return;
     case "about":
       navigate(aboutPath());
+      return;
+    case "activity":
+      navigate(activityPath());
       return;
     default:
       return;
@@ -548,31 +714,40 @@ async function newBranchFlow(): Promise<void> {
   const request: DialogueRequest = {
     kind: "prompt",
     id: dialogueId(),
-    title: "New branch",
-    label: "Branch name",
+    title: t("shell.dialogue.newBranchTitle"),
+    label: t("shell.dialogue.newBranchLabel"),
     value: "",
+    // A git ref example, not copy: `feature/…` is the convention every Git
+    // user reads, so it stays as typed rather than becoming a translated
+    // string that no longer looks like a branch name.
     placeholder: "feature/short-description",
-    helpText: "The branch starts at the current HEAD.",
+    helpText: t("shell.dialogue.newBranchHelp"),
     validate: "refname",
-    option: { label: "Check out the new branch", checked: true },
+    option: { label: t("shell.dialogue.newBranchCheckoutOption"), checked: true },
   };
   const result = await askDialogue(request);
   if (!result || result.value.trim() === "") return;
-  const created = await branches.create(result.value.trim());
+  // `optionChecked` is the "check out after creation" tick; it has to reach the
+  // command, or unticking it does nothing at all.
+  const created = await branches.create(result.value.trim(), result.optionChecked);
   if (created) {
-    shell.pushToast({ kind: "success", text: `Created branch ${created.name}.` });
+    shell.pushToast({ kind: "success", text: t("shell.toast.branchCreated", { branch: created.name }) });
   } else if (branches.lastError.value) {
-    reportError(branches.lastError.value, "Could not create the branch.");
+    reportError(branches.lastError.value, t("shell.toast.branchCreateFailed"));
   }
 }
 
-/** What the sidebar's per-section "+" adds, or the noun to name when it cannot. */
-const SECTION_ADD_NOUN: Record<string, string> = {
-  "working-copy": "working-copy entries",
-  history: "commits",
-  remotes: "remotes",
-  tags: "tags",
-  stashes: "stashes",
+/**
+ * What the sidebar's per-section "+" adds. Keys, not nouns: the noun has to
+ * agree with the sentence built around it, which is a different string in each
+ * language.
+ */
+const SECTION_ADD_NOUN_KEYS: Record<string, string> = {
+  "working-copy": "shell.unavailable.nounWorkingCopy",
+  history: "shell.unavailable.nounCommits",
+  remotes: "shell.unavailable.nounRemotes",
+  tags: "shell.unavailable.nounTags",
+  stashes: "shell.unavailable.nounStashes",
 };
 
 /**
@@ -588,7 +763,9 @@ async function onSectionAdd(sectionId: string): Promise<void> {
   }
   shell.pushToast({
     kind: "info",
-    text: `Adding ${SECTION_ADD_NOUN[sectionId] ?? "entries"} is not available in this build.`,
+    text: t("shell.unavailable.addSection", {
+      noun: t(SECTION_ADD_NOUN_KEYS[sectionId] ?? "shell.unavailable.nounEntries"),
+    }),
   });
 }
 
@@ -601,9 +778,10 @@ async function renameBranchFlow(preset?: string | null): Promise<void> {
   const result = await askDialogue({
     kind: "prompt",
     id: dialogueId(),
-    title: "Rename branch",
-    label: "New name",
+    title: t("shell.dialogue.renameBranchTitle"),
+    label: t("shell.dialogue.renameBranchLabel"),
     value: oldName,
+    // A git ref example; see the note in `newBranchFlow`.
     placeholder: "feature/renamed",
     validate: "refname",
   });
@@ -612,22 +790,22 @@ async function renameBranchFlow(preset?: string | null): Promise<void> {
   const renamed = await branches.rename(oldName, result.value.trim());
   if (renamed) {
     selectedBranchName.value = renamed.fullName;
-    shell.pushToast({ kind: "success", text: `Renamed to ${renamed.name}.` });
+    shell.pushToast({ kind: "success", text: t("shell.toast.branchRenamed", { branch: renamed.name }) });
   } else if (branches.lastError.value) {
-    reportError(branches.lastError.value, "Could not rename the branch.");
+    reportError(branches.lastError.value, t("shell.toast.branchRenameFailed"));
   }
 }
 
 /** Merge `name` into the current branch (docs/03 §12 `merge_start`). */
 async function mergeBranch(name: string | null): Promise<void> {
   if (!name) return;
-  await runVerb(() => git.merge(name), `Merged ${name}.`);
+  await runVerb(() => git.merge(name), t("shell.toast.merged", { branch: name }));
 }
 
 /** Rebase the current branch onto `name` (docs/03 §12 `rebase_start`). */
 async function rebaseBranch(name: string | null): Promise<void> {
   if (!name) return;
-  await runVerb(() => git.rebase(name), `Rebased onto ${name}.`);
+  await runVerb(() => git.rebase(name), t("shell.toast.rebased", { branch: name }));
 }
 
 /** Delete a branch behind an explicit confirmation (docs/03 §4 `branch_delete`). */
@@ -638,63 +816,108 @@ async function deleteBranch(name: string | null): Promise<void> {
   const confirmed = await askDialogue({
     kind: "confirm",
     id: dialogueId(),
-    title: "Delete branch?",
-    message: `Delete ${label}? This cannot be undone.`,
+    title: t("shell.dialogue.deleteBranchTitle"),
+    message: t("shell.dialogue.deleteBranchMessage", { branch: label }),
     items: [label],
-    confirmLabel: "Delete branch",
+    confirmLabel: t("shell.dialogue.deleteBranchConfirm"),
     danger: true,
   });
   if (!confirmed) return;
 
   const ok = await branches.remove(branch?.name ?? name);
-  if (ok) shell.pushToast({ kind: "success", text: `Deleted ${label}.` });
-  else if (branches.lastError.value) reportError(branches.lastError.value, "Could not delete the branch.");
+  if (ok) shell.pushToast({ kind: "success", text: t("shell.toast.branchDeleted", { branch: label }) });
+  else if (branches.lastError.value) reportError(branches.lastError.value, t("shell.toast.branchDeleteFailed"));
 }
 
+/**
+ * Switch branches.
+ *
+ * One picker, every kind of ref, one verb underneath: a remote-tracking ref has
+ * no local branch to switch to, so it is checked out as a new tracking branch
+ * instead of failing with "branch not found".
+ */
 async function checkoutFlow(preset?: string): Promise<void> {
   const name =
     preset ??
     (await askDialogue({
       kind: "chooseBranch",
       id: dialogueId(),
-      title: "Check out branch",
-      branches: branches.branches.value,
+      title: t("shell.dialogue.checkoutTitle"),
+      branches: branches.allBranches.value,
       current: selectedRepo.value?.headBranch ?? null,
+      emitFullName: true,
     }))?.value;
   if (!name) return;
 
-  const dirty = workingCopyTotal.value > 0;
-  if (dirty) {
-    const confirmed = await askDialogue({
-      kind: "confirm",
-      id: dialogueId(),
-      title: "Check out with local changes?",
-      message: `You have ${workingCopyTotal.value} uncommitted change(s). Checking out may fail or carry them over.`,
-      items: workingCopy.entries.value.slice(0, 8).map((entry) => entry.path),
-      confirmLabel: "Check out anyway",
-    });
-    if (!confirmed) return;
+  const branch = branches.allBranches.value.find(
+    (entry) => entry.fullName === name || entry.name === name,
+  );
+  if (branch?.isRemote === true) {
+    // Creating a branch changes what exists on disk, so the dirty-tree
+    // confirmation applies exactly as it does to switching.
+    if (!(await confirmDirtyCheckout())) return;
+    const created = await branches.checkoutRemote(branch.fullName);
+    if (created) {
+      shell.pushToast({
+        kind: "success",
+        text: t("shell.toast.checkedOut", { branch: branch.name }),
+      });
+    } else if (branches.lastError.value) {
+      reportError(branches.lastError.value, t("shell.toast.checkoutFailed"));
+    }
+    return;
   }
 
-  const ok = await branches.checkout(name);
-  if (ok) shell.pushToast({ kind: "success", text: `Checked out ${name}.` });
-  else if (branches.lastError.value) reportError(branches.lastError.value, "Could not check out the branch.");
+  // The setting is remembered because "ask me every time" and "never ask" are
+  // both real preferences; honouring neither would make the switch a lie.
+  if (confirmCheckout.value && !(await confirmDirtyCheckout())) return;
+
+  const ok = await branches.checkout(branch?.name ?? name);
+  if (ok) shell.pushToast({ kind: "success", text: t("shell.toast.checkedOut", { branch: name }) });
+  else if (branches.lastError.value) reportError(branches.lastError.value, t("shell.toast.checkoutFailed"));
+}
+
+/** The dirty-tree confirmation. True when there is nothing to confirm. */
+async function confirmDirtyCheckout(): Promise<boolean> {
+  if (workingCopyTotal.value === 0) return true;
+  const confirmed = await askDialogue({
+    kind: "confirm",
+    id: dialogueId(),
+    title: t("shell.dialogue.checkoutDirtyTitle"),
+    message: t("shell.dialogue.checkoutDirtyMessage", { count: workingCopyTotal.value }),
+    items: workingCopy.entries.value.slice(0, 8).map((entry) => entry.path),
+    confirmLabel: t("shell.dialogue.checkoutDirtyConfirm"),
+  });
+  return Boolean(confirmed);
+}
+
+/**
+ * Clear the assume-unchanged bit on one file.
+ *
+ * No confirmation: it makes a file visible again, which is the safe direction,
+ * and the alternative is a flag a user cannot undo from the interface.
+ */
+async function clearAssumeUnchanged(path: string): Promise<void> {
+  const ok = await workingCopy.setAssumeUnchanged([path], false);
+  if (!ok && workingCopy.lastError.value) {
+    reportError(workingCopy.lastError.value, t("shell.toast.actionFailed"));
+  }
 }
 
 async function discardEntry(path: string): Promise<void> {
   const confirmed = await askDialogue({
     kind: "confirm",
     id: dialogueId(),
-    title: "Discard changes?",
-    message: "This permanently discards the changes in this file. It cannot be undone.",
+    title: t("shell.dialogue.discardTitle"),
+    message: t("shell.dialogue.discardMessage"),
     items: [path],
-    confirmLabel: "Discard changes",
+    confirmLabel: t("shell.dialogue.discardConfirm"),
     danger: true,
   });
   if (!confirmed) return;
   const ok = await workingCopy.discard(path);
-  if (ok) shell.pushToast({ kind: "success", text: "Discarded the file's changes." });
-  else reportError(workingCopy.lastError.value, "Could not discard the changes.");
+  if (ok) shell.pushToast({ kind: "success", text: t("shell.toast.discarded") });
+  else reportError(workingCopy.lastError.value, t("shell.toast.discardFailed"));
 }
 
 /* ---- working copy -------------------------------------------------------- */
@@ -714,7 +937,9 @@ const composerBody = ref("");
 const composerAmend = ref(false);
 const composerSignOff = ref(false);
 
-const commitOptions: SplitActionOption[] = [{ id: "commit.push", label: "Commit & Push" }];
+const commitOptions: SplitActionOption[] = [
+  { id: "commit.push", label: t("shell.commitAndPush") },
+];
 
 const committing = ref(false);
 
@@ -766,7 +991,7 @@ async function commitNow(): Promise<boolean> {
   // changes it (`git commit --amend --no-edit`); otherwise a message is needed.
   const reusesMessage = composerAmend.value && message === "" && staged;
   if (message === "" && !reusesMessage) {
-    shell.pushToast({ kind: "warning", text: "Write a commit message first." });
+    shell.pushToast({ kind: "warning", text: t("shell.toast.commitMessageRequired") });
     return false;
   }
   committing.value = true;
@@ -780,10 +1005,10 @@ async function commitNow(): Promise<boolean> {
     composerSubject.value = "";
     composerBody.value = "";
     composerAmend.value = false;
-    shell.pushToast({ kind: "success", text: "Committed." });
+    shell.pushToast({ kind: "success", text: t("shell.toast.committed") });
     await history.refresh();
   } else {
-    reportError(workingCopy.lastError.value, "Could not create the commit.");
+    reportError(workingCopy.lastError.value, t("shell.toast.commitFailed"));
   }
   return ok;
 }
@@ -794,12 +1019,12 @@ function onCommit(): void {
 
 async function onCommitChoose(optionId: string): Promise<void> {
   if (optionId === "commit.push") {
-    if (await commitNow()) await runVerb(() => git.push(), "Committed and pushed.");
+    if (await commitNow()) await runVerb(() => git.push(), t("shell.toast.committedAndPushed"));
   }
 }
 
 function onResolveConflict(path: string): void {
-  void runVerb(() => git.resolveConflict([path]), "Conflict resolved.");
+  void runVerb(() => git.resolveConflict([path]), t("shell.toast.conflictResolved"));
 }
 
 /** Merge/operation status is owned by `stores/workingCopy` (port pending). */
@@ -853,7 +1078,7 @@ watch(
 );
 
 /** The engine has no merge/non-merge predicate; say so instead of faking it. */
-const historyTypeUnavailable = "Filtering by merge status is not available in this build.";
+const historyTypeUnavailable = computed(() => t("shell.unavailable.historyMergeFilter"));
 
 /* ---- branches ------------------------------------------------------------ */
 
@@ -916,23 +1141,23 @@ const settingsDocument = computed<SettingsDocument>(() => ({
   tabs: [
     {
       id: "appearance",
-      label: "Appearance",
+      label: t("shell.settings.appearance"),
       icon: "sun.max",
       source: "shell",
       groups: [
         {
           id: "editor",
-          label: "Editor",
+          label: t("shell.settings.editor"),
           rows: [
             {
               key: "shell.editorFontSize",
-              label: "Editor font size",
+              label: t("shell.settings.editorFontSize"),
               kind: "int",
               value: editorFontSize.value,
               defaultValue: 13,
               min: 10,
               max: 22,
-              help: "Applies to diff and blame views.",
+              help: t("shell.settings.editorFontSizeHelp"),
               shellOwned: true,
             },
           ],
@@ -941,21 +1166,21 @@ const settingsDocument = computed<SettingsDocument>(() => ({
     },
     {
       id: "git",
-      label: "Git",
+      label: t("shell.settings.git"),
       icon: "action.branch",
       source: "shell",
       groups: [
         {
           id: "safety",
-          label: "Safety",
+          label: t("shell.settings.safety"),
           rows: [
             {
               key: "shell.confirmCheckout",
-              label: "Confirm before checking out with local changes",
+              label: t("shell.settings.confirmCheckout"),
               kind: "bool",
               value: confirmCheckout.value,
               defaultValue: true,
-              help: "Shows a confirmation whenever the working copy is dirty.",
+              help: t("shell.settings.confirmCheckoutHelp"),
               shellOwned: true,
             },
           ],
@@ -964,21 +1189,21 @@ const settingsDocument = computed<SettingsDocument>(() => ({
     },
     {
       id: "general",
-      label: "General",
+      label: t("shell.settings.general"),
       icon: "gearshape",
       source: "schema",
       groups: [],
     },
     {
       id: "services",
-      label: "Services",
+      label: t("shell.settings.services"),
       icon: "cloud",
       source: "schema",
       groups: [],
     },
     {
       id: "advanced",
-      label: "Advanced",
+      label: t("shell.settings.advanced"),
       icon: "wand.and.stars",
       source: "schema",
       groups: [],
@@ -998,7 +1223,34 @@ const activeAccountId = ref<string | null>(route.value.query.account ?? null);
 const recentsState = computed<LoadState<RepoSummaryModel[]>>(() =>
   recents.value.length > 0 ? { status: "data", data: recents.value } : { status: "empty" },
 );
-const nearbyState = computed<LoadState<RepoSummaryModel[]>>(() => ({ status: "empty" }));
+const nearbyState = computed<LoadState<RepoRoot[]>>(() => {
+  switch (repositories.nearbyState.value) {
+    case "scanning":
+      return { status: "loading" };
+    case "done":
+      return { status: "data", data: repositories.nearby.value };
+    default:
+      return { status: "empty" };
+  }
+});
+
+/**
+ * Scan a folder for repositories.
+ *
+ * The user picks the folder rather than being scanned at $HOME: a home walk is
+ * minutes on a large disk, and asking is one dialog instead of a silent,
+ * unbounded filesystem crawl.
+ */
+async function scanNearby(): Promise<void> {
+  const root = await pickDirectory();
+  if (root) await repositories.discoverNearby(root);
+}
+
+/** Open a repository the scan found. It is not open yet, so a path, not an id. */
+async function openNearbyPath(path: string): Promise<void> {
+  const info = await repositories.open(path);
+  if (info) navigate(repositoryPath(info.id));
+}
 const settingsState = computed<LoadState<SettingsDocument>>(() => ({
   status: "data",
   data: settingsDocument.value,
@@ -1022,12 +1274,12 @@ const paletteItems = computed<PaletteItemModel[]>(() => {
   if (paletteMode.value === "actions") {
     const hasRepo = selectedRepo.value !== null;
     return [
-      { id: "action:new-branch", label: "New branch…", icon: "action.branch", group: "Branches", disabled: !hasRepo },
-      { id: "action:checkout", label: "Check out branch…", icon: "arrow.triangle.branch", group: "Branches", disabled: !hasRepo },
-      { id: "action:refresh", label: "Refresh repository", icon: "action.refresh", group: "Repository", disabled: !hasRepo },
-      { id: "action:settings", label: "Open settings", icon: "nav.settings", group: "Application" },
-      { id: "action:account", label: "Open accounts", icon: "nav.services", group: "Application" },
-      { id: "action:repos", label: "Repository list", icon: "nav.repositories", group: "Application" },
+      { id: "action:new-branch", label: t("shell.toolbar.newBranch"), icon: "action.branch", group: t("shell.palette.groupBranches"), disabled: !hasRepo },
+      { id: "action:checkout", label: t("shell.toolbar.checkoutBranch"), icon: "arrow.triangle.branch", group: t("shell.palette.groupBranches"), disabled: !hasRepo },
+      { id: "action:refresh", label: t("shell.palette.refreshRepository"), icon: "action.refresh", group: t("shell.palette.groupRepository"), disabled: !hasRepo },
+      { id: "action:settings", label: t("shell.palette.openSettings"), icon: "nav.settings", group: t("shell.palette.groupApplication") },
+      { id: "action:account", label: t("shell.palette.openAccounts"), icon: "nav.services", group: t("shell.palette.groupApplication") },
+      { id: "action:repos", label: t("shell.palette.repositoryList"), icon: "nav.repositories", group: t("shell.palette.groupApplication") },
     ];
   }
 
@@ -1038,7 +1290,7 @@ const paletteItems = computed<PaletteItemModel[]>(() => {
       label: info.workdir ?? info.gitdir,
       detail: info.headBranch ?? undefined,
       icon: "shippingbox",
-      group: "Repositories",
+      group: t("shell.palette.groupRepositories"),
     });
   }
   for (const branch of localBranches.value) {
@@ -1047,16 +1299,18 @@ const paletteItems = computed<PaletteItemModel[]>(() => {
       label: branch.name,
       detail: branch.tipSummary,
       icon: branch.isHead ? "checkmark.circle.fill" : "arrow.triangle.branch",
-      group: "Branches",
+      group: t("shell.palette.groupBranches"),
       disabled: selectedRepo.value === null,
     });
   }
   for (const tab of ["working-copy", "history", "branches", "compare"] as WorkspaceTab[]) {
     items.push({
       id: `tab:${tab}`,
-      label: tab === "working-copy" ? "Working copy" : tab.charAt(0).toUpperCase() + tab.slice(1),
+      // The route table owns which key names a tab; capitalising the id is not
+      // a translation, it is a coincidence that happened to work in English.
+      label: t(WORKSPACE_TAB_LABEL_KEYS[tab]),
       icon: "nav.history",
-      group: "Views",
+      group: t("shell.palette.groupViews"),
       disabled: selectedRepo.value === null,
     });
   }
@@ -1131,7 +1385,6 @@ function onBlameRequest(path: string): void {
 
 const blamePathFromQuery = computed(() => route.value.query.path ?? "");
 
-const compareEmptyState = computed(() => ({ status: "empty" as const }));
 const blameEmptyState = computed(() => ({ status: "empty" as const }));
 
 watch(
@@ -1150,6 +1403,7 @@ watch(
         :activity="activitySummary"
         @run="onToolbarRun"
         @choose="onToolbarChoose"
+        @open-activity="navigate(activityPath())"
       />
     </template>
 
@@ -1177,22 +1431,24 @@ watch(
       v-if="routeName === 'repositories'"
       :recents="recents"
       :recents-state="recentsState"
-      :nearby="[]"
+      :nearby="repositories.nearby.value"
       :nearby-state="nearbyState"
       :path-input="repositories.pathInput.value"
+      :clone-url="repositories.cloneUrl.value"
       :filter="recentsFilter"
       :busy="repositories.busy.value"
       :error-message="repositories.lastError.value?.message ?? null"
       :error-detail="repositories.lastError.value?.detail ?? null"
-      :unavailable="{
-        browse: 'Choosing a folder is not available in this build.',
-        clone: 'Cloning is not available in this build.',
-        nearby: 'Scanning for repositories is not available in this build.',
-      }"
+      :unavailable="null"
       @update:path-input="repositories.pathInput.value = $event"
+      @update:clone-url="repositories.cloneUrl.value = $event"
       @update:filter="recentsFilter = $event"
+      @browse="() => void repositories.browse()"
+      @clone="(url) => void openAfter(repositories.clone(url))"
+      @refresh-nearby="scanNearby"
+      @open-nearby="openNearbyPath"
       @open="onOpenRequested"
-      @init="(path) => void repositories.init(path)"
+      @init="(path) => void openAfter(repositories.init(path))"
       @open-recent="openRepository"
       @remove-recent="onRemoveRecent"
       @reveal-recent="onRevealRecent"
@@ -1205,8 +1461,8 @@ watch(
       :summary="summary"
       :tab="activeTab"
       @update:tab="goTab"
-      @continue-operation="() => void runVerb(() => git.continueOperation(), 'Operation continued.')"
-      @abort-operation="() => void runVerb(() => git.abortOperation(), 'Operation aborted.')"
+      @continue-operation="() => void runVerb(() => git.continueOperation(), t('shell.toast.operationContinued'))"
+      @abort-operation="() => void runVerb(() => git.abortOperation(), t('shell.toast.operationAborted'))"
     >
       <template #working-copy>
         <WorkingCopyPane
@@ -1237,6 +1493,7 @@ watch(
           @stage="(path) => void workingCopy.stage(path)"
           @unstage="(path) => void workingCopy.unstage(path)"
           @discard="(path) => void discardEntry(path)"
+          @clear-assume-unchanged="(path) => void clearAssumeUnchanged(path)"
           @bulk-stage="(paths) => paths.forEach((path) => void workingCopy.stage(path))"
           @bulk-unstage="(paths) => paths.forEach((path) => void workingCopy.unstage(path))"
           @update:conflicted-only="conflictedOnly = $event"
@@ -1249,8 +1506,8 @@ watch(
           @open-blame="onBlameRequest"
           @open-in-editor="(path) => void workingCopy.openInEditor(path)"
           @resolve-conflict="onResolveConflict"
-          @resolve-merge="() => void runVerb(() => git.continueOperation(), 'Merge continued.')"
-          @abort-merge="() => void runVerb(() => git.abortOperation(), 'Merge aborted.')"
+          @resolve-merge="() => void runVerb(() => git.continueOperation(), t('shell.toast.mergeContinued'))"
+          @abort-merge="() => void runVerb(() => git.abortOperation(), t('shell.toast.mergeAborted'))"
           @update:subject="composerSubject = $event"
           @update:body="composerBody = $event"
           @update:amend="composerAmend = $event"
@@ -1326,7 +1583,7 @@ watch(
           <template #master>
             <BranchListPane
               :state="branches.state.value"
-              :branches="branches.branches.value"
+              :branches="branches.allBranches.value"
               :selected-name="selectedBranchName"
               :filter="branchFilter"
               :search="branchSearch"
@@ -1353,9 +1610,9 @@ watch(
               @checkout="selectedBranchInfo && checkoutFlow(selectedBranchInfo.fullName)"
               @merge-into-current="() => void mergeBranch(selectedBranchInfo?.name ?? selectedBranchName)"
               @rebase-onto="() => void rebaseBranch(selectedBranchInfo?.name ?? selectedBranchName)"
-              @push="() => void runVerb(() => git.push(), 'Pushed.')"
-              @push-choose="() => void runVerb(() => git.push(), 'Pushed.')"
-              @pull="() => void runVerb(() => git.pull(), 'Pulled.')"
+              @push="() => void pushSelectedBranch()"
+              @push-choose="() => void pushSelectedBranch()"
+              @pull="() => void checkoutSelectedBranch()"
               @rename="() => void renameBranchFlow(selectedBranchInfo?.name ?? selectedBranchName)"
               @remove="() => void deleteBranch(selectedBranchInfo?.name ?? selectedBranchName)"
               @show-in-history="goTab('history')"
@@ -1368,17 +1625,47 @@ watch(
 
       <template #compare>
         <ComparePane
-          :state="compareEmptyState"
-          :comparison="null"
-          :left="null"
-          :right="null"
+          :state="compare.state.value"
+          :comparison="compare.comparison.value"
+          :left="compare.left.value"
+          :right="compare.right.value"
+          :selected-oid="history.selectedOid.value"
           :detail-width="detailWidth"
-          unavailable="Comparing revisions is not available in this build."
-          @select-commit="() => {}"
-          @open-commit="() => {}"
+          :busy="compare.busy.value"
+          :unavailable="null"
+          @choose-ref="pickCompareRef"
+          @swap="compare.swap()"
+          @select-commit="history.select($event)"
+          @open-commit="onOpenCommitFromCompare"
           @update:detail-width="detailWidth = $event"
-          @refresh="() => {}"
-        />
+          @refresh="() => void compare.reload()"
+        >
+          <template #detail>
+            <CommitDetailPane
+              :state="history.detail.value"
+              :changeset="history.changeset.value"
+              :diff="null"
+              :diff-mode="diffMode"
+              :diff-options="diff.options.value"
+              :selected-path="history.selectedPath.value"
+              :detail-width="detailWidth"
+              @copy-hash="copyText"
+              @copy-summary="copyText"
+              @select-file="(path) => history.selectPath(path)"
+              @file-contextmenu="() => {}"
+              @open-blame="onBlameRequest"
+              @open-in-editor="(path) => void workingCopy.openInEditor(path)"
+              @browse-tree="goTab('history')"
+              @select-parent="(oid) => void history.select(oid)"
+              @update:detail-width="detailWidth = $event"
+              @update:diff-mode="diffMode = $event"
+              @update:diff-options="(options) => void diff.setOptions(options)"
+              @hunk-action="() => {}"
+              @diff-retry="() => void history.refresh()"
+              @diff-show-anyway="() => void history.refresh()"
+            />
+          </template>
+        </ComparePane>
       </template>
     </RepositoryScreen>
 
@@ -1414,10 +1701,18 @@ watch(
       @update:search="settingsSearch = $event"
       @set="setSetting"
       @reset="resetSetting"
+      @choose-path="onChooseSettingPath"
       @refresh="() => {}"
     />
 
     <!-- About / updates / release notes / feedback -->
+    <ActivityScreen
+      v-else-if="routeName === 'activity'"
+      :entries="activity.entries.value"
+      :running="activity.running.value.length"
+      @clear="activity.clearFinished()"
+    />
+
     <AboutScreen
       v-else-if="routeName === 'about'"
       :info="appInfo"
@@ -1447,7 +1742,7 @@ watch(
       v-else
       :accounts="accountsState"
       :selected-id="activeAccountId"
-      unavailable="Connecting and managing hosting accounts is not available in this build."
+      :unavailable="t('shell.unavailable.accounts')"
       @select="activeAccountId = $event"
       @refresh="() => {}"
     />
@@ -1466,9 +1761,13 @@ watch(
         :open="paletteMode !== null"
         :query="paletteQuery"
         :items="filteredPaletteItems"
-        :heading="paletteMode === 'actions' ? 'Quick actions' : 'Quick open'"
-        :placeholder="paletteMode === 'actions' ? 'Run a command' : 'Search repositories, branches and views'"
-        empty-text="No matches"
+        :heading="paletteMode === 'actions' ? t('shell.palette.headingActions') : t('shell.palette.headingOpen')"
+        :placeholder="
+          paletteMode === 'actions'
+            ? t('shell.palette.placeholderActions')
+            : t('shell.palette.placeholderOpen')
+        "
+        :empty-text="t('shell.palette.empty')"
         @update:query="paletteQuery = $event"
         @select="onPaletteSelect"
         @close="closePalette"

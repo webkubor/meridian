@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
+import { formatRelative } from "../../i18n";
 import type { BlameLines, BlamePopover, LoadState } from "../contracts";
 import EmptyState from "../common/EmptyState.vue";
 import Icon from "../common/Icon.vue";
@@ -13,6 +15,8 @@ import VirtualList from "../common/VirtualList.vue";
  * gutter never relies on colour alone (docs/04 §9) — every hunk's first line
  * carries the full annotation text.
  */
+const { t } = useI18n();
+
 const props = withDefaults(
   defineProps<{
     state: LoadState<BlameLines>;
@@ -93,13 +97,13 @@ function tintOf(index: number): "a" | "b" {
   return (ids[index] ?? 0) % 2 === 0 ? "a" : "b";
 }
 
+/**
+ * `Intl.RelativeTimeFormat` via the app's locale, instead of a hand-rolled
+ * "3d ago". The abbreviation style is a property of the language, not a
+ * shortening this pane is entitled to invent.
+ */
 function relTime(seconds: number): string {
-  const delta = Date.now() / 1000 - seconds;
-  if (delta < 60) return "just now";
-  if (delta < 3600) return `${Math.floor(delta / 60)}m ago`;
-  if (delta < 86400) return `${Math.floor(delta / 3600)}h ago`;
-  if (delta < 86400 * 30) return `${Math.floor(delta / 86400)}d ago`;
-  return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(seconds * 1000));
+  return formatRelative(seconds * 1000);
 }
 </script>
 
@@ -111,33 +115,33 @@ function relTime(seconds: number): string {
       <span class="blame-spacer" />
       <button type="button" class="blame-verb" @click="emit('openDiff')">
         <Icon name="doc.text" :size="13" />
-        Show diff
+        {{ t("blame.showDiff") }}
       </button>
       <button type="button" class="blame-verb" @click="emit('openInEditor')">
         <Icon name="arrow.up.forward.square" :size="13" />
-        Open
+        {{ t("blame.open") }}
       </button>
     </header>
 
     <EmptyState
       v-if="state.status === 'loading'"
       icon="hourglass"
-      title="Blaming…"
+      :title="t('blame.loading')"
       compact
     />
     <EmptyState
       v-else-if="state.status === 'error'"
       icon="exclamationmark.circle"
       :title="state.error.message"
-      action-label="Try again"
+      :action-label="t('common.retry')"
       compact
       @action="emit('retry')"
     />
     <EmptyState
       v-else-if="state.status === 'empty' || lines.length === 0"
       icon="empty.noFileSelected"
-      title="Nothing to blame"
-      caption="This file has no committed history."
+      :title="t('blame.emptyTitle')"
+      :caption="t('blame.emptyCaption')"
     />
 
     <VirtualList v-else :count="lines.length" :row-height="20" class="blame-list">
@@ -180,7 +184,7 @@ function relTime(seconds: number): string {
         v-if="popover && anchor"
         class="blame-annot-panel"
         role="dialog"
-        aria-label="Blame annotation"
+        :aria-label="t('blame.annotationLabel')"
         :style="{ left: `${anchor.x}px`, top: `${anchor.y}px` }"
       >
         <p class="annot-message">{{ popover.summary }}</p>
@@ -191,7 +195,7 @@ function relTime(seconds: number): string {
         <div class="annot-actions">
           <button type="button" @click="emit('openCommit', popover.oid)">
             <Icon name="clock" :size="12" />
-            Show commit
+            {{ t("blame.showCommit") }}
           </button>
           <button
             v-if="popover"
@@ -199,7 +203,7 @@ function relTime(seconds: number): string {
             @click="emit('copyOid', popover.shortOid)"
           >
             <Icon name="doc.on.doc" :size="12" />
-            Copy hash
+            {{ t("blame.copyHash") }}
           </button>
         </div>
       </div>

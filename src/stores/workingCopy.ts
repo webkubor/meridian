@@ -93,5 +93,34 @@ export const useWorkingCopyStore = defineStore("workingCopy", () => {
     }
   }
 
-  return { state, entries, summary, lastError, refresh, stage, unstage, discard, commit, openEntry };
+  /** Set or clear git's assume-unchanged bit on paths. */
+  async function setAssumeUnchanged(
+    repo: RepoId,
+    paths: string[],
+    value: boolean,
+  ): Promise<boolean> {
+    lastError.value = null;
+    try {
+      await commands.wcEntryAssumeUnchangedSet(repo, paths, value);
+      await refresh(repo);
+      return true;
+    } catch (error) {
+      lastError.value = error as ErrorPayload;
+      return false;
+    }
+  }
+
+  return {
+    state,
+    entries,
+    summary,
+    lastError,
+    refresh,
+    stage,
+    unstage,
+    discard,
+    commit,
+    openEntry,
+    setAssumeUnchanged,
+  };
 });

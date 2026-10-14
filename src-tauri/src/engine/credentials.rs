@@ -58,6 +58,21 @@ pub fn callback(
     }
 }
 
+/// The same chain as [`callback`], for the one transport that has no repository
+/// to read configuration from: a clone. Without it a clone could only reach
+/// public `https://` URLs — every `git@host:` URL and every private repository
+/// would fail with an authentication error.
+pub fn callback_for_user(
+) -> impl FnMut(&str, Option<&str>, CredentialType) -> Result<git2::Cred, git2::Error> {
+    let config = CredentialConfig::for_user();
+    let mut state = ChainState::default();
+    move |url, username, allowed| {
+        state
+            .next(&config, url, username, allowed)
+            .map_err(|payload| git2::Error::from_str(&encode_credential_error(&payload)))
+    }
+}
+
 /// Resolve the first credential the `allowed` mask accepts. A convenience
 /// wrapper over [`ChainState`] for direct callers; the transport routes through
 /// [`callback`] so it can offer the following candidate on a retry.
@@ -79,6 +94,19 @@ struct CredentialConfig {
 }
 
 impl CredentialConfig {
+    /// For a transport with no repository yet — a clone. Reads the user's
+    /// global/XDG/system git configuration, which is what `git clone` itself
+    /// would consult before the new repository's own config exists.
+    fn for_user() -> Self {
+        match git2::Config::open_default() {
+            Ok(config) => Self {
+                helpers: helpers_from(&config),
+                use_http_path: config.get_bool("credential.useHttpPath").unwrap_or(false),
+            },
+            Err(_) => Self::default(),
+        }
+    }
+
     fn for_repo(repo: &git2::Repository) -> Self {
         Self {
             helpers: credential_helpers(repo),
@@ -349,9 +377,14 @@ pub fn parse_helper_output(stdout: &str) -> HelperReply {
 /// includes the local `.git/config` as well as the global/system files, so a
 /// repo-scoped `credential.helper` is honoured exactly as git honours it.
 fn credential_helpers(repo: &git2::Repository) -> Vec<String> {
-    let Ok(config) = repo.config() else {
-        return Vec::new();
-    };
+    repo.config()
+        .map(|config| helpers_from(&config))
+        .unwrap_or_default()
+}
+
+/// The `credential.helper` list of one configuration, honouring git's rule that
+/// an empty value resets everything configured before it.
+fn helpers_from(config: &git2::Config) -> Vec<String> {
     let mut helpers = Vec::new();
     let Ok(mut entries) = config.entries(Some("credential.helper")) else {
         return helpers;

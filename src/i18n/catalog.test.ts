@@ -53,6 +53,15 @@ const UNTRANSLATED_BY_DESIGN = new Set([
   // "英语" would show the choice in a script the chooser may not read.
   "language.en",
   "language.zhCN",
+  // `+12 −3` — the signs are the information, and the diff spec requires the
+  // same characters in both languages so a line reads identically either way.
+  // Translating it would mean deciding that "增加 12 删除 3" is the same string.
+  "commitList.overflowBadge",
+  // Hunk statistics are a numeric template, not copy: `@@ -1,4 +1,6 @@` and the
+  // per-row counts are the same data a Chinese user reads in a terminal.
+  "diff.hunkStats",
+  // The tool's own name, like "Meridian" above.
+  "shell.settings.git",
 ]);
 
 describe("i18n catalogues", () => {

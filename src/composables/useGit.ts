@@ -65,11 +65,18 @@ export function useGit() {
         if (!remote) throw missingRemote();
         return commands.remotePull(id, remote);
       }),
-    push: () =>
+    /**
+     * Publish a branch. Defaults to the checked-out one; a branch pane must pass
+     * the branch it is showing, because pushing from a *selected* branch while
+     * the user reads a *different* branch's pane publishes the wrong ref — the
+     * worst kind of quiet wrongness for a tool whose whole promise is not
+     * surprising anyone.
+     */
+    push: (branchName?: string) =>
       run((id) => {
         const remote = repos.defaultRemote;
         if (!remote) throw missingRemote();
-        const branch = repos.selected?.headBranch;
+        const branch = branchName ?? repos.selected?.headBranch;
         if (!branch) {
           throw { code: "invalid_request", message: "HEAD is detached — check out a branch to push.", domain: "git", retryable: false } as ErrorPayload;
         }

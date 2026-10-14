@@ -120,6 +120,88 @@ fn resolve_open_path(args: &RepositoryOpenArgs) -> Result<PathBuf, ErrorPayload>
 
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct RepositoryCloneArgs {
+    pub url: String,
+    /// Where to put the working tree. Empty means "next to the caller's idea of
+    /// a default", which the frontend fills in — see `suggest_clone_destination`.
+    pub destination: String,
+    #[serde(default)]
+    pub bare: bool,
+    #[serde(default)]
+    pub initial_branch: String,
+}
+
+/// Derives the folder name a URL implies: the last path segment of a
+/// `.git`-suffixed URL, with the `.git` removed.
+///
+/// Public because the frontend shows this as the destination the user is about
+/// to be asked to confirm, and a suggestion the UI has to recompute separately
+/// is a suggestion that will disagree with the one the command uses.
+#[tauri::command]
+pub fn repository_clone_suggest_destination(url: String) -> String {
+    let trimmed = url.trim().trim_end_matches('/');
+    let last = trimmed.rsplit('/').next().unwrap_or_default();
+    let name = last.strip_suffix(".git").unwrap_or(last);
+    // A bare `host:` / `host:path` scp-style URL has no slash to split on.
+    let name = name.rsplit(':').next().unwrap_or(name);
+    let name = name.split('\\').next().unwrap_or(name);
+    if name.is_empty() || name == "." || name == ".." {
+        "repository".to_string()
+    } else {
+        name.to_string()
+    }
+}
+
+/// Clones `url` into `destination` and opens the result.
+///
+/// The clone runs on a blocking thread (`spawn_blocking`) rather than inline:
+/// libgit2's transfer is synchronous, and on the command's own task a large
+/// clone would stall every other command in the app for the duration. The
+/// frontend shows a progress chip; this command returns when it is done.
+#[tauri::command]
+pub async fn repository_clone(
+    state: State<'_, AppState>,
+    app: AppHandle,
+    args: RepositoryCloneArgs,
+) -> Result<RepoInfo, ErrorPayload> {
+    let url = args.url.trim().to_string();
+    if url.is_empty() {
+        return Err(ErrorPayload::new(
+            ErrorCode::InvalidRequest,
+            "No clone URL given",
+        ));
+    }
+
+    let destination = if args.destination.trim().is_empty() {
+        repository_clone_suggest_destination(url.clone())
+    } else {
+        args.destination.trim().to_string()
+    };
+    let destination = PathBuf::from(destination);
+    validation::repository::validate_init_path(&destination, "main").map_err(ErrorPayload::from)?;
+
+    let initial_branch = args.initial_branch.trim().to_string();
+    let bare = args.bare;
+    let target = destination.clone();
+    let clone_url = url.clone();
+
+    let repo = tauri::async_runtime::spawn_blocking(move || {
+        engine::repository::clone(&clone_url, &target, bare, &initial_branch)
+    })
+    .await
+    .map_err(|err| {
+        ErrorPayload::new(ErrorCode::Io, format!("The clone did not finish: {err}"))
+    })??;
+
+    let mut info = state.insert_repo(repo)?;
+    info.discovered = false;
+
+    events::emit(&app, AppEvent::ReposChanged);
+    Ok(info)
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RepositoryDiscoverArgs {
     pub root: String,
     /// Depth below the root to inspect; `0` means no limit.
@@ -567,6 +649,44 @@ fn validate_config_key(key: &str) -> Result<(), Violation> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn clone_destination_is_the_last_path_segment_without_dot_git() {
+        let cases = [
+            ("https://github.com/owner/meridian.git", "meridian"),
+            ("https://github.com/owner/meridian", "meridian"),
+            ("https://github.com/owner/meridian/", "meridian"),
+            ("ssh://git@host:2222/team/app.git", "app"),
+            // scp-style has no slash to split on before the path.
+            ("git@github.com:owner/meridian.git", "meridian"),
+            ("git@host:repo.git", "repo"),
+            ("  https://example.com/x/y.git  ", "y"),
+        ];
+        for (url, expected) in cases {
+            assert_eq!(
+                repository_clone_suggest_destination(url.to_string()),
+                expected,
+                "{url}"
+            );
+        }
+    }
+
+    #[test]
+    fn clone_destination_never_returns_a_path_traversal_or_empty_name() {
+        for url in [
+            "",
+            "   ",
+            "/",
+            "https://example.com/..",
+            "https://example.com/.",
+        ] {
+            assert_eq!(
+                repository_clone_suggest_destination(url.to_string()),
+                "repository",
+                "{url:?}"
+            );
+        }
+    }
 
     #[test]
     fn protected_and_malformed_config_keys_are_refused() {

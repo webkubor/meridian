@@ -81,6 +81,7 @@ function confirmBranch(name: string): void {
     :subtitle="branchRequest.subtitle"
     :branches="branchRequest.branches"
     :current="branchRequest.current"
+    :emit-full-name="branchRequest.emitFullName ?? false"
     :busy="busy"
     @confirm="confirmBranch"
     @cancel="emit('cancel', branchRequest.id)"

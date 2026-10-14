@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
 import DialogueShell from "./DialogueShell.vue";
 import ProgressTrack from "../common/ProgressTrack.vue";
 
@@ -8,7 +11,7 @@ import ProgressTrack from "../common/ProgressTrack.vue";
  * destructive verbs the primary button carries the danger tone and initial
  * focus stays on Cancel, so an Enter press never destroys work.
  */
-withDefaults(
+const props = withDefaults(
   defineProps<{
     title: string;
     message: string;
@@ -20,7 +23,6 @@ withDefaults(
     progress?: { done: number; total: number; phase: string | null } | null;
   }>(),
   {
-    cancelLabel: "Cancel",
     danger: false,
     busy: false,
     progress: null,
@@ -28,6 +30,15 @@ withDefaults(
 );
 
 const emit = defineEmits<{ confirm: []; cancel: [] }>();
+
+const { t } = useI18n();
+
+/**
+ * The default comes from the catalogue rather than `withDefaults`, because a
+ * default there is evaluated once at mount: a dialogue opened *after* the
+ * language changed would show the language it was born in.
+ */
+const cancelText = computed(() => props.cancelLabel ?? t("common.cancel"));
 </script>
 
 <template>
@@ -54,7 +65,7 @@ const emit = defineEmits<{ confirm: []; cancel: [] }>();
 
     <template #footer>
       <button type="button" class="btn" :data-autofocus="danger ? '' : undefined" @click="emit('cancel')">
-        {{ cancelLabel }}
+        {{ cancelText }}
       </button>
       <button
         type="button"

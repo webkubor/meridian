@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { EntryStatus } from "../../bridges/bindings";
 import Icon from "../common/Icon.vue";
@@ -14,10 +15,19 @@ import VirtualList from "../common/VirtualList.vue";
  * The rows carry per-row actions on hover; row *selection* and the bulk verbs
  * are reported upward. The list is virtualised because a build tree can hold
  * tens of thousands of untracked files.
+ *
+ * `title` and `emptyCaption` arrive already localised from the pane, which owns
+ * the section vocabulary. `noun` is the phrase the bulk tooltip needs — a
+ * separate string because the tooltip's grammar ("Stage all modified files")
+ * does not survive translation by lower-casing the title.
  */
+const { t } = useI18n();
+
 const props = withDefaults(
   defineProps<{
     title: string;
+    /** Phrase the bulk tooltip is built around, e.g. "modified files". */
+    noun?: string;
     entries: EntryStatus[];
     selectedPath?: string | null;
     /** Bulk verb label + which way it moves entries. */
@@ -30,9 +40,10 @@ const props = withDefaults(
     selectedPaths?: string[];
   }>(),
   {
+    noun: "",
     selectedPath: null,
     bulkAction: null,
-    emptyCaption: "No files",
+    emptyCaption: "",
     allowDiscard: true,
     selectedPaths: () => [],
   },
@@ -44,6 +55,8 @@ const emit = defineEmits<{
   stage: [path: string];
   unstage: [path: string];
   discard: [path: string];
+  /** Clear the assume-unchanged bit so the file shows up in status again. */
+  clearAssumeUnchanged: [path: string];
   bulk: [];
   contextmenu: [path: string, event: MouseEvent];
 }>();
@@ -60,6 +73,18 @@ function nameOf(path: string): string {
 }
 
 const selectedSet = computed(() => new Set(props.selectedPaths));
+
+const bulkLabel = computed(() =>
+  props.bulkAction === "stage" ? t("workingCopy.stageAll") : t("workingCopy.unstageAll"),
+);
+
+const bulkTitle = computed(() =>
+  props.bulkAction === "stage"
+    ? t("workingCopy.bulkStageAll", { noun: props.noun })
+    : t("workingCopy.bulkUnstageAll", { noun: props.noun }),
+);
+
+const emptyText = computed(() => props.emptyCaption || t("workingCopy.noFiles"));
 </script>
 
 <template>
@@ -72,22 +97,21 @@ const selectedSet = computed(() => new Set(props.selectedPaths));
         v-if="bulkAction && entries.length > 0"
         type="button"
         class="section-bulk"
-        :title="bulkAction === 'stage' ? `Stage all ${title.toLowerCase()}` : `Unstage all ${title.toLowerCase()}`"
+        :title="bulkTitle"
         @click="emit('bulk')"
       >
         <Icon :name="bulkAction === 'stage' ? 'plus.circle' : 'minus.circle'" :size="12" />
-        {{ bulkAction === "stage" ? "Stage all" : "Unstage all" }}
+        {{ bulkLabel }}
       </button>
     </header>
 
-    <p v-if="entries.length === 0" class="section-empty">{{ emptyCaption }}</p>
+    <p v-if="entries.length === 0" class="section-empty">{{ emptyText }}</p>
 
     <VirtualList
       v-else
       :count="entries.length"
       :row-height="24"
       class="file-list"
-      @end-reached="() => {}"
     >
       <template #default="{ index }">
         <div
@@ -103,7 +127,7 @@ const selectedSet = computed(() => new Set(props.selectedPaths));
             type="checkbox"
             class="file-check"
             :checked="selectedSet.has(entries[index].path)"
-            :aria-label="`Select ${entries[index].path}`"
+            :aria-label="t('workingCopy.selectFile', { path: entries[index].path })"
             @click.stop
             @change="emit('toggle', entries[index].path)"
           />
@@ -118,7 +142,7 @@ const selectedSet = computed(() => new Set(props.selectedPaths));
               v-if="entries[index].staged"
               type="button"
               class="file-action"
-              title="Unstage"
+              :title="t('workingCopy.unstage')"
               @click.stop="emit('unstage', entries[index].path)"
             >
               <Icon name="minus.circle" :size="13" />
@@ -127,7 +151,7 @@ const selectedSet = computed(() => new Set(props.selectedPaths));
               v-else
               type="button"
               class="file-action"
-              title="Stage"
+              :title="t('workingCopy.stage')"
               @click.stop="emit('stage', entries[index].path)"
             >
               <Icon name="plus.circle" :size="13" />
@@ -136,7 +160,7 @@ const selectedSet = computed(() => new Set(props.selectedPaths));
               v-if="allowDiscard && !entries[index].staged"
               type="button"
               class="file-action danger"
-              title="Discard changes"
+              :title="t('workingCopy.discardChanges')"
               @click.stop="emit('discard', entries[index].path)"
             >
               <Icon name="arrow.uturn.backward" :size="12" />
@@ -145,8 +169,8 @@ const selectedSet = computed(() => new Set(props.selectedPaths));
               v-if="entries[index].assumeUnchanged"
               type="button"
               class="file-action muted"
-              title="Assume unchanged"
-              disabled
+              :title="t('workingCopy.clearAssumeUnchanged')"
+              @click.stop="emit('clearAssumeUnchanged', entries[index].path)"
             >
               <Icon name="eye.slash" :size="12" />
             </button>

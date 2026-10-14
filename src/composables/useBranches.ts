@@ -12,6 +12,8 @@ export function useBranches() {
 
   const state = computed(() => store.state);
   const branches = computed(() => store.branches);
+  const remoteBranches = computed(() => store.remoteBranches);
+  const allBranches = computed(() => store.allBranches);
   const lastError = computed(() => store.lastError);
 
   watch(
@@ -32,16 +34,28 @@ export function useBranches() {
     if (id) await store.refresh(id, search.value);
   }
 
-  async function create(name: string): Promise<BranchInfo | null> {
+  async function create(name: string, checkout = true): Promise<BranchInfo | null> {
     const id = repos.selectedId;
     if (!id) return null;
-    return store.create(id, name);
+    return store.create(id, name, checkout);
   }
 
   async function checkout(name: string): Promise<boolean> {
     const id = repos.selectedId;
     if (!id) return false;
     return store.checkout(id, name);
+  }
+
+  /**
+   * Check out a remote-tracking branch, creating a local branch at its tip.
+   *
+   * Distinct from `checkout` because the verb has to create something: there is
+   * no local `origin/main` to switch to.
+   */
+  async function checkoutRemote(fullName: string): Promise<boolean> {
+    const id = repos.selectedId;
+    if (!id) return false;
+    return store.checkoutRemote(id, fullName);
   }
 
   async function rename(old: string, next: string): Promise<BranchInfo | null> {
@@ -56,5 +70,18 @@ export function useBranches() {
     return store.remove(id, [name]);
   }
 
-  return { search, state, branches, lastError, refresh, create, checkout, rename, remove };
+  return {
+    search,
+    state,
+    branches,
+    remoteBranches,
+    allBranches,
+    lastError,
+    refresh,
+    create,
+    checkout,
+    checkoutRemote,
+    rename,
+    remove,
+  };
 }

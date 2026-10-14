@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { LoadState, ProviderId, ServiceAccount } from "../contracts";
 import EmptyState from "../common/EmptyState.vue";
@@ -40,18 +41,26 @@ const list = computed(() => (props.accounts.status === "data" ? props.accounts.d
 
 const selected = computed(() => list.value.find((account) => account.id === props.selectedId) ?? null);
 
-const PROVIDER_LABEL: Record<ProviderId, string> = {
+const { t } = useI18n();
+
+/**
+ * Vendor names stay inline: a product's own name is not a translatable string,
+ * and a catalogue entry whose two languages are identical reads as a
+ * forgotten translation. Only the generic `custom` slot is a real word, so it
+ * goes through the catalogue — and through a function, not a table, so the
+ * group heading relabels itself on a language switch.
+ */
+const VENDOR_NAME: Partial<Record<ProviderId, string>> = {
   github: "GitHub",
   gitlab: "GitLab",
   bitbucket: "Bitbucket",
   azureDevOps: "Azure DevOps",
   stash: "Bitbucket Server",
   beanstalk: "Beanstalk",
-  custom: "Other service",
 };
 
 function labelOf(provider: ProviderId): string {
-  return PROVIDER_LABEL[provider];
+  return VENDOR_NAME[provider] ?? t("screens.account.providers.other");
 }
 
 const byProvider = computed(() => {
@@ -69,28 +78,28 @@ const byProvider = computed(() => {
   <div class="accounts">
     <div class="accounts-list">
       <header class="accounts-head">
-        <h1 class="accounts-title">Accounts</h1>
+        <h1 class="accounts-title">{{ $t('screens.account.title') }}</h1>
         <span class="accounts-spacer" />
         <button
           type="button"
           class="accounts-add"
           :disabled="!!unavailable"
-          :title="unavailable ?? 'Add account'"
+          :title="unavailable ?? $t('screens.account.add')"
           @click="emit('addAccount')"
         >
           <Icon name="plus" :size="13" />
-          Add account
+          {{ $t('screens.account.add') }}
         </button>
       </header>
 
       <ListShell
         :status="accounts.status"
         empty-icon="empty.services"
-        empty-title="No accounts connected"
-        :empty-caption="unavailable ?? 'Connect a hosting service to browse remotes and pull requests.'"
-        :empty-action-label="unavailable ? undefined : 'Add account'"
+        :empty-title="$t('screens.account.emptyTitle')"
+        :empty-caption="unavailable ?? $t('screens.account.emptyCaption')"
+        :empty-action-label="unavailable ? undefined : $t('screens.account.add')"
         :error-message="accounts.status === 'error' ? accounts.error.message : null"
-        loading-caption="Loading accounts…"
+        :loading-caption="$t('screens.account.loading')"
         @retry="emit('refresh')"
         @empty-action="emit('addAccount')"
       >
@@ -110,7 +119,7 @@ const byProvider = computed(() => {
               <span class="account-name">{{ account.displayName }}</span>
               <span class="account-login">{{ account.login }}</span>
             </span>
-            <span v-if="!account.connected" class="account-offline" title="Not connected">
+            <span v-if="!account.connected" class="account-offline" :title="$t('screens.account.notConnected')">
               <Icon name="exclamationmark.triangle" :size="12" />
             </span>
           </button>
@@ -122,8 +131,8 @@ const byProvider = computed(() => {
       <EmptyState
         v-if="!selected"
         icon="empty.services"
-        title="No account selected"
-        caption="Pick an account to see its details."
+        :title="$t('screens.account.noneSelected')"
+        :caption="$t('screens.account.noneSelectedCaption')"
       />
       <template v-else>
         <header class="detail-head">
@@ -141,38 +150,38 @@ const byProvider = computed(() => {
             class="detail-verb"
             @click="emit('disconnect', selected.id)"
           >
-            Sign out
+            {{ $t('screens.account.signOut') }}
           </button>
           <button v-else type="button" class="detail-verb primary" @click="emit('connect', selected.id)">
-            Connect
+            {{ $t('screens.account.connect') }}
           </button>
         </header>
 
         <dl class="detail-facts">
           <div class="fact">
-            <dt>Repositories</dt>
+            <dt>{{ $t('screens.account.repositories') }}</dt>
             <dd>{{ selected.repositoryCount }}</dd>
           </div>
           <div class="fact">
-            <dt>Organizations</dt>
+            <dt>{{ $t('screens.account.organizations') }}</dt>
             <dd>
-              <span v-if="selected.organizations.length === 0" class="muted">None</span>
+              <span v-if="selected.organizations.length === 0" class="muted">{{ $t('common.none') }}</span>
               <span v-for="org in selected.organizations" :key="org" class="org-chip">{{ org }}</span>
             </dd>
           </div>
         </dl>
 
         <section class="detail-keys">
-          <h3 class="keys-title">Keys</h3>
+          <h3 class="keys-title">{{ $t('screens.account.keys') }}</h3>
           <p v-if="selected.keys.length === 0" class="keys-empty">
-            No keys stored for this account.
+            {{ $t('screens.account.noKeys') }}
           </p>
           <div v-for="key in selected.keys" :key="key.id" class="key-row">
             <Icon name="key" :size="13" class="key-icon" />
             <span class="key-title">{{ key.title }}</span>
             <span v-if="key.fingerprint" class="key-fingerprint mono">{{ key.fingerprint }}</span>
             <span class="accounts-spacer" />
-            <button type="button" class="key-copy" title="Copy the key id" @click="emit('copyKey', key.id)">
+            <button type="button" class="key-copy" :title="$t('screens.account.copyKeyId')" @click="emit('copyKey', key.id)">
               <Icon name="doc.on.doc" :size="12" />
             </button>
           </div>
@@ -181,7 +190,7 @@ const byProvider = computed(() => {
         <footer class="detail-foot">
           <button type="button" class="detail-verb danger" @click="emit('remove', selected.id)">
             <Icon name="trash" :size="13" />
-            Remove account
+            {{ $t('screens.account.remove') }}
           </button>
         </footer>
       </template>

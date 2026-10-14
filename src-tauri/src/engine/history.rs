@@ -1212,6 +1212,29 @@ fn count_cache_put(key: String, value: u64) {
     }
 }
 
+/// Fork point and divergence of two revisions: `(merge_base, left_only, right_only)`.
+///
+/// `left_only` is how many commits `left` has that `right` lacks (what `left`
+/// is *ahead* by), `right_only` the reverse. The merge base is `None` for
+/// unrelated histories — a real answer, not an error.
+///
+/// Lives here rather than inside the command so it can be tested against a real
+/// repository without an `AppHandle`.
+pub fn compare(
+    repo: &git2::Repository,
+    left: &Revision,
+    right: &Revision,
+) -> Result<(Option<String>, usize, usize), ErrorPayload> {
+    let left = resolve(repo, left)?;
+    let right = resolve(repo, right)?;
+    let (left_only, right_only) = repo.graph_ahead_behind(left.id(), right.id())?;
+    let base = repo
+        .merge_base(left.id(), right.id())
+        .ok()
+        .map(|oid| oid.to_string());
+    Ok((base, left_only, right_only))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1278,5 +1301,113 @@ mod tests {
         );
         assert_eq!(normalise_path(Some("   ")), None);
         assert_eq!(normalise_path(None), None);
+    }
+
+    // --- compare -----------------------------------------------------------
+
+    fn scratch_repo(name: &str) -> (std::path::PathBuf, git2::Repository) {
+        let dir = std::env::temp_dir().join(format!(
+            "meridian-compare-{name}-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&dir).expect("scratch dir");
+        let repo = git2::Repository::init(&dir).expect("init");
+        (dir, repo)
+    }
+
+    fn commit_on(
+        repo: &git2::Repository,
+        refname: &str,
+        parents: &[git2::Oid],
+        message: &str,
+    ) -> git2::Oid {
+        let sig = git2::Signature::now("Test", "test@example.com").expect("sig");
+        let tree = {
+            let mut builder = repo.treebuilder(None).expect("treebuilder");
+            let blob = repo.blob(message.as_bytes()).expect("blob");
+            builder.insert("f", blob, 0o100644).expect("insert");
+            let oid = builder.write().expect("write tree");
+            repo.find_tree(oid).expect("tree")
+        };
+        let parents: Vec<git2::Commit> = parents
+            .iter()
+            .map(|oid| repo.find_commit(*oid).expect("parent"))
+            .collect();
+        let parent_refs: Vec<&git2::Commit> = parents.iter().collect();
+        repo.commit(Some(refname), &sig, &sig, message, &tree, &parent_refs)
+            .expect("commit")
+    }
+
+    #[test]
+    fn compare_counts_each_side_from_the_fork_point() {
+        let (dir, repo) = scratch_repo("diverged");
+        let base = commit_on(&repo, "refs/heads/main", &[], "base");
+        // main gains one commit, topic gains two — both from `base`.
+        commit_on(&repo, "refs/heads/main", &[base], "main-1");
+        let t1 = commit_on(&repo, "refs/heads/topic", &[base], "topic-1");
+        commit_on(&repo, "refs/heads/topic", &[t1], "topic-2");
+
+        let (merge_base, left_only, right_only) = compare(
+            &repo,
+            &Revision::Branch("main".into()),
+            &Revision::Branch("topic".into()),
+        )
+        .expect("compare");
+
+        assert_eq!(merge_base.as_deref(), Some(base.to_string().as_str()));
+        assert_eq!(left_only, 1, "main has one commit topic lacks");
+        assert_eq!(right_only, 2, "topic has two commits main lacks");
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn comparing_a_branch_with_itself_is_zero_and_zero() {
+        let (dir, repo) = scratch_repo("same");
+        let base = commit_on(&repo, "refs/heads/main", &[], "only");
+        let (merge_base, left_only, right_only) = compare(
+            &repo,
+            &Revision::Branch("main".into()),
+            &Revision::Branch("main".into()),
+        )
+        .expect("compare");
+        assert_eq!(merge_base.as_deref(), Some(base.to_string().as_str()));
+        assert_eq!((left_only, right_only), (0, 0));
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn unrelated_histories_have_no_merge_base() {
+        let (dir, repo) = scratch_repo("unrelated");
+        commit_on(&repo, "refs/heads/main", &[], "a");
+        commit_on(&repo, "refs/heads/orphan", &[], "b");
+        let (merge_base, left_only, right_only) = compare(
+            &repo,
+            &Revision::Branch("main".into()),
+            &Revision::Branch("orphan".into()),
+        )
+        .expect("compare");
+        assert_eq!(
+            merge_base, None,
+            "no common ancestor is an answer, not an error"
+        );
+        assert_eq!((left_only, right_only), (1, 1));
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn an_unknown_revision_is_an_error_not_a_zero() {
+        let (dir, repo) = scratch_repo("unknown");
+        commit_on(&repo, "refs/heads/main", &[], "a");
+        let result = compare(
+            &repo,
+            &Revision::Branch("main".into()),
+            &Revision::Branch("nope".into()),
+        );
+        assert!(result.is_err());
+        let _ = std::fs::remove_dir_all(dir);
     }
 }

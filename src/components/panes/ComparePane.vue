@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { CompareEntry, Comparison, LoadState, RefChoice } from "../contracts";
 import Icon from "../common/Icon.vue";
@@ -13,6 +14,8 @@ import VirtualList from "../common/VirtualList.vue";
  * commits split into the two sides. Selecting a commit reveals it in the
  * detail column (the screen supplies the commit-detail pane through the slot).
  */
+const { t } = useI18n();
+
 const props = withDefaults(
   defineProps<{
     state: LoadState<Comparison>;
@@ -53,7 +56,7 @@ function orderOf(entry: CompareEntry): number {
 
 const baseLabel = computed(() => {
   const base = props.comparison?.mergeBase;
-  return base ? base.slice(0, 7) : "No common ancestor";
+  return base ? base.slice(0, 7) : t("compare.noCommonAncestor");
 });
 </script>
 
@@ -67,15 +70,15 @@ const baseLabel = computed(() => {
         :title="unavailable ?? undefined"
         @click="emit('chooseRef', 'left')"
       >
-        <span class="ref-side">Base</span>
-        <span class="ref-name">{{ left?.label ?? "Choose a ref" }}</span>
+        <span class="ref-side">{{ t("compare.baseSide") }}</span>
+        <span class="ref-name">{{ left?.label ?? t("compare.chooseRef") }}</span>
         <Icon name="chevron.down" :size="11" />
       </button>
 
       <button
         type="button"
         class="swap"
-        :title="unavailable ?? 'Swap base and target'"
+        :title="unavailable ?? t('compare.swapTitle')"
         :disabled="busy || !!unavailable"
         @click="emit('swap')"
       >
@@ -89,33 +92,35 @@ const baseLabel = computed(() => {
         :title="unavailable ?? undefined"
         @click="emit('chooseRef', 'right')"
       >
-        <span class="ref-side">Compare</span>
-        <span class="ref-name">{{ right?.label ?? "Choose a ref" }}</span>
+        <span class="ref-side">{{ t("compare.compareSide") }}</span>
+        <span class="ref-name">{{ right?.label ?? t("compare.chooseRef") }}</span>
         <Icon name="chevron.down" :size="11" />
       </button>
 
       <span class="compare-spacer" />
 
       <span v-if="comparison" class="compare-counts">
+        <!-- Ahead/behind wording lives under `branch.*` on purpose: it is one
+             concept shown in two panes, and two translations would drift. -->
         <span class="count-ahead">
           <Icon name="arrow.up" :size="11" />
-          {{ comparison.ahead }} ahead
+          {{ t("branch.aheadBy", { count: comparison.ahead }) }}
         </span>
         <span class="count-behind">
           <Icon name="arrow.down" :size="11" />
-          {{ comparison.behind }} behind
+          {{ t("branch.behindBy", { count: comparison.behind }) }}
         </span>
-        <span class="base-line">merge base {{ baseLabel }}</span>
+        <span class="base-line">{{ t("compare.mergeBase", { base: baseLabel }) }}</span>
       </span>
     </header>
 
     <ListShell
       :status="state.status"
       empty-icon="empty.noCommitSelected"
-      empty-title="Choose two refs"
-      empty-caption="Pick a base and a target to compare."
+      :empty-title="t('compare.emptyTitle')"
+      :empty-caption="t('compare.emptyCaption')"
       :error-message="state.status === 'error' ? state.error.message : null"
-      loading-caption="Comparing…"
+      :loading-caption="t('compare.loading')"
       @retry="emit('refresh')"
     >
       <MasterDetail
@@ -128,11 +133,11 @@ const baseLabel = computed(() => {
           <div class="range-list">
             <p v-if="aheadEntries.length > 0" class="range-heading">
               <Icon name="arrow.up" :size="11" />
-              In {{ right?.label ?? "target" }} only
+              {{ t("compare.onlyIn", { ref: right?.label ?? t("compare.targetFallback") }) }}
             </p>
             <p v-if="behindEntries.length > 0" class="range-heading">
               <Icon name="arrow.down" :size="11" />
-              In {{ left?.label ?? "base" }} only
+              {{ t("compare.onlyIn", { ref: left?.label ?? t("compare.baseFallback") }) }}
             </p>
 
             <VirtualList :count="entries.length" :row-height="30" class="range-rows">

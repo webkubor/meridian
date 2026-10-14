@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { EntryStatus, StatusSummary } from "../../bridges/bindings";
 import type {
@@ -25,6 +26,8 @@ import WorkingCopyFileList from "./WorkingCopyFileList.vue";
  * commit composer, and the file diff beside them. All state arrives as props;
  * the pane groups entries and forwards intent.
  */
+const { t } = useI18n();
+
 const props = withDefaults(
   defineProps<{
     state: LoadState<EntryStatus[]>;
@@ -65,6 +68,7 @@ const emit = defineEmits<{
   stage: [path: string];
   unstage: [path: string];
   discard: [path: string];
+  clearAssumeUnchanged: [path: string];
   bulkStage: [paths: string[]];
   bulkUnstage: [paths: string[]];
   "update:conflictedOnly": [value: boolean];
@@ -98,16 +102,48 @@ const modified = computed(
 );
 const untracked = computed(() => entries.value.filter((entry) => entry.code === "untracked"));
 
+type WorkingCopySectionId = "conflicted" | "staged" | "modified" | "untracked";
+
+/**
+ * Each section carries its own empty caption and bulk noun rather than the
+ * pane composing sentences out of a lower-cased title: "Stage all modified" is
+ * English word order, and Chinese needs 「暂存所有已修改的文件」 instead.
+ */
 const visibleSections = computed(() => {
-  if (props.conflictedOnly) {
-    return [{ id: "conflicted", title: "Conflicts", entries: conflicted.value }];
-  }
-  return [
-    { id: "conflicted", title: "Conflicts", entries: conflicted.value },
-    { id: "staged", title: "Staged", entries: staged.value },
-    { id: "modified", title: "Modified", entries: modified.value },
-    { id: "untracked", title: "Untracked", entries: untracked.value },
+  const section = (
+    id: WorkingCopySectionId,
+    title: string,
+    empty: string,
+    noun: string,
+    entries: EntryStatus[],
+  ) => ({ id, title: t(title), empty: t(empty), noun: t(noun), entries });
+
+  const all = [
+    section(
+      "conflicted",
+      "workingCopy.sectionConflicts",
+      "workingCopy.emptyConflicts",
+      "workingCopy.sectionConflicts",
+      conflicted.value,
+    ),
+    section("staged", "workingCopy.sectionStaged", "workingCopy.emptyStaged", "workingCopy.nounStaged", staged.value),
+    section(
+      "modified",
+      "workingCopy.sectionModified",
+      "workingCopy.emptyModified",
+      "workingCopy.nounModified",
+      modified.value,
+    ),
+    section(
+      "untracked",
+      "workingCopy.sectionUntracked",
+      "workingCopy.emptyUntracked",
+      "workingCopy.nounUntracked",
+      untracked.value,
+    ),
   ];
+  if (props.conflictedOnly) return all.slice(0, 1);
+  return all;
 });
 
 const bulkActionFor = (id: string): "stage" | "unstage" | null => {
@@ -127,11 +163,11 @@ function onBulk(id: string, list: EntryStatus[]): void {
   <ListShell
     :status="state.status"
     empty-icon="empty.unchangedFile"
-    empty-title="No local changes"
-    empty-caption="Your working copy matches the last commit."
+    :empty-title="t('workingCopy.emptyTitle')"
+    :empty-caption="t('workingCopy.emptyCaption')"
     :error-message="state.status === 'error' ? state.error.message : null"
     :error-detail="state.status === 'error' ? state.error.detail : null"
-    loading-caption="Reading the working copy…"
+    :loading-caption="t('workingCopy.loading')"
     @retry="emit('refresh')"
   >
     <template #toolbar>
@@ -139,13 +175,15 @@ function onBulk(id: string, list: EntryStatus[]): void {
         <button
           type="button"
           class="wc-refresh"
-          title="Refresh the working copy"
+          :title="t('workingCopy.refreshTitle')"
           @click="emit('refresh')"
         >
           <Icon name="arrow.clockwise" :size="13" />
         </button>
         <span v-if="summary" class="wc-summary">
-          {{ summary.staged }} staged · {{ summary.unstaged }} modified · {{ summary.untracked }} untracked
+          {{ t("workingCopy.countStaged", { count: summary.staged }) }} ·
+          {{ t("workingCopy.countModified", { count: summary.unstaged }) }} ·
+          {{ t("workingCopy.countUntracked", { count: summary.untracked }) }}
         </span>
         <span class="wc-spacer" />
         <label v-if="conflictCount > 0" class="wc-conflict-toggle">
@@ -154,31 +192,37 @@ function onBulk(id: string, list: EntryStatus[]): void {
             :checked="conflictedOnly"
             @change="emit('update:conflictedOnly', ($event.target as HTMLInputElement).checked)"
           />
-          Conflicts only ({{ conflictCount }})
+          {{ t("workingCopy.conflictsOnly", { count: conflictCount }) }}
         </label>
       </div>
     </template>
 
-    <div v-if="merge" class="merge-banner" role="region" aria-label="Merge status">
+    <div v-if="merge" class="merge-banner" role="region" :aria-label="t('workingCopy.mergeStatusLabel')">
       <Icon name="arrow.triangle.merge" :size="14" />
       <span class="merge-text">
-        <template v-if="merge.state === 'conflict'">
-          Merging <strong>{{ merge.incoming?.label ?? "incoming changes" }}</strong> —
-          {{ merge.conflicts.total - merge.conflicts.resolved }} of {{ merge.conflicts.total }} conflicts left.
-        </template>
+        <!-- `<i18n-t>` rather than a plain interpolation: the ref label has to
+             stay wrapped in <strong>, and only the component can splice markup
+             into a translated sentence. -->
+        <i18n-t v-if="merge.state === 'conflict'" keypath="workingCopy.merging" tag="span">
+          <template #label>
+            <strong>{{ merge.incoming?.label ?? t("workingCopy.incomingChanges") }}</strong>
+          </template>
+          <template #remaining>{{ merge.conflicts.total - merge.conflicts.resolved }}</template>
+          <template #total>{{ merge.conflicts.total }}</template>
+        </i18n-t>
         <template v-else-if="merge.state === 'merged'">
-          All conflicts resolved. Commit to finish the merge.
+          {{ t("workingCopy.conflictsResolved") }}
         </template>
-        <template v-else>
-          <strong>{{ merge.incoming?.label ?? "Incoming changes" }}</strong>
-          ({{ merge.incoming?.commits ?? 0 }} commits) can be merged cleanly.
-        </template>
+        <i18n-t v-else keypath="workingCopy.cleanMerge" :plural="merge.incoming?.commits ?? 0" tag="span">
+          <template #label><strong>{{ merge.incoming?.label ?? t("workingCopy.incomingTitle") }}</strong></template>
+          <template #commits>{{ merge.incoming?.commits ?? 0 }}</template>
+        </i18n-t>
       </span>
       <span class="merge-spacer" />
       <button v-if="merge.state === 'merged'" type="button" class="btn primary" @click="emit('resolveMerge')">
-        Commit merge
+        {{ t("workingCopy.commitMerge") }}
       </button>
-      <button type="button" class="btn" @click="emit('abortMerge')">Abort</button>
+      <button type="button" class="btn" @click="emit('abortMerge')">{{ t("workingCopy.abortMerge") }}</button>
     </div>
 
     <MasterDetail
@@ -193,16 +237,18 @@ function onBulk(id: string, list: EntryStatus[]): void {
             v-for="section in visibleSections"
             :key="section.id"
             :title="section.title"
+            :noun="section.noun"
             :entries="section.entries"
             :selected-path="selectedPath"
             :bulk-action="bulkActionFor(section.id)"
             :allow-discard="section.id !== 'conflicted' && section.id !== 'staged'"
-            :empty-caption="section.id === 'conflicted' ? 'No conflicts' : `No ${section.title.toLowerCase()} changes`"
+            :empty-caption="section.empty"
             @select="(path, event) => emit('selectFile', path, event)"
             @contextmenu="(path, event) => emit('contextmenu', path, event)"
             @stage="emit('stage', $event)"
             @unstage="emit('unstage', $event)"
             @discard="emit('discard', $event)"
+            @clear-assume-unchanged="emit('clearAssumeUnchanged', $event)"
             @bulk="onBulk(section.id, section.entries)"
           />
         </div>

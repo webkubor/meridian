@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
+
 import type { HunkRef, HunkAction } from "../contracts";
 import Icon from "../common/Icon.vue";
 
@@ -34,6 +36,8 @@ const emit = defineEmits<{
   discard: [];
 }>();
 
+const { t } = useI18n();
+
 function stage(): void {
   emit("action", "stage");
   emit("stage");
@@ -62,33 +66,33 @@ function titleOf(fallback: string): string | undefined {
       type="button"
       class="hunk-button"
       :disabled="disabled || busy"
-      :title="titleOf(staged ? 'Unstage this hunk' : 'Stage this hunk')"
+      :title="titleOf(staged ? t('diff.unstageThisHunk') : t('diff.stageThisHunk'))"
       @click="staged ? unstage() : stage()"
     >
       <Icon :name="staged ? 'minus.circle' : 'plus.circle'" :size="12" />
-      <span>{{ staged ? "Unstage" : "Stage" }}</span>
+      <span>{{ staged ? t("diff.unstage") : t("diff.stage") }}</span>
     </button>
     <button
       v-if="direction === 'unstage' || direction === 'both'"
       type="button"
       class="hunk-button"
       :disabled="disabled || busy"
-      :title="titleOf('Unstage this hunk')"
+      :title="titleOf(t('diff.unstageThisHunk'))"
       @click="unstage()"
     >
       <Icon name="minus.circle" :size="12" />
-      <span>Unstage</span>
+      <span>{{ t("diff.unstage") }}</span>
     </button>
     <button
       v-if="direction === 'stage' || direction === 'both'"
       type="button"
       class="hunk-button danger"
       :disabled="disabled || busy"
-      :title="titleOf('Discard this hunk')"
+      :title="titleOf(t('diff.discardThisHunk'))"
       @click="discard()"
     >
       <Icon name="arrow.uturn.backward" :size="12" />
-      <span>Discard</span>
+      <span>{{ t("diff.discard") }}</span>
     </button>
   </span>
 </template>
