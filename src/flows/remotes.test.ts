@@ -114,14 +114,10 @@ describe("remote routine operations", () => {
   });
 
   /**
-   * BUG: the toolbar's push toast interpolates an empty branch name.
-   *
-   * `App.vue`'s `onToolbarRun` calls `runVerb(() => git.push(), t("shell.toast.pushed"))`
-   * with no `{ branch }` interpolation, so the sentence renders as 已推送 。 while
-   * the branch pane's own push (which does pass the name) reads correctly.
-   * Expected fix in `src/App.vue`: pass the branch, as `pushSelectedBranch` does.
+   * A toast that read 已推送 。 — the sentence was interpolated with no branch
+   * at all, so the one screen that names what was published showed a blank.
    */
-  it.fails("BUG: the toolbar push toast names the branch it published", async () => {
+  it("the toolbar push toast names the branch it published", async () => {
     const wrapper = await repositoryScreen();
     await clickToolbarVerb("推送", wrapper);
 

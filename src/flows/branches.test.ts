@@ -174,22 +174,21 @@ describe("branch operations", () => {
   });
 
   /**
-   * BUG: selecting a remote branch row leaves the detail pane empty.
+   * A row that looks selectable and selects nothing.
    *
-   * `BranchListPane` lists `branches.allBranches` (local + remote) and emits the
-   * selected row's `fullName`, but `App.vue`'s `selectedBranchInfo` resolves that
-   * name against `branches.branches` — the local-only list. The remote row's
-   * verbs, including 抓取到本地, are therefore unreachable: the row looks
-   * selectable and selects nothing. Expected fix in `src/App.vue`: look the
-   * selection up in `branches.allBranches`.
+   * `BranchListPane` lists local *and* remote branches and emits the selected
+   * row's `fullName`, so the detail pane has to resolve the selection against
+   * that same set; resolving it against the local-only list silently leaves the
+   * remote row's verbs — 抓取到本地 among them — unreachable.
    */
-  it.fails("BUG: a selected remote branch offers its own verbs in the detail pane", async () => {
+  it("a selected remote branch offers its own verbs in the detail pane", async () => {
     const wrapper = await branchScreen();
     await setBranchFilter(wrapper, "远程");
     await selectBranch(wrapper, "review");
 
     expect(wrapper.find(".branch-detail").text()).toContain("review");
     await detailVerb(wrapper, "抓取到本地");
+    await confirmDirtyIfAsked();
     expect(backend.call("branch_checkout_remote")?.payload).toEqual({ args: {
       repo: fixtureRepoId,
       remoteBranch: "origin/review",

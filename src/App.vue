@@ -720,9 +720,16 @@ async function onToolbarRun(id: string): Promise<void> {
     case "pull":
       await runVerb(() => git.pull(), t("shell.toast.pulled"));
       return;
-    case "push":
-      await runVerb(() => git.push(), t("shell.toast.pushed"));
+    case "push": {
+      // The toast names the branch that was published; without it the sentence
+      // renders with an empty name, which is worse than no sentence.
+      const branch = repositories.selected.value?.headBranch ?? "";
+      await runVerb(
+        () => git.push(branch || undefined),
+        t("shell.toast.pushed", { branch }),
+      );
       return;
+    }
     case "stash":
       await runVerb(() => git.stash(), t("shell.toast.stashed"));
       return;
@@ -1144,7 +1151,9 @@ const branchSearch = ref("");
 const selectedBranchInfo = computed(() => {
   const name = selectedBranchName.value;
   if (!name) return null;
-  const branch = branches.branches.value.find((entry) => entry.fullName === name) ?? null;
+  // Local *and* remote: the list pane shows both, so a selected remote row that
+  // resolves against the local-only list looks selectable and selects nothing.
+  const branch = branches.allBranches.value.find((entry) => entry.fullName === name) ?? null;
   return branch ? { ...branch, fullyMerged: undefined, lastAuthor: undefined } : null;
 });
 
