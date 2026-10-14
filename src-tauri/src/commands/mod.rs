@@ -10,6 +10,7 @@
 pub mod app;
 pub mod branches;
 pub mod commit;
+pub mod diagnostics;
 pub mod history;
 pub mod integrate;
 pub mod refs;
@@ -19,17 +20,17 @@ pub mod working_copy;
 pub use app::*;
 pub use branches::*;
 pub use commit::*;
+pub use diagnostics::*;
 pub use history::*;
 pub use integrate::*;
 pub use refs::*;
 pub use repository::*;
 pub use working_copy::*;
 
-use tauri::AppHandle;
-
 use crate::domain::error::ErrorPayload;
 use crate::domain::ids::RepoId;
 use crate::domain::sender::SenderTag;
+use crate::events::EventSink;
 use crate::validation::{ValidateCx, Violation};
 
 /// How dangerous a command is. `Destructive` and `Rewrite` commands will
@@ -44,11 +45,11 @@ pub enum Risk {
 }
 
 /// Execution context handed to [`Command::execute`]: the resolved repository,
-/// its id, and the app handle for emitting domain events.
+/// its id, and an event sink for emitting domain events.
 pub struct ExecCx<'a> {
     pub repo_id: RepoId,
     pub repo: &'a git2::Repository,
-    pub app: &'a AppHandle,
+    pub app: &'a dyn EventSink,
 }
 
 pub trait Command: Send + Sized + 'static {

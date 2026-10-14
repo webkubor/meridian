@@ -42,21 +42,32 @@ pub struct RepositoryOpenArgs {
     pub sender: SenderTag,
 }
 
+impl RepositoryOpenArgs {
+    /// Opens and registers a repository through the lifecycle command path.
+    pub fn execute(
+        self,
+        state: &AppState,
+        sink: &dyn crate::events::EventSink,
+    ) -> Result<RepoInfo, ErrorPayload> {
+        let path = resolve_open_path(&self)?;
+        validation::repository::validate_open_path(&path).map_err(ErrorPayload::from)?;
+
+        let (repo, discovered) = engine::repository::open(&path)?;
+        let mut info = state.insert_repo(repo)?;
+        info.discovered = discovered;
+
+        events::emit(sink, AppEvent::ReposChanged);
+        Ok(info)
+    }
+}
+
 #[tauri::command]
 pub async fn repository_open(
     state: State<'_, AppState>,
     app: AppHandle,
     args: RepositoryOpenArgs,
 ) -> Result<RepoInfo, ErrorPayload> {
-    let path = resolve_open_path(&args)?;
-    validation::repository::validate_open_path(&path).map_err(ErrorPayload::from)?;
-
-    let (repo, discovered) = engine::repository::open(&path)?;
-    let mut info = state.insert_repo(repo)?;
-    info.discovered = discovered;
-
-    events::emit(&app, AppEvent::ReposChanged);
-    Ok(info)
+    args.execute(&state, &app)
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -75,26 +86,37 @@ fn default_initial_branch() -> String {
     "main".to_string()
 }
 
+impl RepositoryInitArgs {
+    /// Validates, initializes, and registers a repository.
+    pub fn execute(
+        self,
+        state: &AppState,
+        sink: &dyn crate::events::EventSink,
+    ) -> Result<RepoInfo, ErrorPayload> {
+        let path = PathBuf::from(&self.path);
+        validation::repository::validate_init_path(&path, &self.initial_branch)
+            .map_err(ErrorPayload::from)?;
+
+        let opts = engine::repository::InitOptions {
+            bare: self.bare,
+            initial_branch: self.initial_branch,
+            create_gitignore: self.create_gitignore,
+        };
+        let repo = engine::repository::init(&path, &opts)?;
+        let info = state.insert_repo(repo)?;
+
+        events::emit(sink, AppEvent::ReposChanged);
+        Ok(info)
+    }
+}
+
 #[tauri::command]
 pub async fn repository_init(
     state: State<'_, AppState>,
     app: AppHandle,
     args: RepositoryInitArgs,
 ) -> Result<RepoInfo, ErrorPayload> {
-    let path = PathBuf::from(&args.path);
-    validation::repository::validate_init_path(&path, &args.initial_branch)
-        .map_err(ErrorPayload::from)?;
-
-    let opts = engine::repository::InitOptions {
-        bare: args.bare,
-        initial_branch: args.initial_branch.clone(),
-        create_gitignore: args.create_gitignore,
-    };
-    let repo = engine::repository::init(&path, &opts)?;
-    let info = state.insert_repo(repo)?;
-
-    events::emit(&app, AppEvent::ReposChanged);
-    Ok(info)
+    args.execute(&state, &app)
 }
 
 fn resolve_open_path(args: &RepositoryOpenArgs) -> Result<PathBuf, ErrorPayload> {
@@ -131,6 +153,48 @@ pub struct RepositoryCloneArgs {
     pub initial_branch: String,
 }
 
+impl RepositoryCloneArgs {
+    /// Clones and registers a repository through the lifecycle command path.
+    pub async fn execute(
+        self,
+        state: &AppState,
+        sink: &dyn crate::events::EventSink,
+    ) -> Result<RepoInfo, ErrorPayload> {
+        let url = self.url.trim().to_string();
+        if url.is_empty() {
+            return Err(ErrorPayload::new(
+                ErrorCode::InvalidRequest,
+                "No clone URL given",
+            ));
+        }
+
+        let destination = if self.destination.trim().is_empty() {
+            repository_clone_suggest_destination(url.clone())
+        } else {
+            self.destination.trim().to_string()
+        };
+        let destination = PathBuf::from(destination);
+        validation::repository::validate_init_path(&destination, "main")
+            .map_err(ErrorPayload::from)?;
+
+        let initial_branch = self.initial_branch.trim().to_string();
+        let bare = self.bare;
+        let target = destination.clone();
+        let repo = tauri::async_runtime::spawn_blocking(move || {
+            engine::repository::clone(&url, &target, bare, &initial_branch)
+        })
+        .await
+        .map_err(|err| {
+            ErrorPayload::new(ErrorCode::Io, format!("The clone did not finish: {err}"))
+        })??;
+
+        let mut info = state.insert_repo(repo)?;
+        info.discovered = false;
+        events::emit(sink, AppEvent::ReposChanged);
+        Ok(info)
+    }
+}
+
 /// Derives the folder name a URL implies: the last path segment of a
 /// `.git`-suffixed URL, with the `.git` removed.
 ///
@@ -164,40 +228,7 @@ pub async fn repository_clone(
     app: AppHandle,
     args: RepositoryCloneArgs,
 ) -> Result<RepoInfo, ErrorPayload> {
-    let url = args.url.trim().to_string();
-    if url.is_empty() {
-        return Err(ErrorPayload::new(
-            ErrorCode::InvalidRequest,
-            "No clone URL given",
-        ));
-    }
-
-    let destination = if args.destination.trim().is_empty() {
-        repository_clone_suggest_destination(url.clone())
-    } else {
-        args.destination.trim().to_string()
-    };
-    let destination = PathBuf::from(destination);
-    validation::repository::validate_init_path(&destination, "main").map_err(ErrorPayload::from)?;
-
-    let initial_branch = args.initial_branch.trim().to_string();
-    let bare = args.bare;
-    let target = destination.clone();
-    let clone_url = url.clone();
-
-    let repo = tauri::async_runtime::spawn_blocking(move || {
-        engine::repository::clone(&clone_url, &target, bare, &initial_branch)
-    })
-    .await
-    .map_err(|err| {
-        ErrorPayload::new(ErrorCode::Io, format!("The clone did not finish: {err}"))
-    })??;
-
-    let mut info = state.insert_repo(repo)?;
-    info.discovered = false;
-
-    events::emit(&app, AppEvent::ReposChanged);
-    Ok(info)
+    args.execute(&state, &app).await
 }
 
 #[derive(Clone, Debug, Deserialize)]
