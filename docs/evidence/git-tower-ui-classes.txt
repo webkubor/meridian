@@ -1,0 +1,1213 @@
+#$assets-mainBundleID
+#1234
+#63
+.AppleSystemUIFont
+.AppleSystemUIFontBold
+.AppleSystemUIFontDemi
+.beanstalkapp.com
+0 additions, 0 deletions
+0 changed files
+01.02.12
+1 chunk, 1 staged
+1 unresolved conflict (1 resolved)
+10
+13
+14
+15:30
+1af34d2
+1af3da7
+2 Changed Files
+2 Commits
+2 Contributors
+27
+27 November 2016
+46
+4D5AB28F-31FB-4ABD-A3D5-2A70EFAE8514
+4af2c404
+5
+6 days ago
+75
+@@ 1,2 2,3 @@
+Abort
+About
+Access Token:
+Access private repositories
+Access:
+Account Name:
+Account View
+Account:
+AccountSidebarItemCellView
+AccountSidebarViewController
+AccountWindowController
+Acknowledgements
+Activity
+Activity Type
+Add
+Add Comment
+Add Menu
+Add Remote Repository…
+Add SVN Remote Repository…
+Add Submodule…
+Add Worktree…
+Add Your Service Accounts
+Add to Merge Queue
+AddMenu
+Adds the branch to the “Pinned“ section in the sidebar.
+All refs under refs/tags are pushed.
+Allow renaming a branch that is already associated with an open GitHub pull request. - please use with care!
+Allowed signers file:
+AllowedSignersMenuController
+Allows renaming a branch that is already associated with an open GitHub pull request.
+Alpha Channel Access Token:
+Alt
+AlternateFooterView
+Always Create Merge Commit
+Always Generate Merge Commit
+Always auto-update submodules
+Always offer to stash local changes
+Always open submodules in Tower
+Always prompt to use Graphite commands
+Always push updates
+Always remove comments in commit message
+Always send crash reports
+Always update submodules automatically
+Amend
+App Icon:
+Appearance:
+Assignees
+Authenticated as...
+Authenticating Graphite...
+Authentication Code:
+Authentication:
+Author
+Author Name
+AuthorImageView
+AutomaticTableColumnIdentifier.0
+AutomaticTableColumnIdentifier.1
+Automatically archive stale and fully merged branches
+Automatically check for updates
+Automatically commit reverted changes
+Automatically convert ref names into valid format while typing
+Automatically download updates
+Automatically fetch remote repositories:
+Automatically index Git repositories
+Automatically request environment variables from login shell
+Automatically submit crash reports to help us diagnose and fix issues in Tower.
+Azure DevOps
+Base Branch Name
+Base Branch:
+Based on
+Basic Authentication
+Beta
+Blame
+Body line character limit:
+Body line wrapping mode:
+Box
+Branch Name
+Branch Name:
+Branch label
+Branch:
+BranchSidebarCellView
+Branches
+BranchesReviewBranchCellView
+BranchesReviewDetailViewController
+BranchesReviewHeaderViewController
+Bypasses any associated hook scripts.
+Can be helpful for  fixing an inconsistent Graphite stack view on Web/GitHub resulting from downtime/a bug.
+Cancel
+Changed Files
+Changeset
+Changeset Summary
+Check
+Check Out
+Check Out Branch
+Checking Out master…
+Checkout Branch
+Choose “Automatic“ to automatically adapt the icon to Light and Dark Appearance.
+Clear
+Clone
+Clone To:
+Clone URL:
+Close
+Collection:
+Commit
+CommitAuthor
+CommitBodyContainerView
+CommitColumn
+CommitDate
+Commits
+Committer Name
+Compare Revision:
+Compare local branches to:
+Compare to:
+Comparing…
+Configure custom environment variables used when running Git commands:
+ConfigureCustomWorkflowDialogueViewController
+ConfigureGraphiteFlowDialogueViewController
+ContentView
+Context:
+Continue
+Conversation
+Copies all modified files into a temporary directory and performs a directory diff on them.
+Copyright © 2010-2023 SaaS.group GmbH. All rights reserved.
+Create
+Create Archive
+Create New Branch…
+Create New Stacked Branch…
+Create New Tag…
+Create a merge commit even when the merge resolves as a fast-forward
+Created at
+Creates a worktree for the given starting revision even if it is already checked out in another worktree.
+Current Base:
+CustomEnvironmentCellIKeydentifier
+CustomEnvironmentCellTextViewKeyIdentifier
+CustomEnvironmentCellTextViewValueIdentifier
+CustomEnvironmentCellValueIdentifier
+Date
+Date format for commits:
+Default directory for cloned repositories:
+Delete
+Delete Branch after Merge
+Delete Stash After Applying Changes
+Delete Tracked Branch
+Deletes remote tracking branches that have been deleted on the remote repository.
+Deletes the tracked branch "...".
+Description that is long and that wraps
+Description:
+Destination:
+Detach
+Developer Channel Access Token:
+Development
+Development Branch:
+Dialogue Title
+DialogueMergeabilityViewController
+DialogueView
+DialogueWindowView
+DialogueWrapperView
+Diff
+Diff Tool:
+Diff tool:
+Directly Commit Merged Changes
+Directly checks out the new branch after it was created.
+Directly commit cherry-picked changes
+Discard Chunk
+Do not ask me again
+DocumentViewController
+Don't Tag Hotfix Release
+Don't Tag Release
+Don't show any source or destination prefix
+Double-click on file in working copy:
+Draft
+Edit
+EditCommitTemplateDialogueViewController
+EditLineCharacterLimitDialogueViewController
+Email
+Email:
+Empty View
+Enable Syntax Coloring
+Enable easy push action for Gerrit
+Enable service integration plugins
+Enables autocompletion of issue references and keywords. Requires an associated service account with the repository's main remote.
+Enforces a new history on the remote branch if fast-forward is not possible. This can cause losing commits on the remote – please use with care!
+Ensure GPG key email matches committer email
+Ensures that all submodule commits that are referenced by the superproject have been pushed.
+EnvironmentCellIdentifier
+ErrorContainerView
+ErrorOptionsView
+ErrorView
+Every 5 Minutes
+Expand All
+ExpandableFilterControl
+F888D333
+FNGradientLineView
+FNView
+Feature Branch Prefix:
+Feature Branch:
+Feature Name:
+Fetch All Remotes
+Fetch All Submodules
+Fetch All Tags
+Fetch Submodules
+FilePath
+Filename
+Font size for working copy items:
+Force
+Force Deletion
+Force Push
+Force Renaming
+Force sync
+Forces the download of all tags.
+Fork point of parent branch...
+Found 2 repositories in 100 directories
+From Branch:
+Full Name (Email)
+Full control of user public keys
+GPG binary:
+GTAbstractSelectorViewController
+GTActionBarView
+GTActivityWindowController
+GTActivityWindowToolbarController
+GTAddCustomIgnorePatternViewController
+GTAddCustomLFSTrackedFilePatternViewController
+GTAddGitUserProfileDialogueViewController
+GTAddOrEditRefSpecViewController
+GTAddRemoteToRepositoryViewController
+GTAddSVNRemoteToRepositoryViewController
+GTAddSubmoduleDialogueViewController
+GTAddWorktreeDialogueViewController
+GTAnnotatedTextViewNew
+GTApplication
+GTApplicationDelegate
+GTApplyPatchToWorkingCopyDialogueViewController
+GTApplyStashViewController
+GTAutoStashDialogueViewController
+GTAutoUpdateSubmodulesDialogueViewController
+GTAvatarImageButton
+GTAvatarImageView
+GTBadgesView
+GTBlameAnnotationCellView
+GTBlameCommitPopoverViewController
+GTBlameLineNumberView
+GTBlameTextView
+GTBlameViewController
+GTBlobTextView
+GTBlobViewController
+GTBookmarksDetailViewController
+GTBookmarksDropZoneView
+GTBookmarksEmptySelectionViewController
+GTBookmarksNoGitRepositoryFoundViewController
+GTBookmarksRepositoryViewController
+GTBookmarksSeachLocalHardDriveViewController
+GTBookmarksSidebarBookmarkItemCellView
+GTBookmarksSidebarFolderItemCellView
+GTBookmarksSidebarViewController
+GTBookmarksViewController
+GTCheckoutPullRequestDialogViewController
+GTCheckoutRevisionViewController
+GTCherryPickRevisionsDialogueViewController
+GTCloneActivityActiveCellView
+GTCloneActivityCancelledCellView
+GTCloneActivityErrorCellView
+GTCloneActivityFinishedCellView
+GTCloneActivityTableView
+GTCloneActivityViewController
+GTCloneDestinationMenuController
+GTCloneGitRepositoryViewController
+GTCloneRepositoryAutocompleteCellView
+GTCloneRepositoryAutocompleteInfoCellView
+GTCloneRepositoryAutocompleteSearchingCellView
+GTCloneSVNRepositoryViewController
+GTCloningDirectoryMenuController
+GTCollapsableView
+GTColoredBackgroundView
+GTCommitChangesetCellView
+GTCommitChangesetCollapseButton
+GTCommitChangesetDiffViewController
+GTCommitChangesetViewController
+GTCommitSubjectScrollView
+GTCommitViewController
+GTCompareRevisionsViewController
+GTConfirmViewController
+GTContributorsView
+GTCreateNewBranchViewController
+GTCreateNewStackedBranchDialogueViewController
+GTCreateTagViewController
+GTDebugController
+GTDeleteBranchesViewController
+GTDeleteGraphiteBranchViewController
+GTDeleteSubmodulesDialogueViewController
+GTDeleteWorktreeDialogueViewController
+GTDialogueFooterView
+GTDialogueOptionsView
+GTDialogueViewController
+GTDialogueWindowController
+GTDiffChunkContentCellView
+GTDiffChunkHeaderCellView
+GTDiffContextLinesMenuController
+GTDiffEmptyCellView
+GTDiffHeaderCellView
+GTDiffHeaderContentView
+GTDiffImageCellView
+GTDiffImageContainerView
+GTDiffImageDetailViewController
+GTDiffImageView
+GTDiffImageViewController
+GTDiffLoadingCellView
+GTDiscardAllLocalChangesDialogueViewController
+GTDiscardDiffContentDialogueViewController
+GTDiscardLocalChangesDialogueViewController
+GTEditCommitMessageDialogueViewController
+GTEditGitActorViewController
+GTEditRemoteNameViewController
+GTEditRemoteURLViewController
+GTEditRepositoryDescriptionViewController
+GTEditSubmoduleURLViewController
+GTEmptyView
+GTEmptyViewController
+GTExportRevisionDialogueViewController
+GTFetchRemoteViewController
+GTFetchSubmoduleViewController
+GTFileDiffViewController
+GTFileHistoryContributorAutocompleteCellView
+GTFileHistoryContributorFormatter
+GTFileHistoryDetailViewController
+GTFileHistoryTimelineCommitCellView
+GTFileHistoryTimelineGroupCellView
+GTFileHistoryTimelineViewController
+GTFileHistoryViewController
+GTFileSelectorFileCellView
+GTFileSelectorFileSearchCellView
+GTFileStatusView.xib
+GTFileViewController
+GTForceAddSubmoduleViewController
+GTForceDeleteSubmodulesViewController
+GTForcePushDialogueViewController
+GTGPGCreateRealKeyDialogueViewController
+GTGitContributorFormatter
+GTGitErrorAccessoryViewController
+GTGitErrorScrollView
+GTGitErrorTextView
+GTGitErrorViewController
+GTGitFileStatusIcon
+GTGitFlowConfigureDialogueViewController
+GTGitFlowCreateFeatureBranchDialogueViewController
+GTGitFlowCreateHotfixBranchDialogueViewController
+GTGitFlowCreateReleaseBranchDialogueViewController
+GTGitFlowFinishFeatureBranchDialogueViewController
+GTGitFlowFinishHotfixBranchDialogueViewController
+GTGitFlowFinishReleaseBranchDialogueViewController
+GTGitRemoteConnectionViewController
+GTGitUserProfileDialogueViewController
+GTGitUserProfilesMenuController
+GTGraphiteErrorViewController
+GTHistoryCommitActionView
+GTHistoryCommitActionsCellView
+GTHistoryCommitChangesetDiffLoadingCellView
+GTHistoryCommitChangesetHeaderCellView
+GTHistoryCommitChangesetItemCellView
+GTHistoryCommitChangesetLoadingCellView
+GTHistoryCommitChangesetView
+GTHistoryCommitChangesetViewController
+GTHistoryCommitDetailOutlineView
+GTHistoryCommitDetailViewController
+GTHistoryCommitForkPointMediumCellView
+GTHistoryCommitForkPointSmallCellView
+GTHistoryCommitHeaderAnnotationView
+GTHistoryCommitHeaderCellView
+GTHistoryCommitHeaderInfoView
+GTHistoryCommitListBaseBranchHeaderViewController
+GTHistoryCommitListEmptyCellView
+GTHistoryCommitListGraphView
+GTHistoryCommitListGroupCellView
+GTHistoryCommitListGroupRowView
+GTHistoryCommitListHeaderView
+GTHistoryCommitListLoadingCellView
+GTHistoryCommitListMediumCellView
+GTHistoryCommitListSmallCellView
+GTHistoryCommitListViewController
+GTHistoryCommitMessageCellView
+GTHistoryCommitNoNewCommitsMediumCellView
+GTHistoryCommitNoNewCommitsSmallCellView
+GTHistoryCommitTreeViewController
+GTHistoryContributorAutocompleteCellView
+GTHistoryDetailFilePathCellView
+GTHistoryDetailFileTreeOutlineView
+GTHistoryDetailLoadingCellView
+GTHistorySearchFilterContainerViewController
+GTHistorySearchFilterView
+GTHistorySearchFilterViewController
+GTHistoryViewController
+GTHistoryViewSettingsMenuController
+GTIgnoreTrackedFilesDialogueViewController
+GTInitSubmoduleViewController
+GTInvalidRepositoryViewController
+GTKeyboardActionOutlineView
+GTLFSFetchRemoteViewController
+GTLFSPullRemoteViewController
+GTLFSPushRemoteViewController
+GTLargeDiffWarningCellView
+GTLineNumberView
+GTMainContentViewController
+GTMainMenuController
+GTMainWindow
+GTMainWindowController
+GTMergeBranchDialogueViewController
+GTMoveSubmoduleViewController
+GTMoveWorktreeDialogueViewController
+GTNonRestorableSplitView
+GTNonVibrantImageView
+GTPrivateSSHKeyMenuController
+GTProgressViewController
+GTPublishBranchViewController
+GTPublishTagDialogueViewController
+GTPullFromRemoteViewController
+GTPullRequestAssigneesView
+GTPullRequestMenuController
+GTPullRequestsChangesetDiffLoadingCellView
+GTPullRequestsChangesetItemCellView
+GTPullRequestsChangesetViewController
+GTPullRequestsCommitsChangesetEntryCellView
+GTPullRequestsCommitsCommitCellView
+GTPullRequestsCommitsDateGroupCellView
+GTPullRequestsCommitsEmptyChangesetCellView
+GTPullRequestsCommitsLoadingCellView
+GTPullRequestsCommitsViewController
+GTPullRequestsConversationAddCommentCellView
+GTPullRequestsConversationAuthorCellView
+GTPullRequestsConversationBodyCellView
+GTPullRequestsConversationCommentCellView
+GTPullRequestsConversationCommentThreadCellView
+GTPullRequestsConversationCommitCellView
+GTPullRequestsConversationDateGroupCellView
+GTPullRequestsConversationEventTableRowView
+GTPullRequestsConversationHeaderCellView
+GTPullRequestsConversationHeaderInfoFormatter
+GTPullRequestsConversationSpacerCellView
+GTPullRequestsConversationTableRowView
+GTPullRequestsConversationViewController
+GTPullRequestsDetailViewController
+GTPullRequestsEmptyCellView
+GTPullRequestsItemCellView
+GTPullRequestsListHeaderViewController
+GTPullRequestsListViewController
+GTPullRequestsLoadingCellView
+GTPullRequestsValidationErrorViewController
+GTPullRequestsViewController
+GTPushBranchDialogueViewController
+GTPushDialogueViewController
+GTPushRevisionDialogueViewController
+GTPushToGerritDialogueViewController
+GTQuickActionEmptyTableCellView
+GTQuickActionTableCellView
+GTQuickActionTableRowView
+GTQuickActionViewController
+GTQuickActionWindow
+GTQuickActionWindowController
+GTQuickOpenGroupCellView
+GTQuickOpenItemCellView
+GTQuickOpenRowView
+GTQuickOpenTableView
+GTQuickOpenViewController
+GTQuickOpenWindow
+GTQuickOpenWindowController
+GTRebaseBranchDialogueViewController
+GTRebaseOntoBranchDialogueViewController
+GTRefBadgesView
+GTRefComparisonViewController
+GTRefControlDividerView
+GTRefLogItemCellView
+GTRefLogListHeaderViewController
+GTRefLogListViewController
+GTRefLogLoadingCellView
+GTRefLogViewController
+GTRefSelectorRefItemCellView
+GTReleaseChannelAccessTokenWindowController
+GTRemoteActivityDetailViewController
+GTRemoteActivityListViewController
+GTRemoteActivityRunningTableCellView
+GTRemoteActivityTableCellView
+GTRemoteActivityViewController
+GTRemoteBranchViewSettingsMenuController
+GTRemoteBranchesSettingsViewController
+GTRemoteConnectionSSHKeyPasswordViewController
+GTRemoteGeneralSettingsViewController
+GTRemoteSelectorItemRowView
+GTRemoteSelectorRemoteItemCellView
+GTRemoteSelectorViewController
+GTRemoteViewController
+GTRenameBranchDialogueViewController
+GTRenameRemoteBranchViewController
+GTRenameSubmoduleViewController
+GTRepairStackDialogueViewController
+GTRepositoryActivityDetailViewController
+GTRepositoryActivityListViewController
+GTRepositoryActivityTableCellView
+GTRepositoryActivityViewController
+GTRepositoryCloneProgressViewController
+GTRepositoryContainerViewController
+GTRepositoryGeneralSettingsViewController
+GTRepositoryGitFlowSettingsViewController
+GTRepositoryGitLFSSettingsViewController
+GTRepositoryHeaderView
+GTRepositoryIgnoresViewController
+GTRepositorySettingsViewController
+GTRepositorySidebarMenuController
+GTRepositorySidebarViewController
+GTRepositoryViewController
+GTResetEntriesToRevisionDialogueViewController
+GTResetToRevisionDialogueViewController
+GTRestackBranchDialogueViewController
+GTRestoreSubmoduleViewController
+GTRestoreTreeEntriesDialogueViewController
+GTRevertRevisionsDialogueViewController
+GTRevisionSelectorRevisionCellView
+GTSavePartialStashViewController
+GTSavePatchDialogueViewController
+GTSaveStashDialogueContentView
+GTSaveStashViewController
+GTSchemeHandlerController
+GTSearchController
+GTSearchLocalHardDriveCheckboxCellView
+GTSearchLocalHardDriveRepositoryInfoCellView
+GTSearchLocalHardDriveViewController
+GTSelectDiffToolDialogueViewController
+GTSelectMergeToolDialogueViewController
+GTSelectorRowView
+GTServiceAccountsMenuController
+GTServiceActivityDetailViewController
+GTServiceActivityListViewController
+GTServiceActivityTableCellView
+GTServiceActivityViewController
+GTServicePullRequestBaseBranchMenuController
+GTServicePullRequestBranchMenuController
+GTServicePullRequestCloseViewController
+GTServicePullRequestMergeTypeMenuController
+GTServicePullRequestMergeViewController
+GTServicePullRequestRepositoryMenuController
+GTServicesAccountView
+GTServicesAccountViewController
+GTServicesAzureDevOpsAccountViewController
+GTServicesAzureDevOpsRepositoryViewController
+GTServicesAzureDevOpsServerAccountViewController
+GTServicesBeanstalkAccountViewController
+GTServicesBeanstalkRepositoryViewController
+GTServicesBitbucketAccountView
+GTServicesBitbucketAccountViewController
+GTServicesBitbucketRepositoryViewController
+GTServicesCloneRepositoryViewController
+GTServicesCloneSVNRepositoryViewController
+GTServicesCustomAccountSSHCredentialsView
+GTServicesCustomAccountViewController
+GTServicesDashboardViewController
+GTServicesDeletePublicKeyViewController
+GTServicesDeletePullRequestCommentViewController
+GTServicesDetailViewController
+GTServicesGitHubAccountViewController
+GTServicesGitHubAuthenticationCodeViewController
+GTServicesGitHubEnterpriseAccountViewController
+GTServicesGitHubRepositoryViewController
+GTServicesGitLabAccountViewController
+GTServicesGitLabCEEEAccountViewController
+GTServicesGitLabRepositoryViewController
+GTServicesGitSwarmAccountViewController
+GTServicesGitSwarmRepositoryViewController
+GTServicesPrivateSSHKeyViewController
+GTServicesPublicKeyCellView
+GTServicesPublicKeyViewController
+GTServicesPublicKeysViewController
+GTServicesPullRequestCommentViewController
+GTServicesPullRequestEditDescriptionViewController
+GTServicesPullRequestViewController
+GTServicesRemoveAccountsViewController
+GTServicesRepositoriesViewController
+GTServicesRepositoryCellView
+GTServicesRepositoryRowView
+GTServicesServiceItemView
+GTServicesServiceItemViewController
+GTServicesSidebarAccountCellView
+GTServicesSidebarViewController
+GTServicesStashAccountViewController
+GTServicesStashRepositoryViewController
+GTServicesViewController
+GTSettingsCheckboxValueCellView
+GTSettingsGitLFSTrackingEntryCellView
+GTSettingsGitUserCellView
+GTSettingsGroupCellView
+GTSettingsIgnorePatternCellView
+GTSettingsItem
+GTSettingsMultiValueCellView
+GTSettingsRowView
+GTSettingsTableView
+GTSettingsTableViewContentColumnIdentifier
+GTSettingsTextValueCellView
+GTSettingsURLCellView
+GTSettingsWarningCellView
+GTSettingsWarningRowView
+GTSidebarHeaderCellView
+GTSidebarTextField
+GTSidebarViewSettingsMenuController
+GTSignaturePopoverViewController
+GTSigningKeySelectionMenuController
+GTStash
+GTStashesListCellView
+GTStashesListHeaderView
+GTStashesListHeaderViewController
+GTStashesListViewController
+GTStashesViewController
+GTSubmoduleConfigSettingsViewController
+GTSubmoduleDetailViewController
+GTSubmoduleGeneralSettingsViewController
+GTSubmodulePathSelectionController
+GTSubmoduleViewController
+GTSyncRemoteDialogueViewController
+GTSynchronizeSubmoduleViewController
+GTTableActionBarView
+GTTableView
+GTTagsSortSettingsMenuController
+GTTimelineGraphView
+GTTrackRemoteBranchViewController
+GTTreeDetailViewController
+GTTreeMasterViewController
+GTTreeViewController
+GTUpdateSubmoduleViewController
+GTUpgradeAccountViewController
+GTUserPreferencesAdvancedViewController
+GTUserPreferencesGeneralViewController
+GTUserPreferencesGitConfigViewController
+GTUserPreferencesIntegrationViewController
+GTUserPreferencesProfilesDetailViewController
+GTUserPreferencesProfilesItemCellView
+GTUserPreferencesProfilesViewController
+GTUserPreferencesQuickOpenIgnoredFilePathCellView
+GTUserPreferencesQuickOpenSearchPathCellView
+GTUserPreferencesUpdatesViewController
+GTView
+GTWarningView
+GTWorkflowMenuController
+GTWorkingCopyActionViewController
+GTWorkingCopyCommitView
+GTWorkingCopyCommitViewController
+GTWorkingCopyContainerViewController
+GTWorkingCopyDefaultStatusHeaderView
+GTWorkingCopyDiffImageViewController
+GTWorkingCopyFileDetailViewController
+GTWorkingCopyFileDiffViewController
+GTWorkingCopyFileListViewController
+GTWorkingCopyFileNameColumn
+GTWorkingCopyFilePathCellView
+GTWorkingCopyMergeStatusBackgroundView
+GTWorkingCopyMergeStatusHeaderView
+GTWorkingCopyMergeStatusView
+GTWorkingCopyMergeStatusViewController
+GTWorkingCopyOutlineView
+GTWorkingCopyProgressViewController
+GTWorkingCopyStagingCellView
+GTWorkingCopyStatusHeaderViewController
+GTWorkingCopyStatusViewController
+GTWorkingCopyTableColumnFileName
+GTWorkingCopyTableColumnStatus
+GTWorkingCopyUnchangedFileViewController
+GTWorkingTreeViewSettingsMenuController
+GTWorktreeDetailViewController
+GTWorktreeGeneralSettingsViewController
+GTWorktreeViewController
+General
+Generate a merge commit even if the merge resolved as a fast-forward.
+Gerrit Code Review:
+Git binary:
+GitHubView
+Global email:
+Global signing key:
+Global user name:
+Graphite Binary:
+Graphite Token:
+GraphiteFetchStackDialogueViewController
+GraphiteRestackBranchDialogueViewController
+GraphiteSquashBranchDialogueViewController
+GraphiteSyncBranchDialogueViewController
+GroupView
+HEADER CELL
+Hash
+Head Branch:
+HeaderView
+Help us improve by sending anonymous usage data.
+HistoryHeaderView
+Host:
+Hotfix Branch Prefix:
+Hotfix Branch:
+Hotfix Name:
+IBImageConfiguration
+IBNSViewAutolayoutGuide
+If set, all new PRs will be created in draft mode.
+If set, marks all PRs being submitted as merge when ready, which will let them automatically merge as soon as all merge requirements are met.
+Ignore Paths
+Include Untracked Files
+Initialize Submodules
+Install
+Instead of exporting the files into a directory, this will create an archive.
+Invisibles:
+Issue Number Prefix:
+Issue Tracker URL:
+Item
+Item 1
+Item 2
+Item 3
+Keep Changes
+Keep Working Tree
+Keep backup files for merge conflicts
+Keeps all changes from rolled back revisions in your working tree.
+Key
+Key ID
+Label
+Last Log
+Last check for updates at:
+Last year
+Less than a minute
+License Agreement
+Line Character Limit:
+Loading Changeset
+Loading Changeset…
+Loading Diff…
+Loading Image Data Failed
+Loading Image Data…
+Loading Pull Requests ...
+Loading Reflog entries ...
+Loading Tree…
+Loading commits ...
+Local Branch:
+Local Config
+Local Tag:
+Location:
+Mainline:
+Making Git accessible and enjoyable for everyone has been our mission since 2010.
+
+Thank you for being a part of our journey and for all the support you have given us!
+Manage "User Profiles" to easily switch between different identities when committing.
+Menlo-Regular
+Merge
+Merge Tool:
+Merge Type:
+Merge is aborted if the tip commit of the side branch is not signed with a valid key.
+Merge tool:
+Merge when ready
+MergeConflictsViewController
+MergeGraphiteBranchDialogueViewController
+Merging "feature/auto-relocate-repository" into "next" leads to 3 conflicts:
+Merging 5 commits into “main”
+Message
+Message:
+NSApplication
+NSArrayController
+NSAttributedString
+NSBitmapImageRep
+NSBox
+NSButton
+NSButtonCell
+NSClipView
+NSCollectionView
+NSCollectionViewGridLayout
+NSColor
+NSColorSpace
+NSComboBox
+NSComboBoxCell
+NSCursor
+NSData
+NSDate
+NSDatePicker
+NSDatePickerCell
+NSDecimalNumberHandler
+NSDecimalNumberPlaceholder
+NSDictionary
+NSFontDescriptor
+NSFontManager
+NSIBHelpConnector
+NSIBUserDefinedRuntimeAttributesConnector
+NSImage
+NSImageCell
+NSImageSymbolConfiguration
+NSImageView
+NSLayoutConstraint
+NSLayoutManager
+NSLocalizableString
+NSMapTable
+NSMenu
+NSMenuItem
+NSNib
+NSNumberFormatter
+NSObject
+NSOutlineView
+NSPopUpButton
+NSPopUpButtonCell
+NSPopover
+NSProgressIndicator
+NSScrollView
+NSScroller
+NSSearchField
+NSSearchFieldCell
+NSSecureTextField
+NSSecureTextFieldCell
+NSSegmentItem
+NSSegmentedCell
+NSSegmentedControl
+NSSortDescriptor
+NSSplitView
+NSStackView
+NSStackViewContainer
+NSStepper
+NSStepperCell
+NSStoryboardPlaceholder
+NSSwitch
+NSTableCellView
+NSTableHeaderCell
+NSTableHeaderView
+NSTableView
+NSTextContainer
+NSTextField
+NSTextFieldCell
+NSTextStorage
+NSTextView
+NSTextViewSharedData
+NSTokenField
+NSTokenFieldCell
+NSUserDefaultsController
+NSValue
+NSView
+NSViewController
+NSViewLayoutMarginsGuide
+NSViewSafeAreaLayoutGuide
+NSVisualEffectView
+Name
+Name:
+Namespace:
+Never
+New Base:
+New Name:
+New Path:
+No Results
+No Signature Found
+No changes.
+No commits
+No new commits on this branch
+No pull requests
+No reflog entries
+Number of commits in history:
+OAuth Access Token
+OK
+Omit Prefixes
+Only pushes and updates branches with existing Pull Requests.
+Open a web browser to edit PR metadata, even if no new PRs are being created.
+Open repositories from bitbucket.com:
+Open repositories from github.com:
+OptionsContainerView
+OptionsView
+Other Label
+OtherViews
+Overwrite all fetched branches with the remote source of truth. Deletes merged local branches in the stack, ignoring local changes.
+Overwrites the remote branch with your local branch. Otherwise defaults to --force-with-lease. - please use with care!
+Parent Branch:
+Parent:
+Password:
+Path
+Path to the Submodule
+Path:
+Pattern:
+Perform Directory Diff
+Perform directory diff
+Performs a fast-forward if the current HEAD is the same as the parent of the cherry-picked commit.
+Personal Access Token
+Personal Access Token:
+Pin Branch
+Please resolve all conflicts and commit to resolve the merge conflict.
+Preserve Merge Commits
+Private SSH Key:
+Private Token:
+Production Branch:
+Profile Title
+Progress output
+Project:
+Prune Obsolete Remote Branches
+Public Key Fingerprint
+Public Key Title
+Public Key:
+PublishRepositoryDialogueViewController
+Pull Request Title
+Push All Tags
+Push Submodule commits on demand
+Quick Open Search Paths
+README.md
+Raw
+Re-Apply Changes After Operation is Finished
+Read org and team membership
+Rebase
+Rebases the local HEAD branch onto the fetched revisions.
+Recently Cloned Repositories
+Recessed
+Recreates merge commits instead of ignoring them
+Recurse Submodules
+Recursively fetches all Submodules. Authentication must have been properly configured for each Submodule in Tower.
+Ref Spec:
+Ref:
+RefName:
+Release Branch Prefix:
+Release Name:
+Release Notes
+Release channel:
+Remote Branch:
+Remote Branch: 
+Remote Name
+Remote Name:
+Remote URL:
+Remote branch label
+Remote sidebar label
+Remote:
+RemoteArrow
+RemoteBranchSidebarCellView
+RemoteSidebarCellView
+RemoveParentDialogueViewController
+Removes only the submodule's config, but keeps its working files.
+Removes the worktree, including any uncommitted changes.
+Rename Submodule Name
+RenameGraphiteBranchDialogueViewController
+Repeat:
+Repository
+Repository Description
+Repository Name
+Repository:
+Restack Branches
+Restack Full Stack
+Restacks all branches in the stack for the selected branch before submitting.
+Restacks all branches in the stack for the selected branch.
+Restacks any branches in the stack that can be restacked without conflicts.
+Restore Staging Area Status
+Review Branch:
+Revision:
+SSH Agent:
+SSH Key:
+SSH keys loaded through the System SSH agent.
+SSH signing program:
+SSHSockHandlerController
+SUUpdater
+SVN Branches:
+SVN Tags:
+SVN Trunk:
+Searching for repositories…
+Searching your local hard drive for Git repositories...
+Select All
+Select Destination Path…
+Select your main development branch for this repository, where all branches will eventually be merged back.
+Selected SSH Agent will be used for SSH remote connections and SSH signing.
+Selected branch will track this branch for local changes and allows integrating them easily.
+Send anonymous usage data
+ServiceAccountDetailContentView
+SetBranchDependencyViewController
+SetGraphiteParentBranchViewController
+Shared Config
+ShortSHA
+Show Diff
+Show Options
+Show Pull Request on Graphite
+Show Quick Start Window on Launch
+Show commit templates button
+Show diffs for merge commits:
+Show guide
+Show invisible characters
+Show only conflicts
+Show subject limit counter
+Show warning for diffs larger than (kB):
+Show warning if message contains comments
+ShowOptionsButtonContainer
+Shows the pull request on Graphite after submitting. 
+SidebarFooterViewController
+Sign Tag
+Sign commits
+Sign-Off
+Signature Good
+Signer:
+Signing Key:
+Skip
+Skip Hooks
+Skip hooks
+Spacebar for file in working copy:
+Specify which side of the merge commit should be used as the mainline to be integrated. In case of multiple merge commits, the same mainline number will be used.
+Squash
+Squash Commits
+Stable
+Stack Branch
+Stacks the new branch on top of the parent branch, allowing local changes to be integrated using restacking.
+Stage All
+Stage Chunk
+Staged
+Starting Point:
+Stash:
+Status
+Status Text
+Status:
+Step 1 of 3: Applying “Some change”
+Stores your local changes on the Stash and leaves you with a clean working directory.
+Subject
+Subject character limit:
+Submit Full Stack
+SubmitGraphiteBranchDialogueViewController
+Submits all branches in the stack for the selected branch.
+Submodule Name
+Submodule cell view label
+Submodule:
+SubmoduleSidebarCellView
+Sync Full Stack
+Syncs all branches in the stack for the selected branch.
+Syntax Coloring in Diffs
+Syntax coloring:
+System
+Tab width:
+Table View Cell
+Tag Message:
+Tag sidebar label
+TagSidebarCellView
+Take Date from System (text will be overridden)
+Template name
+Template subject and body
+Terminal application:
+Text Cell
+The Tower command line tool lets you open existing Git repositories from the command line.
+The changes are applied as a single commit.
+The local branch will automatically push to and pull from the new remote branch.
+The new branch will automatically push to and pull from the entered branch.
+The new branch will track this branch for local changes and allows integrating them easily.
+The worktree will have a detached HEAD based on the selected starting revision.
+This branch is identical to its parent
+This is a large diff. Do you want to show it?
+This is the placeholder for an error message. It can be two lines or more. Maybe more than three lines. Or four lines. Or five lines...
+Title
+Title:
+To Revision:
+Tower
+Tower Command Line Tool:
+Track Branch
+Track This New Remote Branch
+Tree
+Truncate long file names in working copy:
+Trunk Branch:
+Unstage Chunk
+Unstaged
+Update All Submodules
+Update all user data
+Update interval:
+Update only
+Updated at
+Updates all nested submodules as well. Authentication for all nested submodules must have been configured in Tower.
+Updates the submodule's name to match the new path.
+UpstreamPlaceholder-1
+Use Default SVN Directory Layout
+Use LFS Clone
+Use Rebase Instead of Merge
+Use fast-forward if possible
+User Name
+User Name:
+User Profiles
+UserPreferencesAppearanceViewController
+UserPreferencesEditorViewController
+UserPreferencesEnvironmentViewController
+UserPreferencesTextViewController
+UserPrivacyConsentViewController
+Username <Email>
+Username:
+Value
+Verify Signatures
+Verify Submodules before Push
+Version 10.2 (368)
+Version Tag Prefix:
+View Settings
+Waiting…
+Warn when discarding changes in a chunk
+Web
+When enabled, Tower searches your Home directory for Git repositories in the background and indexes them. You can then use Quick Open to find and open repositories that are not bookmarked yet.
+Window
+Window Restoration:
+Without this option, changes are only applied to the working copy but not automatically commited.
+Without this option, changes are only applied to the working copy but not automatically committed.
+WorkflowPickerDialogueViewController
+WorkingCopyCommitView
+Workspace sidebar cell view
+WorkspaceSidebarCellView
+Worktree Name
+Worktree sidebar label
+WorktreeSidebarCellView
+_NSAppleMenu
+_NSCollectionViewCore
+_NSCornerView
+_NSHelpMenu
+_NSMainMenu
+_NSManagedProxy
+_NSRecentDocumentsMenu
+_NSServicesMenu
+_NSWindowsMenu
+_TtC5Tower10AboutPanel
+_TtC5Tower10OpaqueView
+_TtC5Tower11SummaryView
+_TtC5Tower12ToggleButton
+_TtC5Tower13DiffTableView
+_TtC5Tower16ToggleButtonCell
+_TtC5Tower17HistoryHeaderView
+_TtC5Tower18CommitBodyTextView
+_TtC5Tower18TagSidebarCellView
+_TtC5Tower19AboutViewController
+_TtC5Tower19WhatsNewCloseButton
+_TtC5Tower20CommitBodyScrollView
+_TtC5Tower21BranchSidebarCellView
+_TtC5Tower21CommitMessageClipView
+_TtC5Tower21CommitSubjectTextView
+_TtC5Tower21RemoteSidebarCellView
+_TtC5Tower22DocumentViewController
+_TtC5Tower22MergeConflictsCellView
+_TtC5Tower23AccountWindowController
+_TtC5Tower23CommitBodyContainerView
+_TtC5Tower23CommitMessageScrollView
+_TtC5Tower23ExpandableFilterControl
+_TtC5Tower23WorktreeSidebarCellView
+_TtC5Tower24RefComparisonOutlineView
+_TtC5Tower24SSHSockHandlerController
+_TtC5Tower24SubmoduleSidebarCellView
+_TtC5Tower24WorkspaceSidebarCellView
+_TtC5Tower26AccountSidebarItemCellView
+_TtC5Tower27GitMojiAutocompleteCellView
+_TtC5Tower27RefComparisonCommitCellView
+_TtC5Tower27RefComparisonNoDataCellView
+_TtC5Tower27RemoteBranchSidebarCellView
+_TtC5Tower27SidebarFooterViewController
+_TtC5Tower28AccountSidebarViewController
+_TtC5Tower28AllowedSignersMenuController
+_TtC5Tower28BranchesReviewBranchCellView
+_TtC5Tower28MergeConflictsViewController
+_TtC5Tower28RefComparisonSummaryCellView
+_TtC5Tower30GTWorktreeDetailViewController
+_TtC5Tower30RefComparisonChangesetCellView
+_TtC5Tower31FixupAutocompleteCommitCellView
+_TtC5Tower33SetBranchDependencyViewController
+_TtC5Tower33UserPreferencesTextViewController
+_TtC5Tower34BranchesReviewDetailViewController
+_TtC5Tower34BranchesReviewHeaderViewController
+_TtC5Tower34CommitTemplateAutocompleteCellView
+_TtC5Tower34DialogueMergeabilityViewController
+_TtC5Tower35UserPreferencesEditorViewController
+_TtC5Tower37RefComparisonLargeDiffWarningCellView
+_TtC5Tower37SetGraphiteParentBranchViewController
+_TtC5Tower39PublishRepositoryDialogueViewController
+_TtC5Tower39UserPreferencesAppearanceViewController
+_TtC5Tower40EditCommitTemplateDialogueViewController
+_TtC5Tower40UserPreferencesEnvironmentViewController
+_TtC5Tower43ConfigureGraphiteFlowDialogueViewController
+_TtC5Tower44EditLineCharacterLimitDialogueViewController
+_TtC5Tower45ConfigureCustomWorkflowDialogueViewController
+_TtC5Tower45ServiceAccountsAndOrganizationsMenuController
+ab12345
+addRemoteToRepositoryContentView
+asd asd asd asd asd  asd asdas das dasd asd as das das dasd
+author wants to merge 15 commits into BaseBranch from Branch
+branch-name
+created
+d590307f
+dev.azure.com/
+dialogueError
+dialogueHeaderTitle
+dialogueShowOptions
+filename
+forked from https://github.com/jquery/jquery.git
+httpUsername
+is after
+is before
+is in range
+opy Paths
+origin
+origin/branch-name
+ref-name
+refName
+search
+spaces
+sshUsername
+subject
+to
+trackingRefName
+user@name.com
+username
+↩︎
+⚡️

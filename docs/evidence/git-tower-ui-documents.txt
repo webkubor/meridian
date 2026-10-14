@@ -1,0 +1,9273 @@
+
+## NSWindowController-l8i-da-DTw.nib  (9 objects)
+  About
+  NSApplication
+  NSIBUserDefinedRuntimeAttributesConnector
+  NSObject
+  NSStoryboardPlaceholder
+  NSUserDefaultsController
+  NSView
+  _TtC5Tower10AboutPanel
+  _TtC5Tower19AboutViewController
+  outlets:
+    {}
+
+## Xa4-oW-LlV-view-zdm-s1-Nxc.nib  (23 objects)
+  .AppleSystemUIFont
+  Acknowledgements
+  Copyright © 2010-2023 SaaS.group GmbH. All rights reserved.
+  License Agreement
+  Making Git accessible and enjoyable for everyone has been our mission since 2010.
+
+Thank you for being a part of our journey and for all the support you have given us!
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSView
+  NSVisualEffectView
+  Release Notes
+  System
+  Tower
+  UpstreamPlaceholder-1
+  Version 10.2 (368)
+  outlets:
+    {}
+  actions:
+    {}
+
+## AccountSidebarItemCellView.nib  (16 objects)
+  .AppleSystemUIFont
+  AccountSidebarItemCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  _TtC5Tower26AccountSidebarItemCellView
+  outlets:
+    {}
+
+## AccountSidebarViewController.nib  (23 objects)
+  .AppleSystemUIFont
+  AccountSidebarViewController
+  AutomaticTableColumnIdentifier.0
+  IBNSViewAutolayoutGuide
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSOutlineView
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSView
+  NSViewLayoutMarginsGuide
+  NSViewSafeAreaLayoutGuide
+  System
+  Text Cell
+  _NSCornerView
+  _TtC5Tower28AccountSidebarViewController
+  outlets:
+    {}
+
+## AccountWindowController.nib  (6 objects)
+  Account View
+  AccountWindowController
+  NSApplication
+  NSObject
+  NSView
+  _TtC5Tower23AccountWindowController
+  outlets:
+    {}
+
+## BranchSidebarCellView.nib  (17 objects)
+  .AppleSystemUIFont
+  Branch label
+  BranchSidebarCellView
+  GTSidebarTextField
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSValue
+  System
+  _TtC5Tower21BranchSidebarCellView
+  outlets:
+    {}
+
+## BranchesReviewBranchCellView.nib  (27 objects)
+  .AppleSystemUIFont
+  46
+  75
+  BranchesReviewBranchCellView
+  Comparing…
+  IBImageConfiguration
+  Last year
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageSymbolConfiguration
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSStackViewContainer
+  NSTextField
+  NSTextFieldCell
+  NSValue
+  NSView
+  System
+  _TtC5Tower28BranchesReviewBranchCellView
+  branch-name
+  origin/branch-name
+  outlets:
+    {}
+
+## BranchesReviewDetailViewController.nib  (32 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  .AppleSystemUIFontDemi
+  10
+  Base Branch Name
+  Branch Name
+  BranchesReviewDetailViewController
+  Changeset
+  Commits
+  GTRepositoryHeaderView
+  IBNSViewAutolayoutGuide
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  NSViewLayoutMarginsGuide
+  NSViewSafeAreaLayoutGuide
+  System
+  _TtC5Tower34BranchesReviewDetailViewController
+  outlets:
+    {}
+  actions:
+    {}
+
+## BranchesReviewHeaderViewController.nib  (24 objects)
+  .AppleSystemUIFont
+  BranchesReviewHeaderViewController
+  Compare local branches to:
+  GTRepositoryHeaderView
+  NSApplication
+  NSAttributedString
+  NSColor
+  NSColorSpace
+  NSData
+  NSIBHelpConnector
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSMenuItem
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  OtherViews
+  System
+  _TtC5Tower34BranchesReviewHeaderViewController
+  ref-name
+  outlets:
+    {}
+
+## CommitTemplateAutocompleteCellView.nib  (13 objects)
+  .AppleSystemUIFont
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  Other Label
+  System
+  Template name
+  Template subject and body
+  _TtC5Tower34CommitTemplateAutocompleteCellView
+  outlets:
+    {}
+
+## ConfigureCustomWorkflowDialogueViewController.nib  (5 objects)
+  ConfigureCustomWorkflowDialogueViewController
+  NSApplication
+  NSObject
+  NSView
+  _TtC5Tower45ConfigureCustomWorkflowDialogueViewController
+  outlets:
+    {}
+
+## ConfigureGraphiteFlowDialogueViewController.nib  (37 objects)
+  .AppleSystemUIFont
+  Authenticated as...
+  Authenticating Graphite...
+  ConfigureGraphiteFlowDialogueViewController
+  GTCollapsableView
+  Graphite Binary:
+  Graphite Token:
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSMenu
+  NSMenuItem
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSProgressIndicator
+  NSSecureTextField
+  NSStackView
+  NSStackViewContainer
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Select your main development branch for this repository, where all branches will eventually be merged back.
+  System
+  Trunk Branch:
+  _NSManagedProxy
+  _TtC5Tower43ConfigureGraphiteFlowDialogueViewController
+  outlets:
+    {}
+
+## DeleteGraphiteBranchViewController.nib  (17 objects)
+  .AppleSystemUIFont
+  Delete Tracked Branch
+  Deletes the tracked branch "...".
+  Force Deletion
+  GTDeleteGraphiteBranchViewController
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  System
+  outlets:
+    {}
+
+## DialogueMergeabilityViewController.nib  (20 objects)
+  .AppleSystemUIFont
+  DialogueMergeabilityViewController
+  GTCollapsableView
+  IBImageConfiguration
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Status Text
+  System
+  _TtC5Tower34DialogueMergeabilityViewController
+  outlets:
+    {}
+
+## DocumentViewController.nib  (24 objects)
+  .AppleSystemUIFont
+  DocumentViewController
+  NSApplication
+  NSButtonCell
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSCursor
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSLayoutManager
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTextContainer
+  NSTextStorage
+  NSTextView
+  NSTextViewSharedData
+  NSValue
+  NSView
+  System
+  _TtC5Tower19WhatsNewCloseButton
+  _TtC5Tower22DocumentViewController
+  outlets:
+    {}
+  actions:
+    {}
+
+## EditCommitTemplateDialogueViewController.nib  (21 objects)
+  EditCommitTemplateDialogueViewController
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSCursor
+  NSData
+  NSLayoutConstraint
+  NSLayoutManager
+  NSObject
+  NSScroller
+  NSTextContainer
+  NSTextStorage
+  NSTextViewSharedData
+  NSUserDefaultsController
+  NSView
+  System
+  _TtC5Tower18CommitBodyTextView
+  _TtC5Tower21CommitSubjectTextView
+  _TtC5Tower23CommitMessageScrollView
+  _TtC5Tower40EditCommitTemplateDialogueViewController
+  outlets:
+    {}
+
+## EditLineCharacterLimitDialogueViewController.nib  (14 objects)
+  .AppleSystemUIFont
+  EditLineCharacterLimitDialogueViewController
+  Line Character Limit:
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSView
+  System
+  _TtC5Tower44EditLineCharacterLimitDialogueViewController
+  outlets:
+    {}
+
+## ExpandableFilterControl.nib  (18 objects)
+  .AppleSystemUIFont
+  ExpandableFilterControl
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSSearchField
+  NSSearchFieldCell
+  NSValue
+  NSView
+  System
+  _TtC5Tower23ExpandableFilterControl
+  search
+  outlets:
+    {}
+
+## FixupAutocompleteCommitCellView.nib  (13 objects)
+  .AppleSystemUIFont
+  GTAvatarImageView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  _TtC5Tower31FixupAutocompleteCommitCellView
+  outlets:
+    {}
+
+## GTAbstractSelectorViewController.nib  (28 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  GTAbstractSelectorViewController
+  NSApplication
+  NSButtonCell
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSSearchField
+  NSSearchFieldCell
+  NSTableCellView
+  NSTableHeaderCell
+  NSTableView
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  System
+  Table View Cell
+  Text Cell
+  _NSCornerView
+  search
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTActivityWindowController.nib  (10 objects)
+  4D5AB28F-31FB-4ABD-A3D5-2A70EFAE8514
+  Activity
+  GTActivityWindowController
+  GTActivityWindowToolbarController
+  GTSearchController
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSUserDefaultsController
+  NSView
+  outlets:
+    {}
+
+## GTAddCustomIgnorePatternViewController.nib  (13 objects)
+  .AppleSystemUIFont
+  GTAddCustomIgnorePatternViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSView
+  Pattern:
+  System
+  outlets:
+    {}
+
+## GTAddCustomLFSTrackedFilePatternViewController.nib  (14 objects)
+  .AppleSystemUIFont
+  GTAddCustomLFSTrackedFilePatternViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  Pattern:
+  System
+  outlets:
+    {}
+
+## GTAddGitUserProfileDialogueViewController.nib  (13 objects)
+  .AppleSystemUIFont
+  GTAddGitUserProfileDialogueViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSView
+  System
+  Title:
+  outlets:
+    {}
+
+## GTAddOrEditRefSpecViewController.nib  (14 objects)
+  .AppleSystemUIFont
+  FNView
+  GTAddOrEditRefSpecViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  Ref Spec:
+  System
+  outlets:
+    {}
+
+## GTAddRemoteToRepositoryViewController.nib  (17 objects)
+  .AppleSystemUIFont
+  FNView
+  GTAddRemoteToRepositoryViewController
+  GTCollapsableView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  Name:
+  Remote URL:
+  System
+  addRemoteToRepositoryContentView
+  outlets:
+    {}
+
+## GTAddSVNRemoteToRepositoryViewController.nib  (25 objects)
+  .AppleSystemUIFont
+  FNView
+  GTAddSVNRemoteToRepositoryViewController
+  GTCollapsableView
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSTokenField
+  NSTokenFieldCell
+  NSUserDefaultsController
+  Name:
+  Remote URL:
+  SVN Branches:
+  SVN Tags:
+  SVN Trunk:
+  System
+  Use Default SVN Directory Layout
+  addRemoteToRepositoryContentView
+  outlets:
+    {}
+
+## GTAddSubmoduleDialogueViewController.nib  (24 objects)
+  .AppleSystemUIFont
+  GTAddSubmoduleDialogueViewController
+  GTCollapsableView
+  GTSubmodulePathSelectionController
+  Item 2
+  Item 3
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OtherViews
+  Path to the Submodule
+  Path:
+  Remote URL:
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTAddWorktreeDialogueViewController.nib  (34 objects)
+  .AppleSystemUIFont
+  Creates a worktree for the given starting revision even if it is already checked out in another worktree.
+  Destination:
+  Detach
+  FNView
+  Force
+  GTAddWorktreeDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Revision:
+  System
+  The worktree will have a detached HEAD based on the selected starting revision.
+  _NSManagedProxy
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTApplyPatchToWorkingCopyDialogueViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  Bypasses any associated hook scripts.
+  FNView
+  GTApplyPatchToWorkingCopyDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OtherViews
+  Skip Hooks
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTApplyStashViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  Delete Stash After Applying Changes
+  FNView
+  GTApplyStashViewController
+  GTSaveStashDialogueContentView
+  GTStash
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  OtherViews
+  Restore Staging Area Status
+  Stash:
+  System
+  outlets:
+    {}
+
+## GTAutoStashDialogueViewController.nib  (18 objects)
+  .AppleSystemUIFont
+  FNView
+  GTAutoStashDialogueViewController
+  GTSaveStashDialogueContentView
+  Message:
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  Re-Apply Changes After Operation is Finished
+  System
+  outlets:
+    {}
+
+## GTAutoUpdateSubmodulesDialogueViewController.nib  (11 objects)
+  .AppleSystemUIFont
+  Always auto-update submodules
+  FNView
+  GTAutoUpdateSubmodulesDialogueViewController
+  GTSaveStashDialogueContentView
+  NSApplication
+  NSButton
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSUserDefaultsController
+  outlets:
+    {}
+
+## GTBlameAnnotationCellView.nib  (15 objects)
+  .AppleSystemUIFont
+  27 November 2016
+  Author Name
+  GTAvatarImageView
+  GTBlameAnnotationCellView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTBlameCommitPopoverViewController.nib  (17 objects)
+  .AppleSystemUIFont
+  Author
+  Date
+  FNView
+  GTAvatarImageView
+  GTBlameCommitPopoverViewController
+  Hash
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  Subject
+  System
+  outlets:
+    {}
+
+## GTBlameViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  FNView
+  GTAnnotatedTextViewNew
+  GTBlameLineNumberView
+  GTBlameTextView
+  GTBlameViewController
+  GTTableView
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSCursor
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSLayoutManager
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSTextContainer
+  NSTextStorage
+  NSTextViewSharedData
+  System
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+
+## GTBlobViewController.nib  (30 objects)
+  .AppleSystemUIFont
+  2 Contributors
+  Blame
+  GTActionBarView
+  GTBlobViewController
+  GTContributorsView
+  GTRefControlDividerView
+  GTRepositoryHeaderView
+  Menlo-Regular
+  NSApplication
+  NSBox
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Raw
+  Recessed
+  System
+  Title
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTBookmarksDetailViewController.nib  (18 objects)
+  .AppleSystemUIFont
+  GTBookmarksDetailViewController
+  GTRepositoryHeaderView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Repository Name
+  System
+  outlets:
+    {}
+
+## GTBookmarksEmptySelectionViewController.nib  (20 objects)
+  .AppleSystemUIFont
+  Empty View
+  GTBookmarksDropZoneView
+  GTBookmarksEmptySelectionViewController
+  GTEmptyView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  outlets:
+    {}
+
+## GTBookmarksNoGitRepositoryFoundViewController.nib  (3 objects)
+  GTBookmarksNoGitRepositoryFoundViewController
+  NSApplication
+  NSObject
+
+## GTBookmarksRepositoryViewController.nib  (20 objects)
+  .AppleSystemUIFont
+  FNView
+  GTBookmarksRepositoryViewController
+  GTSettingsTableView
+  GTSettingsTableViewContentColumnIdentifier
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSUserDefaultsController
+  System
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+
+## GTBookmarksSeachLocalHardDriveViewController.nib  (6 objects)
+  FNView
+  GTBookmarksSeachLocalHardDriveViewController
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTBookmarksSidebarBookmarkItemCellView.nib  (19 objects)
+  .AppleSystemUIFont
+  GTBookmarksSidebarBookmarkItemCellView
+  GTBookmarksSidebarViewController
+  GTSidebarTextField
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTBookmarksSidebarFolderItemCellView.nib  (16 objects)
+  .AppleSystemUIFont
+  GTBookmarksSidebarFolderItemCellView
+  GTBookmarksSidebarViewController
+  GTSidebarTextField
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTBookmarksSidebarViewController.nib  (29 objects)
+  .AppleSystemUIFont
+  Add
+  AddMenu
+  AutomaticTableColumnIdentifier.0
+  GTBookmarksSidebarViewController
+  NSApplication
+  NSBox
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSMenuItem
+  NSObject
+  NSOutlineView
+  NSPopUpButtonCell
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  Text Cell
+  Title
+  _NSCornerView
+  outlets:
+    {}
+
+## GTBookmarksViewController.nib  (4 objects)
+  FNView
+  GTBookmarksViewController
+  NSApplication
+  NSObject
+  outlets:
+    {}
+
+## GTCheckoutPullRequestDialogViewController.nib  (13 objects)
+  .AppleSystemUIFont
+  GTCheckoutPullRequestDialogViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSView
+  RefName:
+  System
+  outlets:
+    {}
+
+## GTCheckoutRevisionViewController.nib  (17 objects)
+  .AppleSystemUIFont
+  GTCheckoutRevisionViewController
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  Revision:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTCherryPickRevisionsDialogueViewController.nib  (33 objects)
+  .AppleSystemUIFont
+  ContentView
+  Directly commit cherry-picked changes
+  FNGradientLineView
+  FNView
+  GTCherryPickRevisionsDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  Mainline:
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  OptionsView
+  OtherViews
+  Performs a fast-forward if the current HEAD is the same as the parent of the cherry-picked commit.
+  Specify which side of the merge commit should be used as the mainline to be integrated. In case of multiple merge commits, the same mainline number will be used.
+  System
+  Title
+  Use fast-forward if possible
+  Without this option, changes are only applied to the working copy but not automatically commited.
+  _NSManagedProxy
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTCloneActivityActiveCellView.nib  (20 objects)
+  .AppleSystemUIFont
+  GTCloneActivityActiveCellView
+  GTCloneActivityViewController
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTCloneActivityCancelledCellView.nib  (19 objects)
+  .AppleSystemUIFont
+  GTCloneActivityCancelledCellView
+  GTCloneActivityViewController
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTCloneActivityErrorCellView.nib  (18 objects)
+  .AppleSystemUIFont
+  GTCloneActivityErrorCellView
+  GTCloneActivityViewController
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTCloneActivityFinishedCellView.nib  (18 objects)
+  .AppleSystemUIFont
+  GTCloneActivityFinishedCellView
+  GTCloneActivityViewController
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTCloneActivityViewController.nib  (24 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  Clear
+  FNView
+  GTCloneActivityTableView
+  GTCloneActivityViewController
+  NSApplication
+  NSButton
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSTextField
+  Recently Cloned Repositories
+  System
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTCloneGitRepositoryViewController.nib  (29 objects)
+  .AppleSystemUIFont
+  Clone To:
+  GTCloneDestinationMenuController
+  GTCloneGitRepositoryViewController
+  GTCollapsableView
+  Initialize Submodules
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OtherViews
+  Remote URL:
+  System
+  Use LFS Clone
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTCloneRepositoryAutocompleteCellView.nib  (16 objects)
+  .AppleSystemUIFont
+  FilePath
+  GTCloneRepositoryAutocompleteCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  Name
+  System
+  outlets:
+    {}
+
+## GTCloneRepositoryAutocompleteInfoCellView.nib  (11 objects)
+  .AppleSystemUIFont
+  GTCloneRepositoryAutocompleteInfoCellView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+
+## GTCloneRepositoryAutocompleteSearchingCellView.nib  (12 objects)
+  .AppleSystemUIFont
+  GTCloneRepositoryAutocompleteSearchingCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  Name
+  System
+  outlets:
+    {}
+
+## GTCloneSVNRepositoryViewController.nib  (33 objects)
+  .AppleSystemUIFont
+  Clone To:
+  GTCloneDestinationMenuController
+  GTCloneSVNRepositoryViewController
+  GTCollapsableView
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSTokenField
+  NSTokenFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OtherViews
+  Remote URL:
+  SVN Branches:
+  SVN Tags:
+  SVN Trunk:
+  System
+  Use Default SVN Directory Layout
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTCommitChangesetCellView.nib  (12 objects)
+  .AppleSystemUIFont
+  GTCommitChangesetCellView
+  GTGitFileStatusIcon
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTCommitChangesetDiffViewController.nib  (19 objects)
+  .AppleSystemUIFontBold
+  GTActionBarView
+  GTCommitChangesetDiffViewController
+  GTRepositoryHeaderView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  outlets:
+    {}
+
+## GTCommitChangesetViewController.nib  (36 objects)
+  .AppleSystemUIFont
+  1af34d2
+  2 Changed Files
+  AutomaticTableColumnIdentifier.0
+  Changed Files
+  GTAvatarImageView
+  GTCommitChangesetViewController
+  GTRepositoryHeaderView
+  GTTableView
+  Label
+  Menlo-Regular
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImage
+  NSImageCell
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopover
+  NSScrollView
+  NSScroller
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  NSViewController
+  System
+  Text Cell
+  _NSCornerView
+  asd asd asd asd asd  asd asdas das dasd asd as das das dasd
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTCommitEmptyCellView.nib  (11 objects)
+  .AppleSystemUIFont
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTableCellView
+  NSTextField
+  No changes.
+  System
+  outlets:
+    {}
+
+## GTCommitViewController.nib  (7 objects)
+  FNView
+  GTCommitViewController
+  GTNonRestorableSplitView
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTCompareRevisionsViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  Compare Revision:
+  Copies all modified files into a temporary directory and performs a directory diff on them.
+  FNView
+  GTCompareRevisionsViewController
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  Perform Directory Diff
+  System
+  To Revision:
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTConfirmViewController.nib  (3 objects)
+  GTConfirmViewController
+  NSApplication
+  NSObject
+
+## GTCreateNewBranchViewController.nib  (41 objects)
+  .AppleSystemUIFont
+  Adds the branch to the “Pinned“ section in the sidebar.
+  Check Out Branch
+  Directly checks out the new branch after it was created.
+  FNView
+  GTCreateNewBranchViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Name:
+  Parent Branch:
+  Pin Branch
+  Stack Branch
+  Stacks the new branch on top of the parent branch, allowing local changes to be integrated using restacking.
+  Starting Point:
+  System
+  The new branch will automatically push to and pull from the entered branch.
+  The new branch will track this branch for local changes and allows integrating them easily.
+  Track Branch
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTCreateNewStackedBranchDialogueViewController.nib  (31 objects)
+  .AppleSystemUIFont
+  Adds the branch to the “Pinned“ section in the sidebar.
+  Check Out Branch
+  Directly checks out the new branch after it was created.
+  FNView
+  GTCreateNewStackedBranchDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  Name:
+  Parent Branch:
+  Pin Branch
+  System
+  The new branch will track this branch for local changes and allows integrating them easily.
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTCreateTagViewController.nib  (31 objects)
+  .AppleSystemUIFont
+  GTCreateTagViewController
+  Item 1
+  Item 2
+  Item 3
+  Message:
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Name:
+  Revision:
+  Sign Tag
+  Signing Key:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTDeleteBranchesViewController.nib  (17 objects)
+  .AppleSystemUIFont
+  Delete Tracked Branch
+  Deletes the tracked branch "...".
+  Force Deletion
+  GTDeleteBranchesViewController
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  System
+  outlets:
+    {}
+
+## GTDeleteSubmodulesDialogueViewController.nib  (16 objects)
+  .AppleSystemUIFont
+  FNView
+  GTDeleteSubmodulesDialogueViewController
+  Keep Working Tree
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  Removes only the submodule's config, but keeps its working files.
+  System
+  outlets:
+    {}
+
+## GTDeleteWorktreeDialogueViewController.nib  (16 objects)
+  .AppleSystemUIFont
+  Force Deletion
+  GTDeleteWorktreeDialogueViewController
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  Removes the worktree, including any uncommitted changes.
+  System
+  outlets:
+    {}
+
+## GTDialogueViewController.nib  (42 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  Alt
+  AlternateFooterView
+  Cancel
+  Dialogue Title
+  DialogueView
+  ErrorContainerView
+  ErrorView
+  FNView
+  GTCollapsableView
+  GTDialogueFooterView
+  GTDialogueOptionsView
+  GTDialogueViewController
+  HeaderView
+  Label
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OK
+  OptionsContainerView
+  Show Options
+  ShowOptionsButtonContainer
+  Stores your local changes on the Stash and leaves you with a clean working directory.
+  System
+  This is the placeholder for an error message. It can be two lines or more. Maybe more than three lines. Or four lines. Or five lines...
+  dialogueError
+  dialogueHeaderTitle
+  dialogueShowOptions
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTDialogueWindowController.nib  (7 objects)
+  DialogueWindowView
+  DialogueWrapperView
+  GTDialogueWindowController
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  Window
+  outlets:
+    {}
+
+## GTDiffChunkContentCellView.nib  (4 objects)
+  GTDiffChunkContentCellView
+  NSApplication
+  NSObject
+  NSViewController
+
+## GTDiffChunkHeaderCellView.nib  (18 objects)
+  .AppleSystemUIFont
+  @@ 1,2 2,3 @@
+  Discard Chunk
+  GTDiffChunkHeaderCellView
+  GTWorkingCopyFileDiffViewController
+  Menlo-Regular
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSView
+  Stage Chunk
+  System
+  Unstage Chunk
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTDiffEmptyCellView.nib  (5 objects)
+  GTDiffEmptyCellView
+  GTDiffHeaderContentView
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  outlets:
+    {}
+
+## GTDiffHeaderCellView.nib  (5 objects)
+  GTDiffHeaderCellView
+  GTDiffHeaderContentView
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  outlets:
+    {}
+
+## GTDiffImageCellView.nib  (6 objects)
+  GTActionBarView
+  GTDiffImageCellView
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTDiffImageDetailViewController.nib  (14 objects)
+  .AppleSystemUIFont
+  GTActionBarView
+  GTDiffImageContainerView
+  GTDiffImageDetailViewController
+  NSApplication
+  NSBox
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSView
+  System
+  Title
+  outlets:
+    {}
+
+## GTDiffImageViewController.nib  (17 objects)
+  .AppleSystemUIFont
+  GTDiffImageView
+  GTDiffImageViewController
+  GTView
+  Loading Image Data Failed
+  Loading Image Data…
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  System
+  outlets:
+    {}
+
+## GTDiffLoadingCellView.nib  (12 objects)
+  .AppleSystemUIFont
+  GTDiffLoadingCellView
+  Loading Diff…
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTDiscardAllLocalChangesDialogueViewController.nib  (4 objects)
+  GTDiscardAllLocalChangesDialogueViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTDiscardDiffContentDialogueViewController.nib  (10 objects)
+  .AppleSystemUIFont
+  Do not ask me again
+  FNView
+  GTDiscardDiffContentDialogueViewController
+  NSApplication
+  NSButton
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSUserDefaultsController
+  outlets:
+    {}
+
+## GTDiscardLocalChangesDialogueViewController.nib  (4 objects)
+  GTDiscardLocalChangesDialogueViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTEditCommitMessageDialogueViewController.nib  (21 objects)
+  GTCommitSubjectScrollView
+  GTEditCommitMessageDialogueViewController
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSCursor
+  NSData
+  NSLayoutConstraint
+  NSLayoutManager
+  NSObject
+  NSScroller
+  NSTextContainer
+  NSTextStorage
+  NSTextViewSharedData
+  NSUserDefaultsController
+  NSView
+  System
+  _TtC5Tower18CommitBodyTextView
+  _TtC5Tower21CommitSubjectTextView
+  _TtC5Tower23CommitMessageScrollView
+  outlets:
+    {}
+
+## GTEditGitActorViewController.nib  (15 objects)
+  .AppleSystemUIFont
+  Email:
+  GTEditGitActorViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  Name:
+  System
+  outlets:
+    {}
+
+## GTEditRemoteNameViewController.nib  (13 objects)
+  .AppleSystemUIFont
+  GTEditRemoteNameViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSView
+  Name:
+  System
+  outlets:
+    {}
+
+## GTEditRemoteURLViewController.nib  (15 objects)
+  .AppleSystemUIFont
+  GTCollapsableView
+  GTEditRemoteURLViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  Remote URL:
+  System
+  outlets:
+    {}
+
+## GTEditRepositoryDescriptionViewController.nib  (14 objects)
+  .AppleSystemUIFont
+  Description:
+  FNView
+  GTEditRepositoryDescriptionViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  System
+  outlets:
+    {}
+
+## GTEditSubmoduleURLViewController.nib  (15 objects)
+  .AppleSystemUIFont
+  GTCollapsableView
+  GTEditSubmoduleURLViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  Remote URL:
+  System
+  outlets:
+    {}
+
+## GTEmptyViewController.nib  (20 objects)
+  .AppleSystemUIFont
+  Description that is long and that wraps
+  Empty View
+  GTEmptyView
+  GTEmptyViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  outlets:
+    {}
+
+## GTExportRevisionDialogueViewController.nib  (21 objects)
+  .AppleSystemUIFont
+  Create Archive
+  FNView
+  GTExportRevisionDialogueViewController
+  Instead of exporting the files into a directory, this will create an archive.
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  Revision:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTFetchRemoteViewController.nib  (31 objects)
+  .AppleSystemUIFont
+  Deletes remote tracking branches that have been deleted on the remote repository.
+  FNView
+  Fetch All Remotes
+  Fetch All Tags
+  Fetch Submodules
+  Forces the download of all tags.
+  GTFetchRemoteViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  OtherViews
+  Prune Obsolete Remote Branches
+  Recursively fetches all Submodules. Authentication must have been properly configured for each Submodule in Tower.
+  Remote:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTFetchSubmoduleViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  Deletes remote tracking branches that have been deleted on the remote repository.
+  FNView
+  Fetch All Submodules
+  GTFetchSubmoduleViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  OtherViews
+  Prune Obsolete Remote Branches
+  Submodule:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTFileDiffViewController.nib  (19 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  GTFileDiffViewController
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSView
+  System
+  Text Cell
+  _NSCornerView
+  _TtC5Tower13DiffTableView
+  outlets:
+    {}
+
+## GTFileHistoryContributorAutocompleteCellView.nib  (14 objects)
+  .AppleSystemUIFont
+  GTAvatarImageView
+  GTFileHistoryContributorAutocompleteCellView
+  GTFileHistoryContributorFormatter
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTFileHistoryDetailViewController.nib  (20 objects)
+  .AppleSystemUIFont
+  Diff
+  GTActionBarView
+  GTFileHistoryDetailViewController
+  GTRepositoryHeaderView
+  Label
+  Menlo-Regular
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  Raw
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTFileHistoryTimelineCommitCellView.nib  (18 objects)
+  .AppleSystemUIFont
+  15:30
+  Author Name
+  GTAvatarImageView
+  GTFileHistoryTimelineCommitCellView
+  GTTimelineGraphView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSIBUserDefinedRuntimeAttributesConnector
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  Subject
+  System
+  outlets:
+    {}
+
+## GTFileHistoryTimelineGroupCellView.nib  (13 objects)
+  .AppleSystemUIFont
+  GTFileHistoryTimelineGroupCellView
+  GTTimelineGraphView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSIBUserDefinedRuntimeAttributesConnector
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTFileHistoryTimelineViewController.nib  (25 objects)
+  .AppleSystemUIFont
+  2 Commits
+  AutomaticTableColumnIdentifier.0
+  GTFileHistoryTimelineViewController
+  GTRepositoryHeaderView
+  GTTableView
+  NSApplication
+  NSButton
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  Recessed
+  System
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTFileHistoryViewController.nib  (7 objects)
+  FNView
+  GTFileHistoryViewController
+  GTNonRestorableSplitView
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTFileSelectorFileCellView.nib  (15 objects)
+  .AppleSystemUIFont
+  GTFileSelectorFileCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTFileSelectorFileSearchCellView.nib  (11 objects)
+  .AppleSystemUIFont
+  GTFileSelectorFileSearchCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTFileViewController.nib  (20 objects)
+  GTAnnotatedTextViewNew
+  GTBlobTextView
+  GTFileViewController
+  GTLineNumberView
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSCursor
+  NSData
+  NSLayoutConstraint
+  NSLayoutManager
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTextContainer
+  NSTextStorage
+  NSTextViewSharedData
+  NSView
+  System
+  outlets:
+    {}
+
+## GTForceAddSubmoduleViewController.nib  (4 objects)
+  GTForceAddSubmoduleViewController
+  NSApplication
+  NSObject
+  NSView
+
+## GTForceDeleteSubmodulesViewController.nib  (4 objects)
+  GTForceDeleteSubmodulesViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTForcePushDialogueViewController.nib  (34 objects)
+  .AppleSystemUIFont
+  Branch:
+  Bypasses any associated hook scripts.
+  Destination:
+  FNView
+  GTCollapsableView
+  GTForcePushDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  Label
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextField
+  NSValue
+  NSView
+  Skip Hooks
+  Status Text
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTGPGCreateRealKeyDialogueViewController.nib  (15 objects)
+  .AppleSystemUIFont
+  GTGPGCreateRealKeyDialogueViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSecureTextField
+  NSSecureTextFieldCell
+  NSTextField
+  NSView
+  Password:
+  Repeat:
+  System
+  outlets:
+    {}
+
+## GTGitErrorAccessoryViewController.nib  (19 objects)
+  FNView
+  GTGitErrorAccessoryViewController
+  GTGitErrorScrollView
+  GTGitErrorTextView
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSCursor
+  NSData
+  NSLayoutConstraint
+  NSLayoutManager
+  NSObject
+  NSScroller
+  NSTextContainer
+  NSTextStorage
+  NSTextViewSharedData
+  NSUserDefaultsController
+  System
+  outlets:
+    {}
+
+## GTGitErrorViewController.nib  (21 objects)
+  ContentView
+  ErrorOptionsView
+  FNView
+  GTGitErrorScrollView
+  GTGitErrorTextView
+  GTGitErrorViewController
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSCursor
+  NSData
+  NSLayoutConstraint
+  NSLayoutManager
+  NSObject
+  NSScroller
+  NSTextContainer
+  NSTextStorage
+  NSTextViewSharedData
+  NSUserDefaultsController
+  System
+  outlets:
+    {}
+
+## GTGitFlowConfigureDialogueViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  Development Branch:
+  Feature Branch Prefix:
+  GTGitFlowConfigureDialogueViewController
+  Hotfix Branch Prefix:
+  NSApplication
+  NSBox
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSView
+  Production Branch:
+  Release Branch Prefix:
+  System
+  Title
+  Version Tag Prefix:
+  outlets:
+    {}
+
+## GTGitFlowCreateFeatureBranchDialogueViewController.nib  (19 objects)
+  .AppleSystemUIFont
+  Feature Name:
+  GTGitFlowCreateFeatureBranchDialogueViewController
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  Starting Point:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTGitFlowCreateHotfixBranchDialogueViewController.nib  (19 objects)
+  .AppleSystemUIFont
+  GTGitFlowCreateHotfixBranchDialogueViewController
+  Hotfix Name:
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  Starting Point:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTGitFlowCreateReleaseBranchDialogueViewController.nib  (19 objects)
+  .AppleSystemUIFont
+  GTGitFlowCreateReleaseBranchDialogueViewController
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  Release Name:
+  Starting Point:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTGitFlowFinishFeatureBranchDialogueViewController.nib  (30 objects)
+  .AppleSystemUIFont
+  Always Create Merge Commit
+  Create a merge commit even when the merge resolves as a fast-forward
+  FNView
+  Feature Branch:
+  GTGitFlowFinishFeatureBranchDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  OtherViews
+  Preserve Merge Commits
+  Rebases the local HEAD branch onto the fetched revisions.
+  Recreates merge commits instead of ignoring them
+  System
+  Use Rebase Instead of Merge
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTGitFlowFinishHotfixBranchDialogueViewController.nib  (30 objects)
+  .AppleSystemUIFont
+  Don't Tag Hotfix Release
+  GTGitFlowFinishHotfixBranchDialogueViewController
+  Hotfix Branch:
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OtherViews
+  Sign Tag
+  Signing Key:
+  System
+  Tag Message:
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTGitFlowFinishReleaseBranchDialogueViewController.nib  (30 objects)
+  .AppleSystemUIFont
+  Don't Tag Release
+  GTGitFlowFinishReleaseBranchDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OtherViews
+  Release Name:
+  Sign Tag
+  Signing Key:
+  System
+  Tag Message:
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTGitRemoteConnectionViewController.nib  (23 objects)
+  .AppleSystemUIFont
+  Account:
+  Box
+  GTGitRemoteConnectionViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSBox
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTGitUserProfileDialogueViewController.nib  (21 objects)
+  .AppleSystemUIFont
+  Email:
+  GTGitUserProfileDialogueViewController
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSTextField
+  NSTextFieldCell
+  NSView
+  Signing Key:
+  System
+  Title:
+  User Name:
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTGraphiteErrorViewController.nib  (21 objects)
+  ContentView
+  ErrorOptionsView
+  FNView
+  GTGitErrorScrollView
+  GTGitErrorTextView
+  GTGraphiteErrorViewController
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSCursor
+  NSData
+  NSLayoutConstraint
+  NSLayoutManager
+  NSObject
+  NSScroller
+  NSTextContainer
+  NSTextStorage
+  NSTextViewSharedData
+  NSUserDefaultsController
+  System
+  outlets:
+    {}
+
+## GTHistoryCommitActionsCellView.nib  (5 objects)
+  GTHistoryCommitActionView
+  GTHistoryCommitActionsCellView
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  outlets:
+    {}
+
+## GTHistoryCommitChangesetDiffLoadingCellView.nib  (12 objects)
+  .AppleSystemUIFont
+  GTHistoryCommitChangesetDiffLoadingCellView
+  Loading Diff…
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTHistoryCommitChangesetHeaderCellView.nib  (13 objects)
+  .AppleSystemUIFont
+  Changeset Summary
+  Expand All
+  GTCommitChangesetCollapseButton
+  GTHistoryCommitChangesetHeaderCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTHistoryCommitChangesetItemCellView.nib  (13 objects)
+  .AppleSystemUIFont
+  GTGitFileStatusIcon
+  GTHistoryCommitChangesetItemCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  created
+  filename
+  outlets:
+    {}
+
+## GTHistoryCommitChangesetLoadingCellView.nib  (12 objects)
+  .AppleSystemUIFont
+  GTHistoryCommitChangesetLoadingCellView
+  Loading Changeset…
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTHistoryCommitChangesetViewController.nib  (24 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  GTHistoryCommitChangesetView
+  GTHistoryCommitChangesetViewController
+  GTHistoryCommitDetailOutlineView
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSMenu
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableCellView
+  NSTableHeaderCell
+  NSTextField
+  System
+  Table View Cell
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+
+## GTHistoryCommitDetailViewController.nib  (19 objects)
+  .AppleSystemUIFont
+  Changeset
+  GTActionBarView
+  GTHistoryCommitDetailViewController
+  GTRepositoryHeaderView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  System
+  Tree
+  ab12345
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTHistoryCommitForkPointMediumCellView.nib  (18 objects)
+  .AppleSystemUIFont
+  Fork point of parent branch...
+  GTHistoryCommitForkPointMediumCellView
+  GTHistoryCommitListGraphView
+  NSApplication
+  NSBox
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Title
+  outlets:
+    {}
+
+## GTHistoryCommitForkPointSmallCellView.nib  (18 objects)
+  .AppleSystemUIFont
+  Fork point of parent branch...
+  GTHistoryCommitForkPointSmallCellView
+  GTHistoryCommitListGraphView
+  NSApplication
+  NSBox
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Title
+  outlets:
+    {}
+
+## GTHistoryCommitHeaderCellView.nib  (9 objects)
+  .AppleSystemUIFont
+  GTHistoryCommitHeaderAnnotationView
+  GTHistoryCommitHeaderCellView
+  GTHistoryCommitHeaderInfoView
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSLayoutConstraint
+  NSObject
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTHistoryCommitListBaseBranchHeaderViewController.nib  (25 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontDemi
+  13
+  27
+  Compare to:
+  GTHistoryCommitListBaseBranchHeaderViewController
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSStackView
+  NSStackViewContainer
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  branch-name
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTHistoryCommitListEmptyCellView.nib  (11 objects)
+  .AppleSystemUIFont
+  GTHistoryCommitListEmptyCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  No commits
+  System
+  outlets:
+    {}
+
+## GTHistoryCommitListGroupCellView.nib  (12 objects)
+  .AppleSystemUIFont
+  GTHistoryCommitListGraphView
+  GTHistoryCommitListGroupCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTHistoryCommitListGroupRowView.nib  (11 objects)
+  .AppleSystemUIFont
+  GTHistoryCommitListGroupRowView
+  NSApplication
+  NSBox
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  System
+  Title
+  outlets:
+    {}
+
+## GTHistoryCommitListLoadingCellView.nib  (13 objects)
+  .AppleSystemUIFont
+  GTHistoryCommitListLoadingCellView
+  GTHistoryCommitListViewController
+  Loading commits ...
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTHistoryCommitListMediumCellView.nib  (29 objects)
+  .AppleSystemUIFont
+  01.02.12
+  4af2c404
+  Author
+  AuthorImageView
+  CommitAuthor
+  CommitDate
+  GTAvatarImageView
+  GTHistoryCommitListGraphView
+  GTHistoryCommitListMediumCellView
+  GTRefBadgesView
+  Menlo-Regular
+  Message
+  NSApplication
+  NSBox
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  RemoteArrow
+  ShortSHA
+  System
+  Title
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTHistoryCommitListSmallCellView.nib  (28 objects)
+  .AppleSystemUIFont
+  01.02.12
+  Author
+  CommitDate
+  GTHistoryCommitListGraphView
+  GTHistoryCommitListSmallCellView
+  GTRefBadgesView
+  Menlo-Regular
+  NSApplication
+  NSBox
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSStackViewContainer
+  NSTextField
+  NSValue
+  Subject
+  System
+  Title
+  d590307f
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTHistoryCommitListViewController.nib  (50 objects)
+  #1234
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  .AppleSystemUIFontDemi
+  27
+  CommitColumn
+  GTHistoryCommitListHeaderView
+  GTHistoryCommitListViewController
+  GTHistoryViewSettingsMenuController
+  GTTableView
+  HistoryHeaderView
+  NSApplication
+  NSAttributedString
+  NSBox
+  NSButton
+  NSButtonCell
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSIBHelpConnector
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSMenuItem
+  NSNib
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSScrollView
+  NSScroller
+  NSStackView
+  NSStackViewContainer
+  NSTableCellView
+  NSTableHeaderCell
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OtherViews
+  System
+  Table View Cell
+  Text Cell
+  Title
+  _NSCornerView
+  _TtC5Tower17HistoryHeaderView
+  refName
+  trackingRefName
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTHistoryCommitMessageCellView.nib  (5 objects)
+  GTHistoryCommitMessageCellView
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSTextView
+  outlets:
+    {}
+
+## GTHistoryCommitNoNewCommitsMediumCellView.nib  (21 objects)
+  .AppleSystemUIFont
+  GTHistoryCommitNoNewCommitsMediumCellView
+  NSApplication
+  NSBox
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSStackViewContainer
+  NSTextField
+  NSValue
+  NSView
+  No new commits on this branch
+  System
+  This branch is identical to its parent
+  Title
+  outlets:
+    {}
+
+## GTHistoryCommitNoNewCommitsSmallCellView.nib  (21 objects)
+  .AppleSystemUIFont
+  GTHistoryCommitNoNewCommitsSmallCellView
+  NSApplication
+  NSBox
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSStackViewContainer
+  NSTextField
+  NSValue
+  NSView
+  No new commits on this branch
+  System
+  This branch is identical to its parent
+  Title
+  outlets:
+    {}
+
+## GTHistoryCommitTreeViewController.nib  (24 objects)
+  .AppleSystemUIFont
+  Filename
+  GTHistoryCommitTreeViewController
+  GTHistoryDetailFileTreeOutlineView
+  GTWorkingCopyFileNameColumn
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableCellView
+  NSTableHeaderView
+  NSTextField
+  NSView
+  System
+  Table View Cell
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+
+## GTHistoryContributorAutocompleteCellView.nib  (14 objects)
+  .AppleSystemUIFont
+  GTAvatarImageView
+  GTGitContributorFormatter
+  GTHistoryContributorAutocompleteCellView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTHistoryDetailFilePathCellView.nib  (13 objects)
+  .AppleSystemUIFont
+  GTHistoryDetailFilePathCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTHistoryDetailLoadingCellView.nib  (12 objects)
+  .AppleSystemUIFont
+  GTHistoryDetailLoadingCellView
+  Loading Tree…
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTHistorySearchFilterContainerViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  GTHistorySearchFilterContainerViewController
+  Label
+  NSApplication
+  NSBox
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSSegmentItem
+  NSSegmentedCell
+  NSSegmentedControl
+  NSStackView
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  NSVisualEffectView
+  System
+  Title
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTHistorySearchFilterViewController.nib  (31 objects)
+  .AppleSystemUIFont
+  GTHistorySearchFilterView
+  GTHistorySearchFilterViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSDate
+  NSDatePicker
+  NSDatePickerCell
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSSegmentItem
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  is after
+  is before
+  is in range
+  to
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTHistoryViewController.nib  (7 objects)
+  FNView
+  GTHistoryViewController
+  GTNonRestorableSplitView
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTIgnoreTrackedFilesDialogueViewController.nib  (4 objects)
+  GTIgnoreTrackedFilesDialogueViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTInitSubmoduleViewController.nib  (4 objects)
+  GTInitSubmoduleViewController
+  NSApplication
+  NSObject
+  NSView
+
+## GTInvalidRepositoryViewController.nib  (4 objects)
+  GTInvalidRepositoryViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTLFSFetchRemoteViewController.nib  (21 objects)
+  .AppleSystemUIFont
+  FNView
+  GTLFSFetchRemoteViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSValue
+  OtherViews
+  Remote:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTLFSPullRemoteViewController.nib  (21 objects)
+  .AppleSystemUIFont
+  FNView
+  GTLFSPullRemoteViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSValue
+  OtherViews
+  Remote:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTLFSPushRemoteViewController.nib  (21 objects)
+  .AppleSystemUIFont
+  FNView
+  GTLFSPushRemoteViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSValue
+  OtherViews
+  Remote:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTMainContentViewController.nib  (6 objects)
+  FNView
+  GTMainContentViewController
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTMainMenu.nib  (24 objects)
+  GTApplication
+  GTApplicationDelegate
+  GTDebugController
+  GTHistoryViewSettingsMenuController
+  GTMainMenuController
+  GTRemoteBranchViewSettingsMenuController
+  GTSidebarViewSettingsMenuController
+  GTTagsSortSettingsMenuController
+  GTWorkflowMenuController
+  GTWorkingTreeViewSettingsMenuController
+  NSApplication
+  NSFontManager
+  NSImage
+  NSLocalizableString
+  NSMenu
+  NSMenuItem
+  NSUserDefaultsController
+  NSValue
+  _NSAppleMenu
+  _NSHelpMenu
+  _NSMainMenu
+  _NSRecentDocumentsMenu
+  _NSServicesMenu
+  _NSWindowsMenu
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTMainWindowController.nib  (7 objects)
+  GTMainWindow
+  GTMainWindowController
+  NSApplication
+  NSObject
+  NSUserDefaultsController
+  NSView
+  Tower
+  outlets:
+    {}
+
+## GTMergeBranchDialogueViewController.nib  (34 objects)
+  .AppleSystemUIFont
+  Always Generate Merge Commit
+  Branch:
+  Bypasses any associated hook scripts.
+  Directly Commit Merged Changes
+  GTMergeBranchDialogueViewController
+  Generate a merge commit even if the merge resolved as a fast-forward.
+  Item 1
+  Item 2
+  Item 3
+  Merge is aborted if the tip commit of the side branch is not signed with a valid key.
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Skip Hooks
+  Squash Commits
+  System
+  The changes are applied as a single commit.
+  Verify Signatures
+  Without this option, changes are only applied to the working copy but not automatically commited.
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTMoveSubmoduleViewController.nib  (26 objects)
+  .AppleSystemUIFont
+  GTMoveSubmoduleViewController
+  GTSubmodulePathSelectionController
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSMenuItem
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  New Path:
+  Path
+  Rename Submodule Name
+  Select Destination Path…
+  System
+  Updates the submodule's name to match the new path.
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTMoveWorktreeDialogueViewController.nib  (19 objects)
+  .AppleSystemUIFont
+  Destination:
+  GTMoveWorktreeDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSValue
+  NSView
+  System
+  outlets:
+    {}
+
+## GTProgressViewController.nib  (20 objects)
+  .AppleSystemUIFont
+  Checking Out master…
+  GTEmptyView
+  GTProgressViewController
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  Waiting…
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTPublishBranchViewController.nib  (33 objects)
+  .AppleSystemUIFont
+  Branch Name:
+  Bypasses any associated hook scripts.
+  FNView
+  GTPublishBranchViewController
+  Item 1
+  Item 2
+  Item 3
+  Local Branch:
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSValue
+  NSView
+  OtherViews
+  Remote:
+  Skip Hooks
+  System
+  The local branch will automatically push to and pull from the new remote branch.
+  Track This New Remote Branch
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTPublishTagDialogueViewController.nib  (29 objects)
+  .AppleSystemUIFont
+  Bypasses any associated hook scripts.
+  FNView
+  GTPublishTagDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  Local Tag:
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextField
+  NSValue
+  NSView
+  OtherViews
+  Remote:
+  Skip Hooks
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTPullFromRemoteViewController.nib  (32 objects)
+  .AppleSystemUIFont
+  Bypasses any associated hook scripts.
+  FNView
+  GTPullFromRemoteViewController
+  Item 1
+  Item 2
+  Item 3
+  Merge is aborted if the tip commit of the side branch is not signed with a valid key.
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OtherViews
+  Rebases the local HEAD branch onto the fetched revisions.
+  Remote Branch: 
+  Skip Hooks
+  System
+  Use Rebase Instead of Merge
+  Verify Signatures
+  _NSManagedProxy
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTPullRequestsChangesetDiffLoadingCellView.nib  (12 objects)
+  .AppleSystemUIFont
+  GTPullRequestsChangesetDiffLoadingCellView
+  Loading Changeset…
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTPullRequestsChangesetItemCellView.nib  (13 objects)
+  .AppleSystemUIFont
+  GTGitFileStatusIcon
+  GTPullRequestsChangesetItemCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  created
+  filename
+  outlets:
+    {}
+
+## GTPullRequestsChangesetViewController.nib  (28 objects)
+  .AppleSystemUIFont
+  0 additions, 0 deletions
+  0 changed files
+  AutomaticTableColumnIdentifier.0
+  GTKeyboardActionOutlineView
+  GTPullRequestsChangesetViewController
+  GTRepositoryHeaderView
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSMenu
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableCellView
+  NSTableHeaderCell
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  System
+  Table View Cell
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTPullRequestsCommitsChangesetEntryCellView.nib  (13 objects)
+  .AppleSystemUIFont
+  GTGitFileStatusIcon
+  GTPullRequestsCommitsChangesetEntryCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  created
+  filename
+  outlets:
+    {}
+
+## GTPullRequestsCommitsCommitCellView.nib  (25 objects)
+  .AppleSystemUIFont
+  01.02.12
+  4af2c404
+  Author
+  AuthorImageView
+  CommitAuthor
+  CommitDate
+  GTAvatarImageView
+  GTHistoryCommitListGraphView
+  GTPullRequestsCommitsCommitCellView
+  Menlo-Regular
+  Message
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  ShortSHA
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTPullRequestsCommitsDateGroupCellView.nib  (11 objects)
+  .AppleSystemUIFont
+  GTPullRequestsCommitsDateGroupCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTPullRequestsCommitsEmptyChangesetCellView.nib  (11 objects)
+  .AppleSystemUIFont
+  GTPullRequestsCommitsEmptyChangesetCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  No changes.
+  System
+  outlets:
+    {}
+
+## GTPullRequestsCommitsLoadingCellView.nib  (12 objects)
+  .AppleSystemUIFont
+  GTPullRequestsCommitsLoadingCellView
+  Loading Changeset
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTPullRequestsCommitsViewController.nib  (29 objects)
+  .AppleSystemUIFont
+  2 Contributors
+  AutomaticTableColumnIdentifier.0
+  GTContributorsView
+  GTKeyboardActionOutlineView
+  GTPullRequestsCommitsViewController
+  GTRepositoryHeaderView
+  Label
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSMenu
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableCellView
+  NSTableHeaderCell
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  System
+  Table View Cell
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTPullRequestsConversationAddCommentCellView.nib  (7 objects)
+  .AppleSystemUIFont
+  Add Comment
+  GTPullRequestsConversationAddCommentCellView
+  NSApplication
+  NSButton
+  NSLayoutConstraint
+  NSObject
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTPullRequestsConversationAuthorCellView.nib  (14 objects)
+  .AppleSystemUIFont
+  GTAvatarImageView
+  GTGitContributorFormatter
+  GTPullRequestsConversationAuthorCellView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTPullRequestsConversationBodyCellView.nib  (18 objects)
+  .AppleSystemUIFont
+  Edit
+  GTAvatarImageView
+  GTPullRequestsConversationBodyCellView
+  Label
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  NSView
+  System
+  outlets:
+    {}
+
+## GTPullRequestsConversationCommentCellView.nib  (18 objects)
+  .AppleSystemUIFont
+  GTActionBarView
+  GTAvatarImageView
+  GTPullRequestsConversationCommentCellView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  outlets:
+    {}
+
+## GTPullRequestsConversationCommentThreadCellView.nib  (10 objects)
+  .AppleSystemUIFont
+  GTPullRequestsConversationCommentThreadCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSObject
+  NSTextField
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTPullRequestsConversationCommitCellView.nib  (20 objects)
+  .AppleSystemUIFont
+  GTAvatarImageView
+  GTPullRequestsConversationCommitCellView
+  Label
+  Menlo-Regular
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTPullRequestsConversationDateGroupCellView.nib  (15 objects)
+  .AppleSystemUIFont
+  GTPullRequestsConversationDateGroupCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTPullRequestsConversationEventTableRowView.nib  (3 objects)
+  GTPullRequestsConversationEventTableRowView
+  NSApplication
+  NSObject
+
+## GTPullRequestsConversationHeaderCellView.nib  (22 objects)
+  #63
+  .AppleSystemUIFont
+  Assignees
+  GTAvatarImageView
+  GTBadgesView
+  GTPullRequestAssigneesView
+  GTPullRequestsConversationHeaderCellView
+  GTPullRequestsConversationHeaderInfoFormatter
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  Pull Request Title
+  System
+  author wants to merge 15 commits into BaseBranch from Branch
+  outlets:
+    {}
+
+## GTPullRequestsConversationSpacerCellView.nib  (3 objects)
+  GTPullRequestsConversationSpacerCellView
+  NSApplication
+  NSObject
+
+## GTPullRequestsConversationTableRowView.nib  (12 objects)
+  .AppleSystemUIFont
+  GTPullRequestsConversationTableRowView
+  NSApplication
+  NSBox
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSUserDefaultsController
+  System
+  Title
+  outlets:
+    {}
+
+## GTPullRequestsConversationViewController.nib  (30 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  GTKeyboardActionOutlineView
+  GTPullRequestsConversationViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableCellView
+  NSTableHeaderCell
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  Table View Cell
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTPullRequestsDetailViewController.nib  (31 objects)
+  #63
+  .AppleSystemUIFont
+  Add to Merge Queue
+  Changeset
+  Check Out
+  Close
+  Commits
+  Conversation
+  GTActionBarView
+  GTPullRequestsDetailViewController
+  GTRepositoryHeaderView
+  GTWarningView
+  Merge
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSStackView
+  NSStackViewContainer
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTPullRequestsEmptyCellView.nib  (11 objects)
+  .AppleSystemUIFont
+  GTPullRequestsEmptyCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  No pull requests
+  System
+  outlets:
+    {}
+
+## GTPullRequestsItemCellView.nib  (17 objects)
+  .AppleSystemUIFont
+  GTAvatarImageView
+  GTBadgesView
+  GTPullRequestsItemCellView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTPullRequestsListHeaderViewController.nib  (24 objects)
+  .AppleSystemUIFont
+  GTPullRequestsListHeaderViewController
+  NSApplication
+  NSArrayController
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSIBHelpConnector
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSProgressIndicator
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Remote:
+  System
+  _NSManagedProxy
+  origin
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTPullRequestsListViewController.nib  (32 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  GTPullRequestMenuController
+  GTPullRequestsListViewController
+  GTRepositoryHeaderView
+  GTTableView
+  GTWarningView
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableCellView
+  NSTableHeaderCell
+  NSTextField
+  NSValue
+  NSView
+  System
+  Table View Cell
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+
+## GTPullRequestsLoadingCellView.nib  (12 objects)
+  .AppleSystemUIFont
+  GTPullRequestsLoadingCellView
+  Loading Pull Requests ...
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTPullRequestsValidationErrorViewController.nib  (4 objects)
+  GTPullRequestsValidationErrorViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTPullRequestsViewController.nib  (6 objects)
+  GTNonRestorableSplitView
+  GTPullRequestsViewController
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTPushBranchDialogueViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  FNView
+  GTPushBranchDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  Local Branch:
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSValue
+  OtherViews
+  Remote Branch:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTPushDialogueViewController.nib  (37 objects)
+  .AppleSystemUIFont
+  All refs under refs/tags are pushed.
+  Bypasses any associated hook scripts.
+  Destination:
+  Enforces a new history on the remote branch if fast-forward is not possible. This can cause losing commits on the remote – please use with care!
+  Ensures that all submodule commits that are referenced by the superproject have been pushed.
+  FNView
+  Force Push
+  GTPushDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  OtherViews
+  Push All Tags
+  Push Submodule commits on demand
+  Recurse Submodules
+  Skip Hooks
+  System
+  Verify Submodules before Push
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTPushRevisionDialogueViewController.nib  (32 objects)
+  .AppleSystemUIFont
+  Bypasses any associated hook scripts.
+  FNView
+  GTPushRevisionDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextField
+  NSValue
+  NSView
+  OtherViews
+  Ref Spec:
+  Remote:
+  Revision:
+  Skip Hooks
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTPushToGerritDialogueViewController.nib  (26 objects)
+  .AppleSystemUIFont
+  FNView
+  GTPushToGerritDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSTextFieldCell
+  NSValue
+  OtherViews
+  Remote:
+  Review Branch:
+  Revision:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTQuickActionEmptyTableCellView.nib  (11 objects)
+  .AppleSystemUIFont
+  GTQuickActionEmptyTableCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  No Results
+  System
+  outlets:
+    {}
+
+## GTQuickActionTableCellView.nib  (16 objects)
+  .AppleSystemUIFont
+  GTNonVibrantImageView
+  GTQuickActionTableCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  ↩︎
+  outlets:
+    {}
+
+## GTQuickActionTableRowView.nib  (3 objects)
+  GTQuickActionTableRowView
+  NSApplication
+  NSObject
+
+## GTQuickActionViewController.nib  (31 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  GTQuickActionViewController
+  NSApplication
+  NSBox
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableCellView
+  NSTableHeaderCell
+  NSTableView
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  Table View Cell
+  Text Cell
+  Title
+  _NSCornerView
+  outlets:
+    {}
+
+## GTQuickActionWindowController.nib  (6 objects)
+  GTQuickActionWindow
+  GTQuickActionWindowController
+  NSApplication
+  NSObject
+  NSView
+  Window
+  outlets:
+    {}
+
+## GTQuickOpenGroupCellView.nib  (11 objects)
+  .AppleSystemUIFont
+  GTQuickOpenGroupCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  Name
+  System
+  outlets:
+    {}
+
+## GTQuickOpenItemCellView.nib  (19 objects)
+  .AppleSystemUIFont
+  FilePath
+  GTNonVibrantImageView
+  GTQuickOpenItemCellView
+  Menlo-Regular
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  Name
+  System
+  ↩︎
+  outlets:
+    {}
+
+## GTQuickOpenRowView.nib  (3 objects)
+  GTQuickOpenRowView
+  NSApplication
+  NSObject
+
+## GTQuickOpenViewController.nib  (25 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  GTQuickOpenTableView
+  GTQuickOpenViewController
+  NSApplication
+  NSBox
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  System
+  Text Cell
+  Title
+  _NSCornerView
+  outlets:
+    {}
+
+## GTQuickOpenWindowController.nib  (6 objects)
+  FNView
+  GTQuickOpenWindow
+  GTQuickOpenWindowController
+  NSApplication
+  NSObject
+  Window
+  outlets:
+    {}
+
+## GTRebaseBranchDialogueViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  Branch:
+  Bypasses any associated hook scripts.
+  FNView
+  GTRebaseBranchDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSSwitch
+  NSTextField
+  NSValue
+  NSView
+  OtherViews
+  Skip Hooks
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTRebaseOntoBranchDialogueViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  Bypasses any associated hook scripts.
+  Current Base:
+  FNView
+  GTRebaseOntoBranchDialogueViewController
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSTextField
+  NSView
+  New Base:
+  Skip Hooks
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTRefLogEmptyCellView.nib  (11 objects)
+  .AppleSystemUIFont
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTableCellView
+  NSTextField
+  No reflog entries
+  System
+  outlets:
+    {}
+
+## GTRefLogItemCellView.nib  (14 objects)
+  .AppleSystemUIFont
+  GTRefBadgesView
+  GTRefLogItemCellView
+  Label
+  Menlo-Regular
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTRefLogListHeaderViewController.nib  (18 objects)
+  .AppleSystemUIFont
+  GTRefLogListHeaderViewController
+  GTRepositoryHeaderView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  Ref:
+  System
+  ref-name
+  outlets:
+    {}
+
+## GTRefLogListViewController.nib  (23 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  GTRefLogListViewController
+  GTTableView
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableCellView
+  NSTableHeaderCell
+  NSTextField
+  NSView
+  System
+  Table View Cell
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+
+## GTRefLogLoadingCellView.nib  (12 objects)
+  .AppleSystemUIFont
+  GTRefLogLoadingCellView
+  Loading Reflog entries ...
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  System
+  outlets:
+    {}
+
+## GTRefLogViewController.nib  (6 objects)
+  GTNonRestorableSplitView
+  GTRefLogViewController
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTRefSelectorRefItemCellView.nib  (15 objects)
+  .AppleSystemUIFont
+  GTRefSelectorRefItemCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTRefSelectorSeparatorCellView.nib  (11 objects)
+  .AppleSystemUIFont
+  NSApplication
+  NSBox
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTableCellView
+  System
+  Title
+
+## GTReleaseChannelAccessTokenWindowController.nib  (18 objects)
+  .AppleSystemUIFont
+  Alpha Channel Access Token:
+  Close
+  Developer Channel Access Token:
+  GTReleaseChannelAccessTokenWindowController
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  System
+  Window
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTRelocateWorktreeDialogueViewController.nib  (19 objects)
+  .AppleSystemUIFont
+  GTMoveWorktreeDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  Location:
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSValue
+  NSView
+  System
+  outlets:
+    {}
+
+## GTRemoteActivityDetailViewController.nib  (18 objects)
+  FNView
+  GTRemoteActivityDetailViewController
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSCursor
+  NSData
+  NSLayoutConstraint
+  NSLayoutManager
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTextContainer
+  NSTextStorage
+  NSTextView
+  NSTextViewSharedData
+  System
+  outlets:
+    {}
+
+## GTRemoteActivityListViewController.nib  (23 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  FNView
+  GTRemoteActivityListViewController
+  GTRemoteActivityTableCellView
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSTableView
+  NSTextField
+  System
+  Table View Cell
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+
+## GTRemoteActivityViewController.nib  (7 objects)
+  FNView
+  GTRemoteActivityViewController
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSSplitView
+  NSView
+  outlets:
+    {}
+
+## GTRemoteBranchesSettingsViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  FNView
+  GTRemoteBranchesSettingsViewController
+  GTSettingsTableView
+  GTSettingsTableViewContentColumnIdentifier
+  NSApplication
+  NSArrayController
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSUserDefaultsController
+  System
+  Text Cell
+  _NSCornerView
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTRemoteGeneralSettingsViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  FNView
+  GTRemoteGeneralSettingsViewController
+  GTSettingsTableView
+  GTSettingsTableViewContentColumnIdentifier
+  NSApplication
+  NSArrayController
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSUserDefaultsController
+  System
+  Text Cell
+  _NSCornerView
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTRemoteSelectorItemRowView.nib  (3 objects)
+  GTRemoteSelectorItemRowView
+  NSApplication
+  NSObject
+
+## GTRemoteSelectorRemoteItemCellView.nib  (15 objects)
+  .AppleSystemUIFont
+  GTRemoteSelectorRemoteItemCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTRemoteSelectorViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  GTRemoteSelectorViewController
+  NSApplication
+  NSButtonCell
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSSearchField
+  NSSearchFieldCell
+  NSTableCellView
+  NSTableHeaderCell
+  NSTableView
+  NSTextField
+  NSView
+  System
+  Table View Cell
+  Text Cell
+  _NSCornerView
+  search
+  outlets:
+    {}
+
+## GTRemoteViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  Branches
+  GTRemoteViewController
+  GTRepositoryHeaderView
+  General
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Remote Name
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTRenameBranchDialogueViewController.nib  (14 objects)
+  .AppleSystemUIFont
+  GTRenameBranchDialogueViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  Name:
+  System
+  outlets:
+    {}
+
+## GTRenameRemoteBranchViewController.nib  (14 objects)
+  .AppleSystemUIFont
+  GTRenameRemoteBranchViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  Name:
+  System
+  outlets:
+    {}
+
+## GTRenameSubmoduleViewController.nib  (14 objects)
+  .AppleSystemUIFont
+  GTRenameSubmoduleViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  New Name:
+  System
+  outlets:
+    {}
+
+## GTRepairStackDialogueViewController.nib  (15 objects)
+  .AppleSystemUIFont
+  Bypasses any associated hook scripts.
+  GTRepairStackDialogueViewController
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSTextField
+  NSView
+  Skip Hooks
+  System
+  outlets:
+    {}
+
+## GTRepositoryActivityDetailViewController.nib  (18 objects)
+  GTRepositoryActivityDetailViewController
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSCursor
+  NSData
+  NSLayoutConstraint
+  NSLayoutManager
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTextContainer
+  NSTextStorage
+  NSTextView
+  NSTextViewSharedData
+  NSView
+  System
+  outlets:
+    {}
+
+## GTRepositoryActivityListViewController.nib  (23 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  FNView
+  GTRepositoryActivityListViewController
+  GTRepositoryActivityTableCellView
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSTableView
+  NSTextField
+  System
+  Table View Cell
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+
+## GTRepositoryActivityTableCellView.nib  (21 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  GTRepositoryActivityTableCellView
+  Label
+  Last Log
+  Less than a minute
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTRepositoryActivityViewController.nib  (6 objects)
+  GTRepositoryActivityViewController
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSSplitView
+  NSView
+  outlets:
+    {}
+
+## GTRepositoryCloneProgressViewController.nib  (4 objects)
+  GTRepositoryCloneProgressViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTRepositoryContainerViewController.nib  (4 objects)
+  FNView
+  GTRepositoryContainerViewController
+  NSApplication
+  NSObject
+  outlets:
+    {}
+
+## GTRepositoryGeneralSettingsViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  FNView
+  GTRepositoryGeneralSettingsViewController
+  GTSettingsTableView
+  GTSettingsTableViewContentColumnIdentifier
+  NSApplication
+  NSArrayController
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSUserDefaultsController
+  System
+  Text Cell
+  _NSCornerView
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTRepositoryGitFlowSettingsViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  FNView
+  GTRepositoryGitFlowSettingsViewController
+  GTSettingsTableView
+  GTSettingsTableViewContentColumnIdentifier
+  NSApplication
+  NSArrayController
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSUserDefaultsController
+  System
+  Text Cell
+  _NSCornerView
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTRepositoryGitLFSSettingsViewController.nib  (19 objects)
+  .AppleSystemUIFont
+  FNView
+  GTRepositoryGitLFSSettingsViewController
+  GTSettingsTableView
+  GTSettingsTableViewContentColumnIdentifier
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  System
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+
+## GTRepositoryIgnoresViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  FNView
+  GTRepositoryIgnoresViewController
+  GTSettingsTableView
+  GTSettingsTableViewContentColumnIdentifier
+  NSApplication
+  NSArrayController
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSUserDefaultsController
+  System
+  Text Cell
+  _NSCornerView
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTRepositorySettingsViewController.nib  (21 objects)
+  .AppleSystemUIFont
+  GTRepositoryHeaderView
+  GTRepositorySettingsViewController
+  General
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Repository Name
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTRepositorySidebarViewController.nib  (31 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  GTCollapsableView
+  GTRepositorySidebarMenuController
+  GTRepositorySidebarViewController
+  Item
+  NSApplication
+  NSBox
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImage
+  NSLayoutConstraint
+  NSMapTable
+  NSMenu
+  NSObject
+  NSOutlineView
+  NSScrollView
+  NSScroller
+  NSStackView
+  NSStackViewContainer
+  NSTableHeaderCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  Text Cell
+  Title
+  _NSCornerView
+  outlets:
+    {}
+
+## GTRepositoryViewController.nib  (4 objects)
+  FNView
+  GTRepositoryViewController
+  NSApplication
+  NSObject
+  outlets:
+    {}
+
+## GTResetEntriesToRevisionDialogueViewController.nib  (17 objects)
+  .AppleSystemUIFont
+  FNView
+  GTResetEntriesToRevisionDialogueViewController
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  Revision:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTResetToRevisionDialogueViewController.nib  (21 objects)
+  .AppleSystemUIFont
+  GTResetToRevisionDialogueViewController
+  Keep Changes
+  Keeps all changes from rolled back revisions in your working tree.
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  Revision:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTRestackBranchDialogueViewController.nib  (25 objects)
+  .AppleSystemUIFont
+  Bypasses any associated hook scripts.
+  From Branch:
+  GTRestackBranchDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSValue
+  NSView
+  Skip Hooks
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTRestoreSubmoduleViewController.nib  (4 objects)
+  GTRestoreSubmoduleViewController
+  NSApplication
+  NSObject
+  NSView
+
+## GTRestoreTreeEntriesDialogueViewController.nib  (4 objects)
+  GTRestoreTreeEntriesDialogueViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTRevertRevisionsDialogueViewController.nib  (29 objects)
+  .AppleSystemUIFont
+  Automatically commit reverted changes
+  ContentView
+  FNView
+  GTRevertRevisionsDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  Mainline:
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  OptionsView
+  OtherViews
+  Specify which side of the merge commit should be used as the mainline to be integrated. In case of multiple merge commits, the same mainline number will be used.
+  System
+  Without this option, changes are only applied to the working copy but not automatically committed.
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTRevisionSelectorRevisionCellView.nib  (21 objects)
+  .AppleSystemUIFont
+  15:30
+  1af3da7
+  Author Name
+  GTAvatarImageView
+  GTRevisionSelectorRevisionCellView
+  GTTimelineGraphView
+  Menlo-Regular
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSIBUserDefinedRuntimeAttributesConnector
+  NSImage
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  Subject
+  System
+  outlets:
+    {}
+
+## GTSavePartialStashViewController.nib  (15 objects)
+  .AppleSystemUIFont
+  FNView
+  GTSavePartialStashViewController
+  GTSaveStashDialogueContentView
+  Message:
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  System
+  outlets:
+    {}
+
+## GTSavePatchDialogueViewController.nib  (18 objects)
+  .AppleSystemUIFont
+  Don't show any source or destination prefix
+  FNView
+  GTSavePatchDialogueViewController
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  Omit Prefixes
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTSaveStashViewController.nib  (18 objects)
+  .AppleSystemUIFont
+  FNView
+  GTSaveStashDialogueContentView
+  GTSaveStashViewController
+  Include Untracked Files
+  Message:
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  System
+  outlets:
+    {}
+
+## GTSearchLocalHardDriveCheckboxCellView.nib  (8 objects)
+  .AppleSystemUIFont
+  GTSearchLocalHardDriveCheckboxCellView
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+
+## GTSearchLocalHardDriveRepositoryInfoCellView.nib  (13 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  GTSearchLocalHardDriveRepositoryInfoCellView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  Table View Cell
+
+## GTSearchLocalHardDriveViewController.nib  (32 objects)
+  .AppleSystemUIFont
+  FNView
+  GTSearchLocalHardDriveCheckboxCellView
+  GTSearchLocalHardDriveRepositoryInfoCellView
+  GTSearchLocalHardDriveViewController
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSNib
+  NSObject
+  NSProgressIndicator
+  NSScrollView
+  NSScroller
+  NSSortDescriptor
+  NSSwitch
+  NSTableCellView
+  NSTableHeaderCell
+  NSTableHeaderView
+  NSTableView
+  NSTextField
+  Name
+  Searching your local hard drive for Git repositories...
+  Select All
+  System
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTSelectDiffToolDialogueViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  Diff Tool:
+  FNView
+  GTSelectDiffToolDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  OtherViews
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTSelectMergeToolDialogueViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  FNView
+  GTSelectMergeToolDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  Merge Tool:
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  OtherViews
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTSelectorRowView.nib  (3 objects)
+  GTSelectorRowView
+  NSApplication
+  NSObject
+
+## GTServiceActivityDetailViewController.nib  (18 objects)
+  FNView
+  GTServiceActivityDetailViewController
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSCursor
+  NSData
+  NSLayoutConstraint
+  NSLayoutManager
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTextContainer
+  NSTextStorage
+  NSTextView
+  NSTextViewSharedData
+  System
+  outlets:
+    {}
+
+## GTServiceActivityListViewController.nib  (23 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  GTServiceActivityListViewController
+  GTServiceActivityTableCellView
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSTableView
+  NSTextField
+  NSView
+  System
+  Table View Cell
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+
+## GTServiceActivityTableCellView.nib  (20 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  GTServiceActivityTableCellView
+  Label
+  Last Log
+  Less than a minute
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTServiceActivityViewController.nib  (7 objects)
+  FNView
+  GTServiceActivityViewController
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSSplitView
+  NSView
+  outlets:
+    {}
+
+## GTServicePullRequestCloseViewController.nib  (4 objects)
+  GTServicePullRequestCloseViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTServicePullRequestMergeViewController.nib  (24 objects)
+  .AppleSystemUIFont
+  Delete Branch after Merge
+  GTServicePullRequestMergeTypeMenuController
+  GTServicePullRequestMergeViewController
+  Merge
+  Merge Type:
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Rebase
+  Squash
+  System
+  outlets:
+    {}
+
+## GTServicesAccountViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  FNView
+  GTServicesAccountViewController
+  GTSettingsTableView
+  GTSettingsTableViewContentColumnIdentifier
+  NSApplication
+  NSArrayController
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSUserDefaultsController
+  System
+  Text Cell
+  _NSCornerView
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTServicesAzureDevOpsAccountViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  Access Token:
+  Account Name:
+  Authentication:
+  Basic Authentication
+  GTServicesAzureDevOpsAccountViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSecureTextField
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OAuth Access Token
+  OtherViews
+  Password:
+  Personal Access Token
+  System
+  Username:
+  dev.azure.com/
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesAzureDevOpsRepositoryViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  GTServicesAzureDevOpsRepositoryViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Name:
+  Project:
+  System
+  outlets:
+    {}
+
+## GTServicesAzureDevOpsServerAccountViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  Authentication:
+  Basic Authentication
+  Collection:
+  GTServicesAzureDevOpsServerAccountViewController
+  Host:
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSecureTextField
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OAuth Access Token
+  OtherViews
+  Password:
+  Personal Access Token
+  Personal Access Token:
+  System
+  Username:
+  outlets:
+    {}
+
+## GTServicesBeanstalkAccountViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  .beanstalkapp.com
+  Access Token:
+  Account Name:
+  Authentication:
+  Basic Authentication
+  GTServicesAccountView
+  GTServicesBeanstalkAccountViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSecureTextField
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  OAuth Access Token
+  OtherViews
+  Password:
+  Personal Access Token
+  System
+  Username:
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesBeanstalkRepositoryViewController.nib  (15 objects)
+  .AppleSystemUIFont
+  GTServicesBeanstalkRepositoryViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  Name:
+  System
+  Title:
+  outlets:
+    {}
+
+## GTServicesBitbucketAccountViewController.nib  (24 objects)
+  .AppleSystemUIFont
+  Authentication:
+  Basic Authentication
+  Email:
+  GTServicesBitbucketAccountView
+  GTServicesBitbucketAccountViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSecureTextField
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  OAuth Access Token
+  OtherViews
+  Password:
+  Personal Access Token
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesBitbucketRepositoryViewController.nib  (25 objects)
+  .AppleSystemUIFont
+  Access:
+  Account:
+  Description:
+  GTServicesBitbucketRepositoryViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Name:
+  System
+  Title:
+  outlets:
+    {}
+
+## GTServicesCloneRepositoryViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  Clone To:
+  Clone URL:
+  GTCloneDestinationMenuController
+  GTServicesCloneRepositoryViewController
+  Initialize Submodules
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  Use LFS Clone
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesCloneSVNRepositoryViewController.nib  (32 objects)
+  .AppleSystemUIFont
+  Clone To:
+  Clone URL:
+  GTCloneDestinationMenuController
+  GTServicesCloneSVNRepositoryViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSSwitch
+  NSTextField
+  NSTokenField
+  NSTokenFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OtherViews
+  SVN Branches:
+  SVN Tags:
+  SVN Trunk:
+  System
+  Use Default SVN Directory Layout
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesCustomAccountViewController.nib  (30 objects)
+  .AppleSystemUIFont
+  Authentication:
+  Box
+  GTCollapsableView
+  GTPrivateSSHKeyMenuController
+  GTServicesCustomAccountSSHCredentialsView
+  GTServicesCustomAccountViewController
+  NSApplication
+  NSBox
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSSecureTextField
+  NSSecureTextFieldCell
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  OtherViews
+  Password:
+  Remote URL:
+  SSH Key:
+  System
+  Username:
+  httpUsername
+  sshUsername
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesDashboardViewController.nib  (29 objects)
+  .AppleSystemUIFont
+  Add Your Service Accounts
+  Azure DevOps
+  GTEmptyView
+  GTServicesDashboardViewController
+  GTServicesServiceItemView
+  GTServicesServiceItemViewController
+  NSApplication
+  NSBitmapImageRep
+  NSButton
+  NSButtonCell
+  NSClipView
+  NSCollectionView
+  NSCollectionViewGridLayout
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  System
+  _NSCollectionViewCore
+  outlets:
+    {}
+
+## GTServicesDeletePublicKeyViewController.nib  (4 objects)
+  GTServicesDeletePublicKeyViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTServicesDeletePullRequestCommentViewController.nib  (4 objects)
+  GTServicesDeletePullRequestCommentViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTServicesDetailViewController.nib  (26 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  Full Name (Email)
+  GTAvatarImageView
+  GTRepositoryHeaderView
+  GTServicesDetailViewController
+  General
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  ServiceAccountDetailContentView
+  System
+  username
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesGitHubAccountViewController.nib  (30 objects)
+  .AppleSystemUIFont
+  Access private repositories
+  Authentication:
+  Basic Authentication
+  Full control of user public keys
+  GTServicesGitHubAccountViewController
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSecureTextField
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OAuth Access Token
+  OtherViews
+  Password:
+  Personal Access Token
+  Read org and team membership
+  System
+  Update all user data
+  Username:
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesGitHubAuthenticationCodeViewController.nib  (14 objects)
+  .AppleSystemUIFont
+  Authentication Code:
+  GTServicesGitHubAuthenticationCodeViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  System
+  outlets:
+    {}
+
+## GTServicesGitHubEnterpriseAccountViewController.nib  (25 objects)
+  .AppleSystemUIFont
+  Authentication:
+  Basic Authentication
+  GTServicesGitHubEnterpriseAccountViewController
+  Host:
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSecureTextField
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OAuth Access Token
+  OtherViews
+  Password:
+  Personal Access Token
+  System
+  Username:
+  outlets:
+    {}
+
+## GTServicesGitHubRepositoryViewController.nib  (24 objects)
+  .AppleSystemUIFont
+  Access:
+  Account:
+  Description:
+  GTServicesGitHubRepositoryViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Name:
+  System
+  outlets:
+    {}
+
+## GTServicesGitLabAccountViewController.nib  (25 objects)
+  .AppleSystemUIFont
+  Authentication:
+  Basic Authentication
+  GTServicesAccountView
+  GTServicesGitLabAccountViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSecureTextField
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  OAuth Access Token
+  OtherViews
+  Password:
+  Personal Access Token
+  Personal Access Token:
+  System
+  Username:
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesGitLabCEEEAccountViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  Authentication:
+  Basic Authentication
+  GTServicesAccountView
+  GTServicesGitLabCEEEAccountViewController
+  GitHubView
+  Host:
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSecureTextField
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  OAuth Access Token
+  OtherViews
+  Password:
+  Personal Access Token
+  Personal Access Token:
+  System
+  Username:
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesGitLabRepositoryViewController.nib  (25 objects)
+  .AppleSystemUIFont
+  Access:
+  Description:
+  FNView
+  GTServicesGitLabRepositoryViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  Name:
+  Namespace:
+  System
+  Title:
+  outlets:
+    {}
+
+## GTServicesGitSwarmAccountViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  Authentication:
+  Basic Authentication
+  GTServicesAccountView
+  GTServicesGitSwarmAccountViewController
+  GitHubView
+  Host:
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSecureTextField
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  OAuth Access Token
+  OtherViews
+  Password:
+  Personal Access Token
+  Private Token:
+  System
+  Username:
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesGitSwarmRepositoryViewController.nib  (4 objects)
+  GTServicesGitSwarmRepositoryViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTServicesPrivateSSHKeyPasswordViewController.nib  (15 objects)
+  .AppleSystemUIFont
+  GTRemoteConnectionSSHKeyPasswordViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSecureTextField
+  NSSecureTextFieldCell
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  Password:
+  System
+  outlets:
+    {}
+
+## GTServicesPrivateSSHKeyViewController.nib  (21 objects)
+  .AppleSystemUIFont
+  GTPrivateSSHKeyMenuController
+  GTServicesPrivateSSHKeyViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSTextField
+  NSValue
+  NSView
+  Private SSH Key:
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesPublicKeyCellView.nib  (22 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  Created at
+  Delete
+  GTServicesPublicKeyCellView
+  Menlo-Regular
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSValue
+  Public Key Fingerprint
+  Public Key Title
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesPublicKeyViewController.nib  (15 objects)
+  .AppleSystemUIFont
+  GTServicesPublicKeyViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  Public Key:
+  System
+  Title:
+  outlets:
+    {}
+
+## GTServicesPublicKeysViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  FNView
+  GTServicesPublicKeysViewController
+  GTSettingsTableView
+  GTSettingsTableViewContentColumnIdentifier
+  NSApplication
+  NSArrayController
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSUserDefaultsController
+  System
+  Text Cell
+  _NSCornerView
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTServicesPullRequestCommentViewController.nib  (31 objects)
+  .AppleSystemUIFont
+  Account:
+  GTServicesPullRequestCommentViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSCursor
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSLayoutManager
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSScrollView
+  NSScroller
+  NSTextContainer
+  NSTextField
+  NSTextStorage
+  NSTextView
+  NSTextViewSharedData
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTServicesPullRequestEditDescriptionViewController.nib  (18 objects)
+  GTServicesPullRequestEditDescriptionViewController
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSCursor
+  NSData
+  NSLayoutConstraint
+  NSLayoutManager
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTextContainer
+  NSTextStorage
+  NSTextView
+  NSTextViewSharedData
+  NSView
+  System
+  outlets:
+    {}
+
+## GTServicesPullRequestViewController.nib  (30 objects)
+  .AppleSystemUIFont
+  Account:
+  Base Branch:
+  Description:
+  GTServiceAccountsMenuController
+  GTServicePullRequestBaseBranchMenuController
+  GTServicePullRequestBranchMenuController
+  GTServicePullRequestRepositoryMenuController
+  GTServicesPullRequestViewController
+  Head Branch:
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Repository:
+  System
+  Title:
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesRemoveAccountsViewController.nib  (4 objects)
+  GTServicesRemoveAccountsViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTServicesRepositoriesViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  FNView
+  GTServicesRepositoriesViewController
+  GTSettingsTableView
+  GTSettingsTableViewContentColumnIdentifier
+  NSApplication
+  NSArrayController
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSUserDefaultsController
+  System
+  Text Cell
+  _NSCornerView
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTServicesRepositoryCellView.nib  (25 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  Clone
+  GTServicesRepositoriesViewController
+  GTServicesRepositoryCellView
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSValue
+  Repository
+  Repository Description
+  System
+  Updated at
+  forked from https://github.com/jquery/jquery.git
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesRepositoryRowView.nib  (3 objects)
+  GTServicesRepositoryRowView
+  NSApplication
+  NSObject
+
+## GTServicesServiceItemViewController.nib  (18 objects)
+  .AppleSystemUIFont
+  Azure DevOps
+  GTServicesServiceItemView
+  GTServicesServiceItemViewController
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  outlets:
+    {}
+
+## GTServicesSidebarAccountCellView.nib  (19 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  GTAvatarImageView
+  GTServicesSidebarAccountCellView
+  GTServicesSidebarViewController
+  GTSidebarTextField
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesSidebarViewController.nib  (29 objects)
+  .AppleSystemUIFont
+  Add
+  AddMenu
+  AutomaticTableColumnIdentifier.0
+  GTServicesSidebarViewController
+  NSApplication
+  NSBox
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSMenuItem
+  NSObject
+  NSOutlineView
+  NSPopUpButtonCell
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  Text Cell
+  Title
+  _NSCornerView
+  outlets:
+    {}
+
+## GTServicesStashAccountViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  Authentication:
+  Basic Authentication
+  GTServicesAccountView
+  GTServicesStashAccountViewController
+  GitHubView
+  Host:
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSecureTextField
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  OAuth Access Token
+  OtherViews
+  Password:
+  Personal Access Token
+  Personal Access Token:
+  System
+  Username:
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTServicesStashRepositoryViewController.nib  (23 objects)
+  .AppleSystemUIFont
+  Account:
+  GTServicesStashRepositoryViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Name:
+  System
+  outlets:
+    {}
+
+## GTServicesViewController.nib  (4 objects)
+  FNView
+  GTServicesViewController
+  NSApplication
+  NSObject
+  outlets:
+    {}
+
+## GTSettingsCheckboxValueCellView.nib  (14 objects)
+  .AppleSystemUIFont
+  Check
+  GTSettingsCheckboxValueCellView
+  Label
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSTextField
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTSettingsGitLFSTrackingEntryCellView.nib  (15 objects)
+  .AppleSystemUIFont
+  Delete
+  Edit
+  GTSettingsGitLFSTrackingEntryCellView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTSettingsGitUserCellView.nib  (19 objects)
+  .AppleSystemUIFont
+  Delete
+  Edit
+  GTAvatarImageButton
+  GTGitUserProfilesMenuController
+  GTSettingsGitUserCellView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  System
+  User Name
+  user@name.com
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTSettingsGroupCellView.nib  (15 objects)
+  .AppleSystemUIFont
+  Delete
+  Edit
+  GTSettingsGroupCellView
+  GroupView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTSettingsIgnorePatternCellView.nib  (15 objects)
+  .AppleSystemUIFont
+  Delete
+  Edit
+  GTSettingsIgnorePatternCellView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTSettingsMultiValueCellView.nib  (18 objects)
+  .AppleSystemUIFont
+  GTSettingsMultiValueCellView
+  Item 1
+  Item 2
+  Item 3
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSValue
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTSettingsRowView.nib  (3 objects)
+  GTSettingsRowView
+  NSApplication
+  NSObject
+
+## GTSettingsTextValueCellView.nib  (17 objects)
+  .AppleSystemUIFont
+  Delete
+  Edit
+  GTSettingsTextValueCellView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTSettingsURLCellView.nib  (20 objects)
+  .AppleSystemUIFont
+  Delete
+  Edit
+  GTSettingsURLCellView
+  Label
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTSettingsWarningCellView.nib  (15 objects)
+  .AppleSystemUIFont
+  Delete
+  Edit
+  GTSettingsWarningCellView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTSettingsWarningRowView.nib  (3 objects)
+  GTSettingsWarningRowView
+  NSApplication
+  NSObject
+
+## GTSidebarHeaderCellView.nib  (12 objects)
+  .AppleSystemUIFontBold
+  GTSidebarHeaderCellView
+  GTSidebarTextField
+  HEADER CELL
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  System
+  outlets:
+    {}
+
+## GTSignaturePopoverViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  Author
+  Email
+  F888D333
+  GTAvatarImageView
+  GTSignaturePopoverViewController
+  NSApplication
+  NSBox
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  No Signature Found
+  Signature Good
+  Signing Key:
+  Status:
+  System
+  Title
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTStashesListCellView.nib  (14 objects)
+  .AppleSystemUIFont
+  Based on
+  Date
+  GTRefBadgesView
+  GTStashesListCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  subject
+  outlets:
+    {}
+
+## GTStashesListHeaderViewController.nib  (13 objects)
+  .AppleSystemUIFont
+  GTStashesListHeaderView
+  GTStashesListHeaderViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  System
+  Title
+  outlets:
+    {}
+
+## GTStashesListViewController.nib  (20 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  GTRepositoryHeaderView
+  GTStashesListViewController
+  GTTableView
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSView
+  System
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+
+## GTStashesViewController.nib  (6 objects)
+  GTNonRestorableSplitView
+  GTStashesViewController
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTSubmoduleConfigSettingsViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  FNView
+  GTSettingsItem
+  GTSettingsTableView
+  GTSubmoduleConfigSettingsViewController
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSUserDefaultsController
+  System
+  Text Cell
+  _NSCornerView
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTSubmoduleDetailViewController.nib  (23 objects)
+  .AppleSystemUIFont
+  GTRepositoryHeaderView
+  GTSubmoduleDetailViewController
+  General
+  Local Config
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Shared Config
+  Submodule Name
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTSubmoduleGeneralSettingsViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  FNView
+  GTSettingsItem
+  GTSettingsTableView
+  GTSettingsTableViewContentColumnIdentifier
+  GTSubmoduleGeneralSettingsViewController
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSUserDefaultsController
+  System
+  Text Cell
+  _NSCornerView
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTSubmoduleViewController.nib  (4 objects)
+  FNView
+  GTSubmoduleViewController
+  NSApplication
+  NSObject
+  outlets:
+    {}
+
+## GTSyncRemoteDialogueViewController.nib  (40 objects)
+  .AppleSystemUIFont
+  All refs under refs/tags are pushed.
+  Bypasses any associated hook scripts.
+  Ensures that all submodule commits that are referenced by the superproject have been pushed.
+  FNView
+  GTSyncRemoteDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  Merge is aborted if the tip commit of the side branch is not signed with a valid key.
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OtherViews
+  Push All Tags
+  Push Submodule commits on demand
+  Rebases the local HEAD branch onto the fetched revisions.
+  Recurse Submodules
+  Remote Branch: 
+  Skip Hooks
+  System
+  Use Rebase Instead of Merge
+  Verify Signatures
+  Verify Submodules before Push
+  _NSManagedProxy
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTSynchronizeSubmoduleViewController.nib  (4 objects)
+  GTSynchronizeSubmoduleViewController
+  NSApplication
+  NSObject
+  NSView
+
+## GTTrackRemoteBranchViewController.nib  (29 objects)
+  .AppleSystemUIFont
+  Checkout Branch
+  Directly checks out the new branch after it was created.
+  FNView
+  GTTrackRemoteBranchViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  Name:
+  OtherViews
+  Remote Branch:
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTTreeDetailViewController.nib  (15 objects)
+  .AppleSystemUIFontBold
+  GTActionBarView
+  GTFileStatusView.xib
+  GTRepositoryHeaderView
+  GTTreeDetailViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  System
+  outlets:
+    {}
+
+## GTTreeMasterViewController.nib  (22 objects)
+  .AppleSystemUIFontBold
+  GTFileStatusView.xib
+  GTRefControlDividerView
+  GTRepositoryHeaderView
+  GTTreeMasterViewController
+  Menlo-Regular
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Recessed
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTTreeViewController.nib  (6 objects)
+  GTNonRestorableSplitView
+  GTTreeViewController
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTUpdateSubmoduleViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  FNView
+  GTUpdateSubmoduleViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  OtherViews
+  Recurse Submodules
+  Submodule:
+  System
+  Update All Submodules
+  Updates all nested submodules as well. Authentication for all nested submodules must have been configured in Tower.
+  _NSManagedProxy
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTUpgradeAccountViewController.nib  (4 objects)
+  GTUpgradeAccountViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTUserPreferencesAdvancedViewController.nib  (40 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  Automatically index Git repositories
+  Found 2 repositories in 100 directories
+  GTColoredBackgroundView
+  GTTableActionBarView
+  GTUserPreferencesAdvancedViewController
+  Ignore Paths
+  NSApplication
+  NSBox
+  NSButton
+  NSButtonCell
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImage
+  NSLayoutConstraint
+  NSNib
+  NSObject
+  NSProgressIndicator
+  NSScrollView
+  NSScroller
+  NSSwitch
+  NSTableCellView
+  NSTableHeaderView
+  NSTableView
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Quick Open Search Paths
+  Searching for repositories…
+  System
+  Table View Cell
+  Text Cell
+  Title
+  When enabled, Tower searches your Home directory for Git repositories in the background and indexes them. You can then use Quick Open to find and open repositories that are not bookmarked yet.
+  _NSCornerView
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTUserPreferencesGeneralViewController.nib  (49 objects)
+  .AppleSystemUIFont
+  6 days ago
+  Always offer to stash local changes
+  Always open submodules in Tower
+  Always update submodules automatically
+  Automatically archive stale and fully merged branches
+  Automatically convert ref names into valid format while typing
+  Automatically fetch remote repositories:
+  Date format for commits:
+  Default directory for cloned repositories:
+  Double-click on file in working copy:
+  FNView
+  Font size for working copy items:
+  GTCloningDirectoryMenuController
+  GTUserPreferencesGeneralViewController
+  NSApplication
+  NSArrayController
+  NSBox
+  NSButton
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  Number of commits in history:
+  OtherViews
+  Show Quick Start Window on Launch
+  Show diffs for merge commits:
+  Show warning for diffs larger than (kB):
+  Spacebar for file in working copy:
+  System
+  Take Date from System (text will be overridden)
+  Terminal application:
+  Title
+  Truncate long file names in working copy:
+  Warn when discarding changes in a chunk
+  Window Restoration:
+  _NSManagedProxy
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTUserPreferencesGitConfigViewController.nib  (48 objects)
+  .AppleSystemUIFont
+  Allowed signers file:
+  AllowedSignersMenuController
+  Diff tool:
+  Ensure GPG key email matches committer email
+  FNGradientLineView
+  FNView
+  GPG binary:
+  GTAvatarImageButton
+  GTGitUserProfilesMenuController
+  GTSigningKeySelectionMenuController
+  GTUserPreferencesGitConfigViewController
+  Git binary:
+  Global email:
+  Global signing key:
+  Global user name:
+  Item 1
+  Item 2
+  Item 3
+  Keep backup files for merge conflicts
+  Merge tool:
+  NSApplication
+  NSArrayController
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  OtherViews
+  Perform directory diff
+  SSH keys loaded through the System SSH agent.
+  SSH signing program:
+  Sign commits
+  System
+  Title
+  _NSManagedProxy
+  _TtC5Tower28AllowedSignersMenuController
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTUserPreferencesIntegrationViewController.nib  (53 objects)
+  .AppleSystemUIFont
+  Always prompt to use Graphite commands
+  Always send crash reports
+  Automatically submit crash reports to help us diagnose and fix issues in Tower.
+  Edit
+  Enable easy push action for Gerrit
+  FNView
+  GTSchemeHandlerController
+  GTUserPreferencesIntegrationViewController
+  Gerrit Code Review:
+  Graphite Binary:
+  Help us improve by sending anonymous usage data.
+  Install
+  Issue Number Prefix:
+  Issue Tracker URL:
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSBox
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSMenuItem
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSSegmentedCell
+  NSSegmentedControl
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  Open repositories from bitbucket.com:
+  Open repositories from github.com:
+  OtherViews
+  SSH Agent:
+  SSHSockHandlerController
+  Selected SSH Agent will be used for SSH remote connections and SSH signing.
+  Send anonymous usage data
+  System
+  The Tower command line tool lets you open existing Git repositories from the command line.
+  Title
+  Tower Command Line Tool:
+  _NSManagedProxy
+  _TtC5Tower24SSHSockHandlerController
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTUserPreferencesProfilesDetailViewController.nib  (31 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  Edit
+  Email
+  Email:
+  GTAvatarImageView
+  GTUserPreferencesProfilesDetailViewController
+  Key ID
+  NSApplication
+  NSBox
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Name
+  Profile Title
+  Signer:
+  Signing Key:
+  System
+  Title
+  User Name:
+  Username <Email>
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTUserPreferencesProfilesItemCellView.nib  (16 objects)
+  .AppleSystemUIFont
+  GTAvatarImageView
+  GTUserPreferencesProfilesItemCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTUserPreferencesProfilesViewController.nib  (33 objects)
+  #$assets-mainBundleID
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  Box
+  GTColoredBackgroundView
+  GTTableView
+  GTUserPreferencesProfilesViewController
+  Manage "User Profiles" to easily switch between different identities when committing.
+  NSApplication
+  NSBox
+  NSButton
+  NSButtonCell
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImage
+  NSLayoutConstraint
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableCellView
+  NSTextField
+  NSValue
+  NSView
+  System
+  Table View Cell
+  Text Cell
+  Title
+  User Profiles
+  _NSCornerView
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTUserPreferencesQuickOpenIgnoredFilePathCellView.nib  (14 objects)
+  .AppleSystemUIFont
+  GTUserPreferencesQuickOpenIgnoredFilePathCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTUserPreferencesQuickOpenSearchPathCellView.nib  (14 objects)
+  .AppleSystemUIFont
+  GTUserPreferencesQuickOpenSearchPathCellView
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTUserPreferencesUpdatesViewController.nib  (35 objects)
+  .AppleSystemUIFont
+  Automatically check for updates
+  Automatically download updates
+  Beta
+  Development
+  Every 5 Minutes
+  FNView
+  GTUserPreferencesUpdatesViewController
+  Item 2
+  Item 3
+  Last check for updates at:
+  NSApplication
+  NSBox
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSDictionary
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  Never
+  OtherViews
+  Release channel:
+  SUUpdater
+  Stable
+  System
+  Title
+  Update interval:
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTWorkingCopyActionView.nib  (15 objects)
+  .AppleSystemUIFont
+  Commit
+  Create
+  GTWorkingCopyActionViewController
+  NSApplication
+  NSButton
+  NSIBHelpConnector
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSStackViewContainer
+  NSUserDefaultsController
+  NSValue
+  NSView
+  outlets:
+    {}
+
+## GTWorkingCopyActionViewOld.nib  (9 objects)
+  .AppleSystemUIFont
+  Commit
+  GTWorkingCopyCommitViewController
+  NSApplication
+  NSButton
+  NSLayoutConstraint
+  NSObject
+  NSUserDefaultsController
+  NSView
+  actions:
+    {}
+
+## GTWorkingCopyCommitViewController.nib  (41 objects)
+  .AppleSystemUIFont
+  Amend
+  CommitBodyContainerView
+  Committer Name
+  Email
+  GTAvatarImageButton
+  GTCollapsableView
+  GTCommitSubjectScrollView
+  GTWorkingCopyCommitView
+  GTWorkingCopyCommitViewController
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSCursor
+  NSData
+  NSLayoutConstraint
+  NSLayoutManager
+  NSMapTable
+  NSObject
+  NSProgressIndicator
+  NSScroller
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextContainer
+  NSTextField
+  NSTextStorage
+  NSTextViewSharedData
+  NSUserDefaultsController
+  NSView
+  Sign-Off
+  Skip Hooks
+  Stage All
+  System
+  WorkingCopyCommitView
+  _TtC5Tower18CommitBodyTextView
+  _TtC5Tower20CommitBodyScrollView
+  _TtC5Tower21CommitMessageClipView
+  _TtC5Tower21CommitSubjectTextView
+  _TtC5Tower23CommitBodyContainerView
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTWorkingCopyContainerViewController.nib  (4 objects)
+  GTWorkingCopyContainerViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTWorkingCopyDiffImageViewController.nib  (14 objects)
+  .AppleSystemUIFont
+  GTActionBarView
+  GTDiffImageContainerView
+  GTWorkingCopyDiffImageViewController
+  NSApplication
+  NSBox
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSView
+  System
+  Title
+  outlets:
+    {}
+
+## GTWorkingCopyFileDetailViewController.nib  (25 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  FNView
+  GTActionBarView
+  GTFileStatusView.xib
+  GTRepositoryHeaderView
+  GTWorkingCopyFileDetailViewController
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Staged
+  System
+  Unstaged
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTWorkingCopyFileDiffViewController.nib  (36 objects)
+  .AppleSystemUIFont
+  1 chunk, 1 staged
+  5
+  AutomaticTableColumnIdentifier.0
+  Context:
+  GTDiffContextLinesMenuController
+  GTWorkingCopyFileDiffViewController
+  IBImageConfiguration
+  Item 2
+  Item 3
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSIBHelpConnector
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  NSVisualEffectView
+  System
+  Text Cell
+  _NSCornerView
+  _TtC5Tower12ToggleButton
+  _TtC5Tower13DiffTableView
+  _TtC5Tower16ToggleButtonCell
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTWorkingCopyFileListViewController.nib  (28 objects)
+  .AppleSystemUIFont
+  Filename
+  GTWorkingCopyFileListViewController
+  GTWorkingCopyOutlineView
+  GTWorkingCopyTableColumnFileName
+  GTWorkingCopyTableColumnStatus
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSMenu
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableCellView
+  NSTableHeaderView
+  NSTextField
+  NSUserDefaultsController
+  NSView
+  Status
+  System
+  Table View Cell
+  Text Cell
+  _NSCornerView
+  outlets:
+    {}
+
+## GTWorkingCopyFilePathCellView.nib  (17 objects)
+  .AppleSystemUIFont
+  GTWorkingCopyFileListViewController
+  GTWorkingCopyFilePathCellView
+  IBImageConfiguration
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## GTWorkingCopyMergeStatusViewController.nib  (33 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  1 unresolved conflict (1 resolved)
+  Abort
+  Continue
+  GTWorkingCopyMergeStatusBackgroundView
+  GTWorkingCopyMergeStatusView
+  GTWorkingCopyMergeStatusViewController
+  Merging 5 commits into “main”
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Please resolve all conflicts and commit to resolve the merge conflict.
+  Show only conflicts
+  Skip
+  Step 1 of 3: Applying “Some change”
+  System
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTWorkingCopyProgressViewController.nib  (4 objects)
+  GTWorkingCopyProgressViewController
+  NSApplication
+  NSObject
+  NSView
+  outlets:
+    {}
+
+## GTWorkingCopyStagingCellView.nib  (9 objects)
+  .AppleSystemUIFont
+  GTWorkingCopyFileListViewController
+  GTWorkingCopyStagingCellView
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  outlets:
+    {}
+  actions:
+    {}
+
+## GTWorkingCopyStatusHeaderViewController.nib  (30 objects)
+  .AppleSystemUIFont
+  GTWorkingCopyDefaultStatusHeaderView
+  GTWorkingCopyMergeStatusHeaderView
+  GTWorkingCopyStatusHeaderViewController
+  GTWorkingTreeViewSettingsMenuController
+  Label
+  NSApplication
+  NSAttributedString
+  NSColor
+  NSColorSpace
+  NSData
+  NSIBHelpConnector
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSMenuItem
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSStackView
+  NSStackViewContainer
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  OtherViews
+  System
+  refName
+  trackingRefName
+  outlets:
+    {}
+
+## GTWorkingCopyStatusViewController.nib  (11 objects)
+  GTWarningView
+  GTWorkingCopyStatusViewController
+  IBNSViewAutolayoutGuide
+  NSApplication
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSView
+  NSViewLayoutMarginsGuide
+  NSViewSafeAreaLayoutGuide
+  _TtC5Tower10OpaqueView
+  outlets:
+    {}
+
+## GTWorkingCopyUnchangedFileViewController.nib  (4 objects)
+  FNView
+  GTWorkingCopyUnchangedFileViewController
+  NSApplication
+  NSObject
+  outlets:
+    {}
+
+## GTWorktreeDetailViewController.nib  (25 objects)
+  .AppleSystemUIFont
+  GTRepositoryHeaderView
+  GTWorktreeDetailViewController
+  General
+  IBNSViewAutolayoutGuide
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSSegmentedCell
+  NSSegmentedControl
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  NSViewLayoutMarginsGuide
+  NSViewSafeAreaLayoutGuide
+  System
+  Worktree Name
+  _TtC5Tower30GTWorktreeDetailViewController
+  outlets:
+    {}
+
+## GTWorktreeGeneralSettingsViewController.nib  (22 objects)
+  .AppleSystemUIFont
+  FNView
+  GTSettingsItem
+  GTSettingsTableView
+  GTSettingsTableViewContentColumnIdentifier
+  GTWorktreeGeneralSettingsViewController
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSUserDefaultsController
+  System
+  Text Cell
+  _NSCornerView
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GTWorktreeViewController.nib  (4 objects)
+  FNView
+  GTWorktreeViewController
+  NSApplication
+  NSObject
+  outlets:
+    {}
+
+## GitMojiAutocompleteCellView.nib  (12 objects)
+  .AppleSystemUIFont
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  _TtC5Tower27GitMojiAutocompleteCellView
+  ⚡️
+  outlets:
+    {}
+
+## GraphiteFetchStackDialogueViewController.nib  (21 objects)
+  .AppleSystemUIFont
+  From Branch:
+  GraphiteFetchStackDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSValue
+  NSView
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GraphiteRestackBranchDialogueViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  Bypasses any associated hook scripts.
+  From Branch:
+  GraphiteRestackBranchDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSValue
+  NSView
+  Restack Full Stack
+  Restacks all branches in the stack for the selected branch.
+  Skip Hooks
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GraphiteSquashBranchDialogueViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  Branch:
+  Bypasses any associated hook scripts.
+  GraphiteSquashBranchDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextField
+  NSValue
+  NSView
+  Skip Hooks
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## GraphiteSyncBranchDialogueViewController.nib  (33 objects)
+  .AppleSystemUIFont
+  Bypasses any associated hook scripts.
+  Force sync
+  From Branch:
+  GraphiteSyncBranchDialogueViewController
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextField
+  NSValue
+  NSView
+  Overwrite all fetched branches with the remote source of truth. Deletes merged local branches in the stack, ignoring local changes.
+  Restack Branches
+  Restacks any branches in the stack that can be restacked without conflicts.
+  Skip Hooks
+  Sync Full Stack
+  Syncs all branches in the stack for the selected branch.
+  System
+  _NSManagedProxy
+  outlets:
+    {}
+
+## LargeDiffWarningCellView.nib  (13 objects)
+  .AppleSystemUIFont
+  GTLargeDiffWarningCellView
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  Show Diff
+  System
+  This is a large diff. Do you want to show it?
+  outlets:
+    {}
+  actions:
+    {}
+
+## MergeConflictsCellView.nib  (13 objects)
+  .AppleSystemUIFont
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  README.md
+  System
+  _TtC5Tower22MergeConflictsCellView
+  outlets:
+    {}
+
+## MergeConflictsViewController.nib  (29 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  MergeConflictsViewController
+  Merging "feature/auto-relocate-repository" into "next" leads to 3 conflicts:
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableHeaderCell
+  NSTableView
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  Text Cell
+  _NSCornerView
+  _TtC5Tower28MergeConflictsViewController
+  opy Paths
+  outlets:
+    {}
+
+## MergeGraphiteBranchDialogueViewController.nib  (12 objects)
+  .AppleSystemUIFont
+  MergeGraphiteBranchDialogueViewController
+  NSApplication
+  NSButton
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSUserDefaultsController
+  NSView
+  Skip hooks
+  outlets:
+    {}
+
+## PublishRepositoryDialogueViewController.nib  (24 objects)
+  .AppleSystemUIFont
+  Access:
+  Account:
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSTextFieldCell
+  NSValue
+  NSView
+  PublishRepositoryDialogueViewController
+  Remote Name:
+  System
+  _TtC5Tower39PublishRepositoryDialogueViewController
+  _TtC5Tower45ServiceAccountsAndOrganizationsMenuController
+  outlets:
+    {}
+
+## RefComparisonChangesetCellView.nib  (13 objects)
+  .AppleSystemUIFont
+  GTGitFileStatusIcon
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  System
+  _TtC5Tower30RefComparisonChangesetCellView
+  created
+  filename
+  outlets:
+    {}
+
+## RefComparisonCommitCellView.nib  (25 objects)
+  .AppleSystemUIFont
+  01.02.12
+  4af2c404
+  Author
+  AuthorImageView
+  CommitAuthor
+  CommitDate
+  GTAvatarImageView
+  GTHistoryCommitListGraphView
+  Menlo-Regular
+  Message
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  ShortSHA
+  System
+  _TtC5Tower27RefComparisonCommitCellView
+  outlets:
+    {}
+  actions:
+    {}
+
+## RefComparisonLargeDiffWarningCellView.nib  (13 objects)
+  .AppleSystemUIFont
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  Show Diff
+  System
+  This is a large diff. Do you want to show it?
+  _TtC5Tower37RefComparisonLargeDiffWarningCellView
+  outlets:
+    {}
+  actions:
+    {}
+
+## RefComparisonNoDataCellView.nib  (10 objects)
+  .AppleSystemUIFont
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSObject
+  NSTextField
+  System
+  Table View Cell
+  _TtC5Tower27RefComparisonNoDataCellView
+  outlets:
+    {}
+
+## RefComparisonSummaryCellView.nib  (19 objects)
+  .AppleSystemUIFont
+  GTAvatarImageView
+  Label
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSStackViewContainer
+  NSTextField
+  NSValue
+  System
+  _TtC5Tower11SummaryView
+  _TtC5Tower28RefComparisonSummaryCellView
+  outlets:
+    {}
+
+## RefComparisonViewController.nib  (23 objects)
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  GTRefComparisonViewController
+  NSApplication
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSLayoutConstraint
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSTableCellView
+  NSTableHeaderCell
+  NSTextField
+  NSView
+  System
+  Table View Cell
+  Text Cell
+  _NSCornerView
+  _TtC5Tower24RefComparisonOutlineView
+  outlets:
+    {}
+
+## RemoteActivityRunningTableCellView.nib  (23 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  Activity Type
+  GTRemoteActivityRunningTableCellView
+  Less than a minute
+  NSApplication
+  NSButton
+  NSButtonCell
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSProgressIndicator
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  Progress output
+  Repository
+  System
+  outlets:
+    {}
+
+## RemoteActivityTableCellView.nib  (19 objects)
+  .AppleSystemUIFont
+  .AppleSystemUIFontBold
+  GTRemoteActivityTableCellView
+  Label
+  Last Log
+  Less than a minute
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSValue
+  System
+  Table View Cell
+  outlets:
+    {}
+
+## RemoteBranchSidebarCellView.nib  (19 objects)
+  .AppleSystemUIFont
+  GTSidebarTextField
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSTextField
+  NSTextFieldCell
+  NSValue
+  Remote branch label
+  RemoteBranchSidebarCellView
+  System
+  _TtC5Tower27RemoteBranchSidebarCellView
+  outlets:
+    {}
+
+## RemoteSidebarCellView.nib  (19 objects)
+  .AppleSystemUIFont
+  GTSidebarTextField
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSTextField
+  NSTextFieldCell
+  NSValue
+  Remote sidebar label
+  RemoteSidebarCellView
+  System
+  _TtC5Tower21RemoteSidebarCellView
+  outlets:
+    {}
+
+## RemoveParentDialogueViewController.nib  (10 objects)
+  .AppleSystemUIFont
+  Do not ask me again
+  FNView
+  NSApplication
+  NSButton
+  NSLayoutConstraint
+  NSObject
+  NSSwitch
+  NSUserDefaultsController
+  RemoveParentDialogueViewController
+  outlets:
+    {}
+
+## RenameGraphiteBranchDialogueViewController.nib  (24 objects)
+  .AppleSystemUIFont
+  Allow renaming a branch that is already associated with an open GitHub pull request. - please use with care!
+  Allows renaming a branch that is already associated with an open GitHub pull request.
+  Force
+  Force Renaming
+  NSApplication
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSMapTable
+  NSObject
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSView
+  Name:
+  RenameGraphiteBranchDialogueViewController
+  Skip hooks
+  System
+  outlets:
+    {}
+
+## SetBranchDependencyViewController.nib  (27 objects)
+  .AppleSystemUIFont
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSValue
+  NSView
+  Parent:
+  SetBranchDependencyViewController
+  Stack Branch
+  Stacks the new branch on top of the parent branch, allowing local changes to be integrated using restacking.
+  System
+  The new branch will track this branch for local changes and allows integrating them easily.
+  _NSManagedProxy
+  _TtC5Tower33SetBranchDependencyViewController
+  outlets:
+    {}
+
+## SetGraphiteParentBranchViewController.nib  (23 objects)
+  .AppleSystemUIFont
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSArrayController
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSTextField
+  NSValue
+  NSView
+  Parent:
+  Selected branch will track this branch for local changes and allows integrating them easily.
+  SetGraphiteParentBranchViewController
+  System
+  _NSManagedProxy
+  _TtC5Tower37SetGraphiteParentBranchViewController
+  outlets:
+    {}
+
+## SidebarFooterViewController.nib  (34 objects)
+  .AppleSystemUIFont
+  14
+  Add Menu
+  Add Remote Repository…
+  Add SVN Remote Repository…
+  Add Submodule…
+  Add Worktree…
+  Create New Branch…
+  Create New Stacked Branch…
+  Create New Tag…
+  IBImageConfiguration
+  NSApplication
+  NSBox
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageSymbolConfiguration
+  NSLayoutConstraint
+  NSMenuItem
+  NSObject
+  NSPopUpButton
+  NSPopUpButtonCell
+  NSStackView
+  NSStackViewContainer
+  NSValue
+  NSView
+  SidebarFooterViewController
+  System
+  Title
+  View Settings
+  _TtC5Tower23ExpandableFilterControl
+  _TtC5Tower27SidebarFooterViewController
+  outlets:
+    {}
+
+## SubmitGraphiteBranchDialogueViewController.nib  (47 objects)
+  .AppleSystemUIFont
+  Always push updates
+  Bypasses any associated hook scripts.
+  Can be helpful for  fixing an inconsistent Graphite stack view on Web/GitHub resulting from downtime/a bug.
+  Draft
+  Force
+  From Branch:
+  If set, all new PRs will be created in draft mode.
+  If set, marks all PRs being submitted as merge when ready, which will let them automatically merge as soon as all merge requirements are met.
+  Item 1
+  Item 2
+  Item 3
+  Merge when ready
+  NSApplication
+  NSArrayController
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMapTable
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Only pushes and updates branches with existing Pull Requests.
+  Open a web browser to edit PR metadata, even if no new PRs are being created.
+  Overwrites the remote branch with your local branch. Otherwise defaults to --force-with-lease. - please use with care!
+  Restack Branches
+  Restacks all branches in the stack for the selected branch before submitting.
+  Show Pull Request on Graphite
+  Shows the pull request on Graphite after submitting. 
+  Skip hooks
+  Submit Full Stack
+  SubmitGraphiteBranchDialogueViewController
+  Submits all branches in the stack for the selected branch.
+  System
+  Update only
+  Web
+  _NSManagedProxy
+  outlets:
+    {}
+
+## SubmoduleSidebarCellView.nib  (19 objects)
+  .AppleSystemUIFont
+  GTSidebarTextField
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSTextField
+  NSTextFieldCell
+  NSValue
+  Submodule cell view label
+  SubmoduleSidebarCellView
+  System
+  _TtC5Tower24SubmoduleSidebarCellView
+  outlets:
+    {}
+
+## TagSidebarCellView.nib  (19 objects)
+  .AppleSystemUIFont
+  GTSidebarTextField
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSTextField
+  NSTextFieldCell
+  NSValue
+  System
+  Tag sidebar label
+  TagSidebarCellView
+  _TtC5Tower18TagSidebarCellView
+  outlets:
+    {}
+
+## UserPreferencesAppearanceViewController.nib  (17 objects)
+  .AppleSystemUIFont
+  App Icon:
+  Appearance:
+  Choose “Automatic“ to automatically adapt the icon to Light and Dark Appearance.
+  NSApplication
+  NSBox
+  NSColor
+  NSColorSpace
+  NSData
+  NSLayoutConstraint
+  NSObject
+  NSTextField
+  NSView
+  System
+  Title
+  UserPreferencesAppearanceViewController
+  _TtC5Tower39UserPreferencesAppearanceViewController
+  outlets:
+    {}
+
+## UserPreferencesEditorViewController.nib  (36 objects)
+  .AppleSystemUIFont
+  Always remove comments in commit message
+  Body line character limit:
+  Body line wrapping mode:
+  Enable service integration plugins
+  Enables autocompletion of issue references and keywords. Requires an associated service account with the repository's main remote.
+  Item 1
+  Item 2
+  Item 3
+  NSApplication
+  NSBox
+  NSButton
+  NSColor
+  NSColorSpace
+  NSComboBox
+  NSComboBoxCell
+  NSData
+  NSImage
+  NSLayoutConstraint
+  NSMenu
+  NSObject
+  NSPopUpButton
+  NSSwitch
+  NSTextField
+  NSUserDefaultsController
+  NSValue
+  NSView
+  Show commit templates button
+  Show guide
+  Show subject limit counter
+  Show warning if message contains comments
+  Subject character limit:
+  System
+  Title
+  UserPreferencesEditorViewController
+  _TtC5Tower35UserPreferencesEditorViewController
+  outlets:
+    {}
+
+## UserPreferencesEnvironmentViewController.nib  (48 objects)
+  #$assets-mainBundleID
+  .AppleSystemUIFont
+  AutomaticTableColumnIdentifier.0
+  AutomaticTableColumnIdentifier.1
+  Automatically request environment variables from login shell
+  Check
+  Configure custom environment variables used when running Git commands:
+  CustomEnvironmentCellIKeydentifier
+  CustomEnvironmentCellTextViewKeyIdentifier
+  CustomEnvironmentCellTextViewValueIdentifier
+  CustomEnvironmentCellValueIdentifier
+  EnvironmentCellIdentifier
+  GTColoredBackgroundView
+  Key
+  NSApplication
+  NSBox
+  NSButton
+  NSButtonCell
+  NSClipView
+  NSColor
+  NSColorSpace
+  NSData
+  NSFontDescriptor
+  NSImage
+  NSLayoutConstraint
+  NSNib
+  NSObject
+  NSScrollView
+  NSScroller
+  NSStackView
+  NSStackViewContainer
+  NSSwitch
+  NSTableCellView
+  NSTableHeaderView
+  NSTableView
+  NSTextField
+  NSTextFieldCell
+  NSUserDefaultsController
+  NSValue
+  NSView
+  System
+  Table View Cell
+  Text Cell
+  Title
+  UserPreferencesEnvironmentViewController
+  Value
+  _NSCornerView
+  _TtC5Tower40UserPreferencesEnvironmentViewController
+  outlets:
+    {}
+  actions:
+    {}
+
+## UserPreferencesTextViewController.nib  (30 objects)
+  .AppleSystemUIFont
+  Enable Syntax Coloring
+  Invisibles:
+  NSApplication
+  NSAttributedString
+  NSBox
+  NSButton
+  NSColor
+  NSColorSpace
+  NSData
+  NSDecimalNumberHandler
+  NSDecimalNumberPlaceholder
+  NSLayoutConstraint
+  NSNumberFormatter
+  NSObject
+  NSStepper
+  NSStepperCell
+  NSSwitch
+  NSTextField
+  NSTextFieldCell
+  NSView
+  Show invisible characters
+  Syntax Coloring in Diffs
+  Syntax coloring:
+  System
+  Tab width:
+  Title
+  UserPreferencesTextViewController
+  _TtC5Tower33UserPreferencesTextViewController
+  spaces
+  outlets:
+    {}
+
+## UserPrivacyConsentViewController.nib  (4 objects)
+  NSApplication
+  NSObject
+  NSView
+  UserPrivacyConsentViewController
+  outlets:
+    {}
+
+## WorkflowPickerDialogueViewController.nib  (4 objects)
+  NSApplication
+  NSObject
+  NSView
+  WorkflowPickerDialogueViewController
+  outlets:
+    {}
+
+## WorkspaceSidebarCellView.nib  (19 objects)
+  .AppleSystemUIFont
+  GTSidebarTextField
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSTextField
+  NSTextFieldCell
+  NSValue
+  System
+  Workspace sidebar cell view
+  WorkspaceSidebarCellView
+  _TtC5Tower24WorkspaceSidebarCellView
+  outlets:
+    {}
+
+## WorktreeSidebarCellView.nib  (19 objects)
+  .AppleSystemUIFont
+  GTSidebarTextField
+  NSApplication
+  NSColor
+  NSColorSpace
+  NSData
+  NSImage
+  NSImageCell
+  NSImageView
+  NSLayoutConstraint
+  NSObject
+  NSStackView
+  NSTextField
+  NSTextFieldCell
+  NSValue
+  System
+  Worktree sidebar label
+  WorktreeSidebarCellView
+  _TtC5Tower23WorktreeSidebarCellView
+  outlets:
+    {}
