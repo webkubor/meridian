@@ -56,6 +56,16 @@ Action → Validator → Operation triad. To add one:
    `state.run(&app, args).await`, plus its registration in
    `src-tauri/src/lib.rs` (`generate_handler!`) and the typed wrapper in
    `src/bridges/commands.ts`.
+6. **IPC contract and flow test** — add the command and its input/output
+   vocabulary to `docs/03-command-surface.md`. Add a flow test that follows the
+   command from the wrapper through validation and execution to its result, so
+   the contract cannot drift from the shipped behaviour.
+7. **Diagnostics and visible failures** — route frontend calls through the
+   shared instrumentation in `src/bridges/commands.ts`, which records argument
+   key names by default and only safe, allowlisted scalar values in debug mode.
+   Every failure path must reach the user through
+   a visible error state or message; logging an error alone is not handling it.
+   See `src/diagnostics/failures.ts` for the failure net and its fallback toast.
 
 Orchestration lives only in `AppState::run` (docs/02 §3): resolve RepoId →
 enqueue on the repo's queue → validate → (policy/snapshot hooks) → execute on a

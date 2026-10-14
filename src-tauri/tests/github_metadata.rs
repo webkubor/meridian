@@ -11,7 +11,8 @@
 //! It checks both directions, because both fail quietly:
 //!
 //! * every id and template filename `commands/app.rs` writes must exist in the
-//!   YAML — otherwise the prefill lands nowhere;
+//!   YAML — otherwise the prefill lands nowhere. That includes `diagnostics`,
+//!   the textarea the Diagnostics report is prefilled into;
 //! * the fields we deliberately *do not* prefill must still exist — otherwise
 //!   the "we never fill this in for you" test in `commands/app.rs` is asserting
 //!   the absence of a parameter that no longer has a field to land on.
@@ -121,7 +122,7 @@ fn every_form_field_the_app_prefills_still_exists() {
     let sent = string_constants(production_source(&source));
     let bug_ids = field_ids(&read(BUG_FORM));
 
-    for id in ["version", "macos-version", "architecture"] {
+    for id in ["version", "macos-version", "architecture", "diagnostics"] {
         assert!(
             sent.contains(id),
             "commands/app.rs no longer has a `const ... = \"{id}\"` for the bug \
@@ -160,6 +161,44 @@ fn the_forms_keep_the_fields_we_deliberately_leave_blank() {
         "{FEATURE_FORM} lost its `problem` field — a capability request with no \
          space to describe the problem becomes a wish list.\n  \
          the form has: {feature_ids:?}"
+    );
+}
+
+/// The slice of an issue form belonging to the field with this `id`: from its
+/// `- type:` line up to the next one. Same no-YAML-parser approach as
+/// `field_ids`; a field's attributes are all indented under that line.
+fn field_block(yaml: &str, id: &str) -> Option<String> {
+    let mut blocks: Vec<Vec<&str>> = Vec::new();
+    for line in yaml.lines() {
+        if line.trim_start().starts_with("- type:") {
+            blocks.push(Vec::new());
+        }
+        if let Some(block) = blocks.last_mut() {
+            block.push(line);
+        }
+    }
+    blocks
+        .into_iter()
+        .map(|lines| lines.join("\n"))
+        .find(|block| field_ids(block).contains(id))
+}
+
+#[test]
+fn the_diagnostics_field_is_an_optional_textarea() {
+    // The app prefills it from a report that can be absent, and a reporter who
+    // cannot produce one (the app will not start, say) must still be able to
+    // file. A required field would turn "no report" into "no bug report".
+    let yaml = read(BUG_FORM);
+    let block = field_block(&yaml, "diagnostics")
+        .unwrap_or_else(|| panic!("{BUG_FORM} has no field with `id: diagnostics`"));
+
+    assert!(
+        block.contains("type: textarea"),
+        "`diagnostics` must be a textarea — a one-line input cannot hold a report:\n{block}"
+    );
+    assert!(
+        !block.contains("required: true"),
+        "`diagnostics` must stay optional:\n{block}"
     );
 }
 

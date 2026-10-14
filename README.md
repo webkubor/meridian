@@ -69,12 +69,42 @@ release notes read offline and in either language.
 
 ### Privacy
 
-No telemetry, no account. Two things leave the machine, both avoidable:
+No telemetry, no account. The optional update check asks GitHub for the latest
+release tag and carries the app version only. When you choose to report a bug,
+Meridian builds a URL and opens it in your browser; if you include a diagnostics
+report, that report is in the URL. Meridian never submits the issue. Review the
+form and its URL before you choose to submit it in GitHub.
 
-- the update check, which asks GitHub for the latest release tag and carries the
-  app version and nothing else;
-- a bug report, which is a URL this app builds and hands to your browser — the
-  app submits nothing, and you edit the form before pressing Submit.
+### Debugging and reporting
+
+Open **About Meridian → Diagnostics** to turn on debug mode, inspect recent
+failures and command calls, read the log, or copy/export a report. To start the
+installed app in debug mode from Terminal, run
+`MERIDIAN_DEBUG=1 /Applications/Meridian.app/Contents/MacOS/meridian`. The log is
+`~/Library/Logs/dev.meridian.app/meridian.log`; it rotates automatically, and
+logs and rotated files stay on your Mac.
+
+Logs record command names, outcomes, durations, error details and argument key
+names. Argument values are included only in debug mode for a small allowlist of
+harmless scalar fields. File contents, diffs, commit messages, credentials and
+credential-helper output are never logged. Reports mask your home folder, URL
+logins and token-shaped strings, but automatic redaction is not perfect: read a
+report before sharing it. Copy the report, or export it to Downloads and attach
+the `.txt` file to a bug report you review and submit yourself in GitHub. If the
+report does not fit in the issue URL, the form marks it as truncated and asks you
+to attach the exported file instead.
+
+打开「关于 Meridian → 诊断」可开启调试模式、查看最近失败和命令调用、阅读日志，或
+复制/导出报告。也可以在终端运行
+`MERIDIAN_DEBUG=1 /Applications/Meridian.app/Contents/MacOS/meridian` 以调试模式启动应用。
+日志位于 `~/Library/Logs/dev.meridian.app/meridian.log`，会自动轮换；日志及轮换文件只保存在
+你的 Mac 上。
+
+日志记录命令名称、结果、耗时、错误详情和参数键名。只有开启调试模式时，少量无害的标量
+参数值才会写入日志。文件内容、差异、提交说明、凭据和凭据助手输出绝不会记录。报告会遮盖
+主目录、URL 登录信息和类似令牌的字符串，但自动脱敏并不完美：分享前请先阅读报告。你可以
+复制报告，或将报告导出到「下载」文件夹，再把 `.txt` 文件附加到你自行检查并提交的 GitHub
+问题报告中。若报告无法完整放入问题链接，表单会标明内容已截断，并提示改为附上导出的文件。
 
 ### Not built yet
 

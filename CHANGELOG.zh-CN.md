@@ -9,7 +9,16 @@ Meridian 的重要改动。格式遵循 [Keep a Changelog](https://keepachangelo
 
 ## [Unreleased]
 
-暂无。改动先记在这里，打版本标签时再移到对应的版本标题下。
+### 新增
+
+- **诊断** —— 新增诊断页面，提供可持久保存的调试模式开关、最近失败与命令调用，以及
+  日志末尾内容。日志只保存在本机 `~/Library/Logs/dev.meridian.app/meridian.log`，并会自动
+  轮换。也可在启动应用时通过
+  `MERIDIAN_DEBUG=1 /Applications/Meridian.app/Contents/MacOS/meridian` 开启调试模式。
+- **错误可见性** —— 统一命令监测会在本机记录失败；如果界面没有处理错误，兜底提示会将其
+  呈现出来，避免常规操作无声失败。
+- **诊断报告** —— 可复制脱敏报告、导出到「下载」文件夹，或预填到 GitHub 问题报告中供你检查。
+  Meridian 不会提交报告，也不会向其他地方发送诊断信息。
 
 ## [0.1.0] - 2026-10-14
 

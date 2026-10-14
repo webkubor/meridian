@@ -14,8 +14,19 @@ there is exactly one place that knows where the project is hosted.
 
 ## [Unreleased]
 
-Nothing yet. Changes land here first and move under a version heading when that
-version is tagged.
+### Added
+
+- **Diagnostics** — an in-app Diagnostics screen with a persistent debug-mode
+  switch, recent failures and command calls, and a readable log tail. Logs stay
+  on the Mac at `~/Library/Logs/dev.meridian.app/meridian.log` and rotate
+  automatically. Debug mode can also be enabled at launch with
+  `MERIDIAN_DEBUG=1 /Applications/Meridian.app/Contents/MacOS/meridian`.
+- **Failure visibility** — the shared command instrumentation records failures
+  locally, and a fallback notification surfaces an unhandled failure instead of
+  leaving routine operations to fail silently.
+- **Diagnostic reports** — copy a redacted report, export it to Downloads, or
+  prefill it into a bug report for review in GitHub. Meridian never submits the
+  report or sends diagnostics elsewhere.
 
 ## [0.1.0] - 2026-10-14
 

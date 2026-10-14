@@ -146,6 +146,12 @@ pub struct FeedbackRequest {
     /// a query parameter on a GitHub URL the *user* opens and reviews.
     #[serde(default)]
     pub summary: Option<String>,
+    /// The compact diagnostics text from the Diagnostics screen, already
+    /// redacted there. Prefills the bug form's `diagnostics` field and nothing
+    /// else; a feature request ignores it. Like `summary` it ends up in a URL
+    /// the user opens and reviews, never in a request this app makes.
+    #[serde(default)]
+    pub context: Option<String>,
 }
 
 /// The URL the feedback action opens, plus what was put in it.

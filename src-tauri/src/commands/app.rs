@@ -355,7 +355,24 @@ pub async fn app_pick_directory<R: Runtime>(
 const FIELD_VERSION: &str = "version";
 const FIELD_MACOS: &str = "macos-version";
 const FIELD_ARCH: &str = "architecture";
+/// The bug form's optional textarea for the Diagnostics report. Unlike the
+/// three above it is prefilled from the caller's `context`, not from build facts.
+const FIELD_DIAGNOSTICS: &str = "diagnostics";
 
+/// Ceiling for the whole issue URL, in characters. Browsers and GitHub's edge
+/// both refuse very long request lines — and they refuse with a bare error page,
+/// not a trimmed form — so the report is cut to fit rather than sent whole and
+/// lost. 7000 leaves a margin under the roughly 8 KB where that starts to happen.
+const URL_BUDGET: usize = 7000;
+/// A user-entered title can also contain arbitrarily long or multibyte text.
+/// Keep a little room for it, then give the remainder to diagnostics.
+const TITLE_BUDGET: usize = 768;
+const TITLE_TRUNCATION_MARKER: &str = "[truncated]";
+
+/// Appended, on its own line, when the context did not fit. A report that stops
+/// mid-sentence with no sign of it is worse than none: the maintainer would
+/// debug on evidence that is missing without knowing it.
+const TRUNCATION_MARKER: &str = "[truncated — attach the exported file]";
 /// Turns build facts into the two lines a maintainer actually needs.
 ///
 /// Deliberately excludes: repository paths, remote URLs, branch names, the
@@ -407,7 +424,8 @@ fn feedback_target(info: &AppInfo, request: &FeedbackRequest) -> Option<Feedback
     push_param(&mut query, "template", template);
     if let Some(summary) = request.summary.as_deref().map(str::trim) {
         if !summary.is_empty() {
-            push_param(&mut query, "title", summary);
+            let title = fit_title(summary);
+            push_param(&mut query, "title", &title);
         }
     }
     for (key, value) in prefilled.iter() {
@@ -415,13 +433,120 @@ fn feedback_target(info: &AppInfo, request: &FeedbackRequest) -> Option<Feedback
     }
 
     prefilled.retain(|(_, value)| !value.is_empty());
+    let mut lines: Vec<String> = prefilled
+        .into_iter()
+        .map(|(key, value)| format!("{key}: {value}"))
+        .collect();
+
+    // The diagnostics report goes last: everything else is a few dozen bytes,
+    // so whatever room is left under the URL budget is the report's to use.
+    // Only the bug form has the field; a feature request has nothing to attach
+    // a log to, so it ignores `context` rather than sending a parameter GitHub
+    // would drop.
+    let origin = format!("https://github.com/{slug}/issues/new?");
+    if let (FeedbackKind::Bug, Some(context)) = (request.kind, request.context.as_deref()) {
+        let context = context.trim();
+        if !context.is_empty() {
+            // `&` + `diagnostics` + `=` is what `push_param` will add.
+            let overhead = origin.len() + query.len() + encode(FIELD_DIAGNOSTICS).len() + 2;
+            let room = URL_BUDGET.saturating_sub(overhead);
+            match fit_context(context, room) {
+                Fitted::Whole(text) => {
+                    lines.push(format!(
+                        "{FIELD_DIAGNOSTICS}: {} characters",
+                        text.chars().count()
+                    ));
+                    push_param(&mut query, FIELD_DIAGNOSTICS, &text);
+                }
+                Fitted::Truncated(text) => {
+                    lines.push(format!(
+                        "{FIELD_DIAGNOSTICS}: {} of {} characters (truncated)",
+                        text.chars().count(),
+                        context.chars().count()
+                    ));
+                    push_param(&mut query, FIELD_DIAGNOSTICS, &text);
+                }
+                Fitted::Omitted => lines.push(format!(
+                    "{FIELD_DIAGNOSTICS}: omitted, no room left in the link (attach the exported file)"
+                )),
+            }
+        }
+    }
 
     Some(FeedbackTarget {
-        url: format!("https://github.com/{slug}/issues/new?{query}"),
-        prefilled: prefilled
-            .into_iter()
-            .map(|(key, value)| format!("{key}: {value}"))
-            .collect(),
+        url: format!("{origin}{query}"),
+        prefilled: lines,
+    })
+}
+
+/// What became of the diagnostics text once the URL budget was applied.
+#[derive(Debug, PartialEq, Eq)]
+enum Fitted {
+    /// It fit; sent unchanged.
+    Whole(String),
+    /// It did not fit. The text ends with `TRUNCATION_MARKER`.
+    Truncated(String),
+    /// Not even the marker fits — the title alone nearly fills the budget.
+    /// Nothing is sent, and the caller says so instead of dropping it quietly.
+    Omitted,
+}
+
+/// Fits `context` into `room` characters of *percent-encoded* URL.
+///
+/// The budget is measured after encoding because that is what the URL costs:
+/// a CJK character is three bytes and so nine characters on the wire, a newline
+/// three. Measuring the raw text would let a Chinese report run to three times
+/// the limit. The cut is made on `char` boundaries by construction — it walks
+/// `char_indices` and slices only at an index it has just seen — so a multi-byte
+/// character is kept whole or dropped whole, never split into invalid UTF-8.
+fn fit_title(title: &str) -> String {
+    if encode(title).len() <= TITLE_BUDGET {
+        return title.to_string();
+    }
+
+    let available = TITLE_BUDGET - encode(TITLE_TRUNCATION_MARKER).len();
+    let mut used = 0;
+    let mut end = 0;
+    for (index, character) in title.char_indices() {
+        let cost = encode(character.encode_utf8(&mut [0; 4])).len();
+        if used + cost > available {
+            break;
+        }
+        used += cost;
+        end = index + character.len_utf8();
+    }
+
+    let kept = title[..end].trim_end();
+    format!("{kept}{TITLE_TRUNCATION_MARKER}")
+}
+
+fn fit_context(context: &str, room: usize) -> Fitted {
+    if encode(context).len() <= room {
+        return Fitted::Whole(context.to_string());
+    }
+
+    let marker = format!("\n{TRUNCATION_MARKER}");
+    let Some(available) = room.checked_sub(encode(&marker).len()) else {
+        return Fitted::Omitted;
+    };
+
+    let mut used = 0;
+    let mut end = 0;
+    for (index, character) in context.char_indices() {
+        // Same encoder as the URL itself, so the two can never disagree.
+        let cost = encode(character.encode_utf8(&mut [0; 4])).len();
+        if used + cost > available {
+            break;
+        }
+        used += cost;
+        end = index + character.len_utf8();
+    }
+
+    let kept = context[..end].trim_end();
+    Fitted::Truncated(if kept.is_empty() {
+        TRUNCATION_MARKER.to_string()
+    } else {
+        format!("{kept}{marker}")
     })
 }
 
@@ -531,6 +656,7 @@ mod tests {
             &FeedbackRequest {
                 kind: FeedbackKind::Bug,
                 summary: None,
+                context: None,
             },
         )
         .expect("slug is set");
@@ -552,6 +678,7 @@ mod tests {
             &FeedbackRequest {
                 kind: FeedbackKind::Bug,
                 summary: Some("crash on stage".into()),
+                context: None,
             },
         )
         .expect("slug is set");
@@ -570,6 +697,7 @@ mod tests {
             &FeedbackRequest {
                 kind: FeedbackKind::Feature,
                 summary: None,
+                context: None,
             },
         )
         .expect("slug is set");
@@ -593,6 +721,7 @@ mod tests {
             &FeedbackRequest {
                 kind: FeedbackKind::Bug,
                 summary: None,
+                context: None,
             }
         )
         .is_none());
@@ -606,6 +735,7 @@ mod tests {
             &FeedbackRequest {
                 kind: FeedbackKind::Bug,
                 summary: Some("staging \"foo/bar\" fails & dies".into()),
+                context: None,
             },
         )
         .expect("slug is set");
@@ -613,6 +743,221 @@ mod tests {
         assert!(target
             .url
             .contains("title=staging+%22foo%2Fbar%22+fails+%26+dies"));
+    }
+
+    // --- the diagnostics report in the bug URL ------------------------------
+
+    /// Inverse of `encode`, for asserting on what a browser would hand to
+    /// GitHub. Panics on bytes that are not UTF-8 — which is the point: a cut
+    /// that split a character would decode to garbage there, so every test that
+    /// reads a parameter back also proves the cut was on a char boundary.
+    fn decode(value: &str) -> String {
+        let bytes = value.as_bytes();
+        let mut out = Vec::new();
+        let mut index = 0;
+        while index < bytes.len() {
+            match bytes[index] {
+                b'+' => {
+                    out.push(b' ');
+                    index += 1;
+                }
+                b'%' => {
+                    let hex = std::str::from_utf8(&bytes[index + 1..index + 3]).expect("hex pair");
+                    out.push(u8::from_str_radix(hex, 16).expect("valid hex pair"));
+                    index += 3;
+                }
+                other => {
+                    out.push(other);
+                    index += 1;
+                }
+            }
+        }
+        String::from_utf8(out).expect("the decoded parameter is valid UTF-8")
+    }
+
+    fn param(url: &str, key: &str) -> Option<String> {
+        let query = url.split_once('?')?.1;
+        query.split('&').find_map(|pair| {
+            let (name, value) = pair.split_once('=')?;
+            (name == key).then(|| decode(value))
+        })
+    }
+
+    fn bug_with(summary: Option<String>, context: Option<&str>) -> FeedbackTarget {
+        feedback_target(
+            &sample_info(),
+            &FeedbackRequest {
+                kind: FeedbackKind::Bug,
+                summary,
+                context: context.map(str::to_string),
+            },
+        )
+        .expect("slug is set")
+    }
+
+    #[test]
+    fn bug_url_carries_the_diagnostics_context() {
+        let report = "Meridian 0.1.0\nlast failure: remote_fetch (network)\n";
+        let target = bug_with(None, Some(report));
+
+        // Trimmed, otherwise untouched: newlines survive the round trip.
+        assert_eq!(
+            param(&target.url, FIELD_DIAGNOSTICS).as_deref(),
+            Some(report.trim())
+        );
+        // Whole, so no truncation marker anywhere.
+        assert!(!target.url.contains(&encode(TRUNCATION_MARKER)));
+        // The existing build-fact prefill is unchanged by the new field.
+        assert!(target.url.contains("version=0.1.0+%28abc123def456%29"));
+        assert!(target.url.contains("architecture=Apple+silicon"));
+        // The UI is told something was attached, and how much — never the text.
+        let line = target
+            .prefilled
+            .iter()
+            .find(|line| line.starts_with("diagnostics:"))
+            .expect("a diagnostics line is reported");
+        assert!(line.contains("characters") && !line.contains("remote_fetch"));
+        assert!(!target.url.contains("sensitive-data"));
+    }
+
+    #[test]
+    fn an_oversized_cjk_context_is_cut_visibly_and_on_a_char_boundary() {
+        let report = "诊断报告：推送失败，远程拒绝了这次请求。\n".repeat(600);
+
+        // Three bytes per character means the encoded length steps by nine, so
+        // sliding the budget one character at a time over a full cycle lands the
+        // cut on every alignment — `decode` fails the test if any of them splits
+        // a character.
+        for title_len in 0..24 {
+            let target = bug_with(Some("x".repeat(title_len)), Some(&report));
+            let sent = param(&target.url, FIELD_DIAGNOSTICS).expect("diagnostics sent");
+
+            assert!(
+                sent.ends_with(TRUNCATION_MARKER),
+                "the cut is announced (title of {title_len} characters)"
+            );
+            assert!(
+                report.starts_with(sent.trim_end_matches(TRUNCATION_MARKER).trim_end()),
+                "what is kept is a prefix of the original, not a rearrangement"
+            );
+            assert!(target
+                .prefilled
+                .iter()
+                .any(|line| line.starts_with("diagnostics:") && line.contains("(truncated)")));
+        }
+    }
+
+    #[test]
+    fn the_whole_url_stays_inside_the_budget() {
+        // Mixed worst cases for the encoder: 4-byte emoji (twelve characters
+        // each on the wire), 3-byte CJK, newlines, and reserved ASCII.
+        let reports = [
+            "诊断".repeat(5000),
+            "🧭\n".repeat(5000),
+            "line with spaces & symbols = ? # / %\n".repeat(1000),
+        ];
+        for report in &reports {
+            let target = bug_with(Some("push fails after rename".into()), Some(report));
+            assert!(
+                target.url.len() <= URL_BUDGET,
+                "{} characters exceeds the {URL_BUDGET} budget",
+                target.url.len()
+            );
+        }
+
+        // And it is not over-trimmed: a pure-CJK report fills the budget to
+        // within one encoded character plus the trimmed trailing space.
+        let target = bug_with(None, Some(&reports[0]));
+        assert!(
+            target.url.len() > URL_BUDGET - 16,
+            "{} leaves needless room under {URL_BUDGET}",
+            target.url.len()
+        );
+    }
+
+    #[test]
+    fn a_context_that_fits_is_never_marked_truncated() {
+        let report = "short report".repeat(10);
+        let target = bug_with(None, Some(&report));
+
+        assert_eq!(
+            param(&target.url, FIELD_DIAGNOSTICS).as_deref(),
+            Some(report.as_str())
+        );
+        assert!(!target.url.contains(&encode("truncated")));
+    }
+
+    #[test]
+    fn an_oversized_title_is_bounded_and_visibly_truncated() {
+        let title = "诊断标题".repeat(1000);
+        let target = bug_with(Some(title), Some("any report"));
+        let sent_title = param(&target.url, "title").expect("title is present");
+
+        assert!(sent_title.ends_with(TITLE_TRUNCATION_MARKER));
+        assert!(encode(&sent_title).len() <= TITLE_BUDGET);
+        assert!(param(&target.url, FIELD_DIAGNOSTICS).is_some());
+        assert!(target.url.len() <= URL_BUDGET);
+    }
+
+    #[test]
+    fn a_feature_request_ignores_the_context() {
+        let target = feedback_target(
+            &sample_info(),
+            &FeedbackRequest {
+                kind: FeedbackKind::Feature,
+                summary: None,
+                context: Some("last failure: remote_fetch".into()),
+            },
+        )
+        .expect("slug is set");
+
+        assert!(target.url.contains("template=feature_request.yml"));
+        assert!(!target.url.contains("diagnostics"));
+        assert!(!target.url.contains("remote_fetch"));
+        assert!(target.prefilled.is_empty());
+    }
+
+    #[test]
+    fn no_context_means_no_diagnostics_parameter() {
+        for context in [None, Some(""), Some("  \n\t ")] {
+            let target = bug_with(None, context);
+            assert!(
+                !target.url.contains("diagnostics"),
+                "context {context:?} must not produce a parameter: {}",
+                target.url
+            );
+            assert!(target
+                .prefilled
+                .iter()
+                .all(|line| !line.starts_with("diagnostics")));
+        }
+    }
+
+    #[test]
+    fn fit_context_is_exact_at_the_edges() {
+        let marker_cost = encode(&format!("\n{TRUNCATION_MARKER}")).len();
+
+        let long = "abcdefghij".repeat(20);
+
+        assert_eq!(fit_context("abc", 3), Fitted::Whole("abc".into()));
+        // One short of fitting, with no room for the marker either.
+        assert_eq!(fit_context("abc", 2), Fitted::Omitted);
+        // Too long, and room for the marker alone: the marker alone is sent.
+        assert_eq!(
+            fit_context(&long, marker_cost),
+            Fitted::Truncated(TRUNCATION_MARKER.to_string())
+        );
+        // Room for exactly "ab" before the marker.
+        assert_eq!(
+            fit_context(&long, marker_cost + 2),
+            Fitted::Truncated(format!("ab\n{TRUNCATION_MARKER}"))
+        );
+        // A character that does not fit is dropped whole: nine wire characters
+        // for "诊", so eight spare ones keep only the "a" before it.
+        assert_eq!(
+            fit_context(&format!("a{}", "诊断".repeat(20)), marker_cost + 1 + 8),
+            Fitted::Truncated(format!("a\n{TRUNCATION_MARKER}"))
+        );
     }
 
     #[test]
