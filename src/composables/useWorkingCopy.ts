@@ -40,10 +40,10 @@ export function useWorkingCopy() {
     if (id) await store.unstage(id, [path]);
   }
 
-  async function discard(path: string): Promise<boolean> {
+  async function discard(path: string, includeUntracked = false): Promise<boolean> {
     const id = activeRepo();
     if (!id) return false;
-    return store.discard(id, [path]);
+    return store.discard(id, [path], includeUntracked);
   }
 
   async function commit(request: CommitRequest): Promise<boolean> {

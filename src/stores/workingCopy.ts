@@ -49,10 +49,20 @@ export const useWorkingCopyStore = defineStore("workingCopy", () => {
   }
 
   /** Discard the working-tree changes in `paths` (docs/03 §3, destructive). */
-  async function discard(repo: RepoId, paths: string[]): Promise<boolean> {
+  async function discard(
+    repo: RepoId,
+    paths: string[],
+    includeUntracked = false,
+  ): Promise<boolean> {
     lastError.value = null;
     try {
-      apply(await commands.wcPathsDiscard(repo, paths));
+      apply(
+        await commands.wcPathsDiscard(
+          repo,
+          paths,
+          includeUntracked ? { includeUntracked: true, confirmToken: "confirmed" } : {},
+        ),
+      );
       return true;
     } catch (error) {
       lastError.value = error as ErrorPayload;

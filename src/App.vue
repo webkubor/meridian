@@ -44,7 +44,11 @@ import { useGit } from "./composables/useGit";
 import { useHistory } from "./composables/useHistory";
 import { useRepositories } from "./composables/useRepositories";
 import { useWorkingCopy } from "./composables/useWorkingCopy";
+import { useDiagnostics } from "./composables/useDiagnostics";
+import { captureFailure, configureFailureNet, normalizeError } from "./diagnostics/failures";
+import { errorText } from "./i18n";
 import AboutScreen from "./components/screens/AboutScreen.vue";
+import DiagnosticsScreen from "./components/screens/DiagnosticsScreen.vue";
 import ActivityScreen from "./components/screens/ActivityScreen.vue";
 import AccountScreen from "./components/screens/AccountScreen.vue";
 import BlamePane from "./components/panes/BlamePane.vue";
@@ -69,6 +73,7 @@ import {
   accountPath,
   activityPath,
   blamePath,
+  diagnosticsPath,
   isWorkspaceTab,
   repositoriesPath,
   repositoryPath,
@@ -129,6 +134,52 @@ const branches = useBranches();
 const history = useHistory();
 const diff = useDiff();
 const git = useGit();
+const diagnostics = useDiagnostics({
+  appInfo: () => appInfo.value.status === "data" ? appInfo.value.data : null,
+  routeName: () => route.value.name,
+  copy: copyText,
+  notify: (text) => shell.pushToast({ kind: "info", text }),
+});
+const diagnosticsState = diagnostics.state;
+const diagnosticsDebugEnabled = diagnostics.debugEnabled;
+
+/**
+ * Extra chrome for the fallback error toast: the machine code in small text and
+ * a one-click route to the diagnostics screen.
+ *
+ * Kept beside the shell's toast queue rather than inside it because the shell
+ * owns *when* a toast disappears, not what a failure wants to say about itself.
+ */
+const toastMeta = ref<Record<string, { detail?: string; diagnostics?: boolean }>>({});
+
+const toastViews = computed(() =>
+  shell.toasts.value.map((toast) => ({ ...toast, detail: toastMeta.value[toast.id]?.detail })),
+);
+
+/** The last resort: a failure nobody claimed is still shown, with its code. */
+function showErrorToast(payload: ErrorPayload, fallback?: string): void {
+  const id = shell.pushToast({
+    kind: "danger",
+    text: fallback ?? (payload.code === "unclassified" ? t("diagnostics.internalError") : errorText(payload)),
+    actionLabel: t("diagnostics.actions.details"),
+  });
+  toastMeta.value = { ...toastMeta.value, [id]: { detail: payload.code, diagnostics: true } };
+}
+configureFailureNet({ showToast: (payload) => showErrorToast(payload) });
+
+function onToastAction(id: string): void {
+  if (toastMeta.value[id]?.diagnostics) navigate(diagnosticsPath());
+  onToastDismiss(id);
+}
+
+function onToastDismiss(id: string): void {
+  if (toastMeta.value[id]) {
+    const next = { ...toastMeta.value };
+    delete next[id];
+    toastMeta.value = next;
+  }
+  shell.dismissToast(id);
+}
 
 /** Diff view mode is shared by the working-copy and commit-detail panes. */
 const diffMode = ref<DiffViewMode>("unified");
@@ -221,6 +272,7 @@ const windowSubtitle = computed(() => {
   if (routeName.value === "settings") return t("shell.subtitle.settings");
   if (routeName.value === "account") return t("shell.subtitle.account");
   if (routeName.value === "about") return t("shell.subtitle.about");
+  if (routeName.value === "diagnostics") return t("diagnostics.title");
   if (routeName.value === "repositories") return t("shell.subtitle.repositories");
   const head = selectedRepo.value?.headBranch;
   return head ? t("shell.subtitle.on", { branch: head }) : selectedRepo.value?.gitdir ?? null;
@@ -546,11 +598,11 @@ function onOpenRequested(path: string): void {
 /* ---- shell helpers ------------------------------------------------------- */
 
 function reportError(error: unknown, fallback: string): void {
-  const message =
-    error && typeof error === "object" && "message" in error
-      ? String((error as { message: unknown }).message)
-      : fallback;
-  shell.pushToast({ kind: "danger", text: message });
+  // A store that returns its error rather than throwing has already recorded it
+  // through the bridge; claiming it here stops the fallback toast from firing a
+  // second time for the one failure the user is already being told about.
+  captureFailure(error, "ui", { handled: true, payload: normalizeError(error) });
+  showErrorToast(normalizeError(error), fallback);
 }
 
 /** Copy text (hashes, branch names, keys) to the clipboard. */
@@ -915,7 +967,10 @@ async function discardEntry(path: string): Promise<void> {
     danger: true,
   });
   if (!confirmed) return;
-  const ok = await workingCopy.discard(path);
+  const includeUntracked = workingCopy.entries.value.some(
+    (entry) => entry.path === path && entry.code === "untracked",
+  );
+  const ok = await workingCopy.discard(path, includeUntracked);
   if (ok) shell.pushToast({ kind: "success", text: t("shell.toast.discarded") });
   else reportError(workingCopy.lastError.value, t("shell.toast.discardFailed"));
 }
@@ -1401,6 +1456,8 @@ watch(
       <AppToolbar
         :verbs="toolbarVerbs"
         :activity="activitySummary"
+        :debug-enabled="diagnosticsDebugEnabled"
+        @open-diagnostics="navigate(diagnosticsPath())"
         @run="onToolbarRun"
         @choose="onToolbarChoose"
         @open-activity="navigate(activityPath())"
@@ -1713,6 +1770,19 @@ watch(
       @clear="activity.clearFinished()"
     />
 
+    <DiagnosticsScreen
+      v-else-if="routeName === 'diagnostics'"
+      v-bind="diagnosticsState"
+      @refresh="diagnostics.refresh"
+      @set-debug="diagnostics.setDebug"
+      @reveal-logs="diagnostics.revealLogs"
+      @dismiss-crash="diagnostics.dismissCrash"
+      @copy-report="diagnostics.copyReport"
+      @export-report="diagnostics.exportReport"
+      @open-devtools="diagnostics.openDevtools"
+      @report-problem="diagnostics.reportProblem"
+    />
+
     <AboutScreen
       v-else-if="routeName === 'about'"
       :info="appInfo"
@@ -1729,6 +1799,7 @@ watch(
       @install="() => void app.installUpdate()"
       @restart="() => void restartToUpdate()"
       @copy-diagnostics="() => void copyText(appInfoDiagnostics())"
+      @open-diagnostics="navigate(diagnosticsPath())"
       @retry-notes="() => void app.loadReleaseNotes(locale)"
       @notes-locale="(next: Locale) => void app.loadReleaseNotes(next)"
       @open-link="(url: string) => void openExternalLink(url)"
@@ -1748,7 +1819,7 @@ watch(
     />
 
     <template #overlay>
-      <ToastHost :toasts="shell.toasts.value" @dismiss="shell.dismissToast" @action="shell.dismissToast" />
+      <ToastHost :toasts="toastViews" @dismiss="onToastDismiss" @action="onToastAction" />
 
       <DialogueHost
         :request="shell.activeDialogue.value"

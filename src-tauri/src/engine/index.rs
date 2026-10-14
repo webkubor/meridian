@@ -269,6 +269,16 @@ pub fn discard_paths(
         if status.contains(Status::WT_NEW) && !tracked {
             if opts.include_untracked {
                 to_delete.push(path.clone());
+            } else {
+                // Returning Ok here makes the caller report "discarded" while
+                // the only copy of the file is still on disk. The UI asks for
+                // confirmation before it sets include_untracked; if it forgets
+                // the option, fail loudly so it cannot show a false success.
+                return Err(ErrorPayload::new(
+                    ErrorCode::InvalidRequest,
+                    format!("{path} is untracked; explicit confirmation is required to discard it"),
+                )
+                .with_param("path", path.clone()));
             }
             continue;
         }
@@ -1416,7 +1426,19 @@ mod tests {
         assert_eq!(std::fs::read_to_string(dir.join("a.txt")).unwrap(), "one\n");
         assert_eq!(code_of(&repo, "a.txt", false), None);
 
-        // Untracked needs the token…
+        // The default options must fail rather than report a no-op as success.
+        // This is the exact payload the UI used to send after its confirmation.
+        let err = discard_paths(
+            &repo,
+            &["scratch.txt".to_string()],
+            &DiscardOptions::default(),
+        )
+        .unwrap_err();
+        assert_eq!(err.code, ErrorCode::InvalidRequest);
+        assert!(err.message.contains("untracked"));
+        assert!(dir.join("scratch.txt").exists());
+
+        // The explicit include flag still needs a non-empty confirmation token.
         let err = discard_paths(
             &repo,
             &["scratch.txt".to_string()],
