@@ -9,6 +9,7 @@ import type {
   RepositoryRemote,
 } from "../bridges/bindings";
 import * as commands from "../bridges/commands";
+import { markHandled } from "../diagnostics/failures";
 
 /**
  * Open repositories and the current selection. One store per domain module
@@ -42,6 +43,19 @@ export const useReposStore = defineStore("repos", () => {
     }
   }
 
+  /** Re-read HEAD after a checkout, merge, rebase or pull moves it. */
+  async function refreshInfo(repo: RepoId): Promise<RepoInfo | null> {
+    try {
+      const info = await commands.repositoryRefresh(repo);
+      upsert(info);
+      return info;
+    } catch (error) {
+      lastError.value = error as ErrorPayload;
+      markHandled(error);
+      return null;
+    }
+  }
+
   async function loadRemotes(repo: RepoId): Promise<void> {
     remotesLoading.value = true;
     try {
@@ -63,7 +77,10 @@ export const useReposStore = defineStore("repos", () => {
       await loadRemotes(info.id);
       return info;
     } catch (error) {
+      // The launch screen renders `lastError` as an alert, so this failure is
+      // already on screen; claiming it keeps the fallback toast from repeating it.
       lastError.value = error as ErrorPayload;
+      markHandled(error);
       return null;
     } finally {
       busy.value = false;
@@ -81,6 +98,7 @@ export const useReposStore = defineStore("repos", () => {
       return info;
     } catch (error) {
       lastError.value = error as ErrorPayload;
+      markHandled(error);
       return null;
     } finally {
       busy.value = false;
@@ -127,6 +145,7 @@ export const useReposStore = defineStore("repos", () => {
       return info;
     } catch (error) {
       lastError.value = error as ErrorPayload;
+      markHandled(error);
       return null;
     } finally {
       busy.value = false;
@@ -152,6 +171,7 @@ export const useReposStore = defineStore("repos", () => {
       nearby.value = [];
       nearbyState.value = "empty";
       lastError.value = error as ErrorPayload;
+      markHandled(error);
     }
   }
 
@@ -172,6 +192,7 @@ export const useReposStore = defineStore("repos", () => {
       return null;
     } catch (error) {
       lastError.value = error as ErrorPayload;
+      markHandled(error);
       return lastError.value;
     }
   }
@@ -192,6 +213,7 @@ export const useReposStore = defineStore("repos", () => {
     clone,
     discoverNearby,
     select,
+    refreshInfo,
     remove,
     reveal,
     upsert,

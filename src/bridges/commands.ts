@@ -43,7 +43,7 @@ import type {
   PullOptions,
   RebaseOptions,
   ReleaseNotes,
-  RemoteFetchExecutionMode,
+  RemoteFetchOptions,
   RepoId,
   RepoInfo,
   RepoRoot,
@@ -123,6 +123,11 @@ export function diagnosticsDismissCrash(): Promise<void> {
 
 export function repositoryOpen(path: string, sender: SenderTag = "dialogue"): Promise<RepoInfo> {
   return call<RepoInfo>("repository_open", { args: { path, sender } });
+}
+
+/** Re-read HEAD and integration state for an open repository after ref changes. */
+export function repositoryRefresh(repo: RepoId): Promise<RepoInfo> {
+  return call<RepoInfo>("repository_refresh", { args: { repo } });
 }
 
 export function repositoryInit(
@@ -351,13 +356,20 @@ export function repositoryRemotesLoad(repo: RepoId): Promise<RepositoryRemotes> 
   return call<RepositoryRemotes>("repository_remotes_load", { args: { repo } });
 }
 
+/**
+ * Fetch a remote.
+ *
+ * `opts` is the per-invocation policy `{ prune, tags, depth }` — the same
+ * shape `RepositoryRemote.fetchMode` reports, and *not* the `all | specified`
+ * enum, which describes a remote's stored refspecs rather than one fetch.
+ */
 export function remoteFetch(
   repo: RepoId,
   remote: string,
   refspecs: string[] = [],
-  mode: RemoteFetchExecutionMode = "all",
+  opts: RemoteFetchOptions = {},
 ): Promise<unknown> {
-  return call<unknown>("remote_fetch", { args: { repo, remote, refspecs, mode } });
+  return call<unknown>("remote_fetch", { args: { repo, remote, refspecs, mode: opts } });
 }
 
 export function remotePull(

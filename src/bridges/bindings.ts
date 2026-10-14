@@ -500,11 +500,32 @@ export interface CommitResult {
 /** Per-repository fetch preferences, used only by remote config commands. */
 export type RemoteFetchMode = "default" | "prune" | "tags" | "pruneTags";
 
-/** Which refs a single `remote_fetch` operation fetches. */
-export type RemoteFetchExecutionMode = "all" | "specified";
+/** Tag handling for one `remote_fetch` (Rust `TagFetch`, camelCase). */
+export type TagFetch = "unspecified" | "follow" | "all" | "none";
+
+/**
+ * Per-invocation fetch policy (Rust `engine::remotes::RemoteFetchMode`).
+ *
+ * Distinct from the `all | specified` enum, which describes how a remote's
+ * stored refspecs are shaped; that one never travels on `remote_fetch`.
+ */
+export interface RemoteFetchOptions {
+  prune?: boolean;
+  tags?: TagFetch;
+  depth?: number | null;
+}
+
+/**
+ * How `pull` integrates the fetched commits (Rust `PullMode`, camelCase).
+ *
+ * The third variant is `fastForwardOnly`, not `ffOnly`: the wire value is the
+ * Rust variant name under `rename_all = "camelCase"`, and an abbreviation that
+ * is not on the wire is a payload serde rejects.
+ */
+export type PullMode = "merge" | "rebase" | "fastForwardOnly";
 
 export interface PullOptions {
-  mode?: "merge" | "rebase" | "ffOnly";
+  mode?: PullMode;
   message?: string;
 }
 

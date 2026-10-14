@@ -4,8 +4,10 @@ import { defineStore } from "pinia";
 import type { BranchInfo, ErrorPayload, RepoId } from "../bridges/bindings";
 import * as commands from "../bridges/commands";
 import { dataState, errorState, type LoadState } from "./loadState";
+import { useReposStore } from "./repos";
 
 export const useBranchesStore = defineStore("branches", () => {
+  const repos = useReposStore();
   const state = ref<LoadState<BranchInfo[]>>({ status: "empty" });
   /** Local branches only: the create/checkout/rename verbs act on these. */
   const branches = ref<BranchInfo[]>([]);
@@ -49,6 +51,7 @@ export const useBranchesStore = defineStore("branches", () => {
     lastError.value = null;
     try {
       const info = await commands.branchCreate(repo, name, { kind: "head" }, checkout, "dialogue");
+      if (checkout) await repos.refreshInfo(repo);
       await refresh(repo);
       return info;
     } catch (error) {
@@ -61,6 +64,9 @@ export const useBranchesStore = defineStore("branches", () => {
     lastError.value = null;
     try {
       await commands.branchCheckout(repo, name, {});
+      // HEAD moved: the repository's own view of it has to move with it, or the
+      // toolbar pushes whatever branch was checked out when it was opened.
+      await repos.refreshInfo(repo);
       await refresh(repo);
       return true;
     } catch (error) {
@@ -77,6 +83,7 @@ export const useBranchesStore = defineStore("branches", () => {
     const nameExists = branches.value.some((branch) => branch.name === suggestedName);
     try {
       await commands.branchCheckoutRemote(repo, shorthand, nameExists ? undefined : suggestedName, true);
+      await repos.refreshInfo(repo);
       await refresh(repo);
       return true;
     } catch (error) {
@@ -89,6 +96,7 @@ export const useBranchesStore = defineStore("branches", () => {
     lastError.value = null;
     try {
       const info = await commands.branchRename(repo, old, next, force);
+      if (old === repos.selected?.headBranch) await repos.refreshInfo(repo);
       await refresh(repo);
       return info;
     } catch (error) {
@@ -101,6 +109,7 @@ export const useBranchesStore = defineStore("branches", () => {
     lastError.value = null;
     try {
       await commands.branchDelete(repo, names, force);
+      if (names.includes(repos.selected?.headBranch ?? "")) await repos.refreshInfo(repo);
       await refresh(repo);
       return true;
     } catch (error) {

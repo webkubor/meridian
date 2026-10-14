@@ -1,0 +1,1175 @@
+[
+  {
+    "wrapper": "appFeedbackCompose",
+    "case": "minimal",
+    "command": "app_feedback_compose",
+    "payload": {
+      "args": {
+        "kind": "feature"
+      }
+    }
+  },
+  {
+    "wrapper": "appFeedbackCompose",
+    "case": "populated",
+    "command": "app_feedback_compose",
+    "payload": {
+      "args": {
+        "context": "sample diagnostics",
+        "kind": "bug",
+        "summary": "sample report"
+      }
+    }
+  },
+  {
+    "wrapper": "appInfoLoad",
+    "case": "populated",
+    "command": "app_info_load",
+    "payload": null
+  },
+  {
+    "wrapper": "call",
+    "case": "populated",
+    "command": "app_info_load",
+    "payload": null
+  },
+  {
+    "wrapper": "pickDirectory",
+    "case": "populated",
+    "command": "app_pick_directory",
+    "payload": null
+  },
+  {
+    "wrapper": "relaunch",
+    "case": "populated",
+    "command": "app_relaunch",
+    "payload": null
+  },
+  {
+    "wrapper": "appReleaseNotesLoad",
+    "case": "defaults",
+    "command": "app_release_notes_load",
+    "payload": {
+      "args": {
+        "locale": null
+      }
+    }
+  },
+  {
+    "wrapper": "appReleaseNotesLoad",
+    "case": "populated",
+    "command": "app_release_notes_load",
+    "payload": {
+      "args": {
+        "locale": "en"
+      }
+    }
+  },
+  {
+    "wrapper": "appUpdateCheck",
+    "case": "populated",
+    "command": "app_update_check",
+    "payload": null
+  },
+  {
+    "wrapper": "appUpdateInstall",
+    "case": "populated",
+    "command": "app_update_install",
+    "payload": {
+      "onProgress": {
+        "$channel": true
+      }
+    }
+  },
+  {
+    "wrapper": "branchCheckoutRemote",
+    "case": "defaults",
+    "command": "branch_checkout_remote",
+    "payload": {
+      "args": {
+        "remoteBranch": "origin/main",
+        "repo": "repo-contract",
+        "track": true
+      }
+    }
+  },
+  {
+    "wrapper": "branchCheckoutRemote",
+    "case": "populated",
+    "command": "branch_checkout_remote",
+    "payload": {
+      "args": {
+        "localName": "main",
+        "remoteBranch": "origin/main",
+        "repo": "repo-contract",
+        "track": true
+      }
+    }
+  },
+  {
+    "wrapper": "branchCheckout",
+    "case": "defaults",
+    "command": "branch_checkout",
+    "payload": {
+      "args": {
+        "name": "main",
+        "opts": {},
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "branchCheckout",
+    "case": "populated",
+    "command": "branch_checkout",
+    "payload": {
+      "args": {
+        "name": "main",
+        "opts": {
+          "detach": false
+        },
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "branchCreate",
+    "case": "defaults",
+    "command": "branch_create",
+    "payload": {
+      "args": {
+        "checkout": true,
+        "name": "contract",
+        "repo": "repo-contract",
+        "sender": "dialogue",
+        "start": {
+          "kind": "head"
+        }
+      }
+    }
+  },
+  {
+    "wrapper": "branchCreate",
+    "case": "populated",
+    "command": "branch_create",
+    "payload": {
+      "args": {
+        "checkout": true,
+        "name": "contract",
+        "repo": "repo-contract",
+        "sender": "dialogue",
+        "start": {
+          "kind": "branch",
+          "value": "main"
+        }
+      }
+    }
+  },
+  {
+    "wrapper": "branchDelete",
+    "case": "defaults",
+    "command": "branch_delete",
+    "payload": {
+      "args": {
+        "force": false,
+        "names": [
+          "old"
+        ],
+        "repo": "repo-contract",
+        "sender": "dialogue"
+      }
+    }
+  },
+  {
+    "wrapper": "branchDelete",
+    "case": "populated",
+    "command": "branch_delete",
+    "payload": {
+      "args": {
+        "force": false,
+        "names": [
+          "old"
+        ],
+        "repo": "repo-contract",
+        "sender": "dialogue"
+      }
+    }
+  },
+  {
+    "wrapper": "branchList",
+    "case": "defaults",
+    "command": "branch_list",
+    "payload": {
+      "args": {
+        "filter": "local",
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "branchList",
+    "case": "populated",
+    "command": "branch_list",
+    "payload": {
+      "args": {
+        "filter": "all",
+        "repo": "repo-contract",
+        "search": "main"
+      }
+    }
+  },
+  {
+    "wrapper": "branchRename",
+    "case": "defaults",
+    "command": "branch_rename",
+    "payload": {
+      "args": {
+        "force": false,
+        "new": "new",
+        "old": "old",
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "branchRename",
+    "case": "populated",
+    "command": "branch_rename",
+    "payload": {
+      "args": {
+        "force": false,
+        "new": "new",
+        "old": "old",
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "commitAmend",
+    "case": "defaults",
+    "command": "commit_amend",
+    "payload": {
+      "args": {
+        "message": null,
+        "opts": {},
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "commitAmend",
+    "case": "populated",
+    "command": "commit_amend",
+    "payload": {
+      "args": {
+        "message": null,
+        "opts": {
+          "committer": {
+            "email": "test@example.com",
+            "name": "Contract Tester",
+            "time": 1700000000
+          },
+          "sign": {
+            "key": "test-key",
+            "kind": "gpg"
+          },
+          "signOff": true,
+          "skipHooks": false,
+          "templateUsed": false
+        },
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "commitCreate",
+    "case": "defaults",
+    "command": "commit_create",
+    "payload": {
+      "args": {
+        "message": "sample commit",
+        "opts": {},
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "commitCreate",
+    "case": "populated",
+    "command": "commit_create",
+    "payload": {
+      "args": {
+        "message": "sample commit",
+        "opts": {
+          "committer": {
+            "email": "test@example.com",
+            "name": "Contract Tester",
+            "time": 1700000000
+          },
+          "sign": {
+            "kind": "none"
+          },
+          "signOff": true,
+          "skipHooks": false,
+          "templateUsed": false
+        },
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "diagnosticsDebugGet",
+    "case": "populated",
+    "command": "diagnostics_debug_get",
+    "payload": null
+  },
+  {
+    "wrapper": "diagnosticsDebugSet",
+    "case": "populated",
+    "command": "diagnostics_debug_set",
+    "payload": {
+      "args": {
+        "enabled": true
+      }
+    }
+  },
+  {
+    "wrapper": "diagnosticsDismissCrash",
+    "case": "populated",
+    "command": "diagnostics_dismiss_crash",
+    "payload": null
+  },
+  {
+    "wrapper": "diagnosticsExport",
+    "case": "populated",
+    "command": "diagnostics_export",
+    "payload": {
+      "args": {
+        "context": "contract sample"
+      }
+    }
+  },
+  {
+    "wrapper": "diagnosticsExport",
+    "case": "withoutContext",
+    "command": "diagnostics_export",
+    "payload": {
+      "args": {}
+    }
+  },
+  {
+    "wrapper": "diagnosticsLastCrash",
+    "case": "populated",
+    "command": "diagnostics_last_crash",
+    "payload": null
+  },
+  {
+    "wrapper": "diagnosticsLogTail",
+    "case": "populated",
+    "command": "diagnostics_log_tail",
+    "payload": {
+      "args": {
+        "lines": 20
+      }
+    }
+  },
+  {
+    "wrapper": "diagnosticsLogWrite",
+    "case": "populated",
+    "command": "diagnostics_log_write",
+    "payload": {
+      "args": {
+        "level": "error",
+        "message": "sample failure",
+        "source": "ipc-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "diagnosticsLogWrite",
+    "case": "withoutSource",
+    "command": "diagnostics_log_write",
+    "payload": {
+      "args": {
+        "level": "info",
+        "message": "sample"
+      }
+    }
+  },
+  {
+    "wrapper": "diagnosticsOpenDevtools",
+    "case": "populated",
+    "command": "diagnostics_open_devtools",
+    "payload": null
+  },
+  {
+    "wrapper": "diagnosticsRevealLogs",
+    "case": "populated",
+    "command": "diagnostics_reveal_logs",
+    "payload": null
+  },
+  {
+    "wrapper": "historyChangesetLoad",
+    "case": "defaults",
+    "command": "history_changeset_load",
+    "payload": {
+      "args": {
+        "oid": "0123456789abcdef0123456789abcdef01234567",
+        "opts": {
+          "detectRenames": true
+        },
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "historyChangesetLoad",
+    "case": "populated",
+    "command": "history_changeset_load",
+    "payload": {
+      "args": {
+        "oid": "0123456789abcdef0123456789abcdef01234567",
+        "opts": {
+          "detectRenames": true
+        },
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "historyCommitLoad",
+    "case": "populated",
+    "command": "history_commit_load",
+    "payload": {
+      "args": {
+        "oid": "0123456789abcdef0123456789abcdef01234567",
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "historyCommitsLoad",
+    "case": "defaults",
+    "command": "history_commits_load",
+    "payload": {
+      "args": {
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "historyCommitsLoad",
+    "case": "populated",
+    "command": "history_commits_load",
+    "payload": {
+      "args": {
+        "firstParent": false,
+        "followRenames": true,
+        "from": {
+          "kind": "head"
+        },
+        "limit": 25,
+        "path": "README.md",
+        "repo": "repo-contract",
+        "search": "sample",
+        "searchMode": "message",
+        "skip": 0,
+        "sort": "date",
+        "to": {
+          "kind": "branch",
+          "value": "main"
+        }
+      }
+    }
+  },
+  {
+    "wrapper": "historyContributorsLoad",
+    "case": "populated",
+    "command": "history_contributors_load",
+    "payload": {
+      "args": {
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "historyGraphCompute",
+    "case": "populated",
+    "command": "history_graph_compute",
+    "payload": {
+      "args": {
+        "oids": [
+          "0123456789abcdef0123456789abcdef01234567"
+        ],
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "historyCompareSummary",
+    "case": "populated",
+    "command": "history_merge_base",
+    "payload": {
+      "args": {
+        "left": {
+          "kind": "head"
+        },
+        "repo": "repo-contract",
+        "right": {
+          "kind": "branch",
+          "value": "main"
+        }
+      }
+    }
+  },
+  {
+    "wrapper": "integrationContinue",
+    "case": "defaults",
+    "command": "integration_continue",
+    "payload": {
+      "args": {
+        "message": null,
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "integrationContinue",
+    "case": "populated",
+    "command": "integration_continue",
+    "payload": {
+      "args": {
+        "message": null,
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "integrationSkip",
+    "case": "populated",
+    "command": "integration_skip",
+    "payload": {
+      "args": {
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "mergeAbort",
+    "case": "populated",
+    "command": "merge_abort",
+    "payload": {
+      "args": {
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "mergeStart",
+    "case": "defaults",
+    "command": "merge_start",
+    "payload": {
+      "args": {
+        "opts": {},
+        "repo": "repo-contract",
+        "revision": {
+          "kind": "branch",
+          "value": "main"
+        }
+      }
+    }
+  },
+  {
+    "wrapper": "mergeStart",
+    "case": "populated",
+    "command": "merge_start",
+    "payload": {
+      "args": {
+        "opts": {
+          "alwaysMergeCommit": false,
+          "autoCommit": true,
+          "autostash": false,
+          "message": "",
+          "squash": false,
+          "strategy": "default",
+          "verifySignatures": false
+        },
+        "repo": "repo-contract",
+        "revision": {
+          "kind": "branch",
+          "value": "main"
+        }
+      }
+    }
+  },
+  {
+    "wrapper": "mergeToolInvoke",
+    "case": "populated",
+    "command": "merge_tool_invoke",
+    "payload": {
+      "args": {
+        "paths": [
+          "README.md"
+        ],
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "rebaseStart",
+    "case": "defaults",
+    "command": "rebase_start",
+    "payload": {
+      "args": {
+        "onto": null,
+        "opts": {},
+        "repo": "repo-contract",
+        "upstream": {
+          "kind": "branch",
+          "value": "main"
+        }
+      }
+    }
+  },
+  {
+    "wrapper": "rebaseStart",
+    "case": "populated",
+    "command": "rebase_start",
+    "payload": {
+      "args": {
+        "onto": null,
+        "opts": {
+          "autostash": false,
+          "verifySignatures": false
+        },
+        "repo": "repo-contract",
+        "upstream": {
+          "kind": "branch",
+          "value": "main"
+        }
+      }
+    }
+  },
+  {
+    "wrapper": "remoteFetch",
+    "case": "defaults",
+    "command": "remote_fetch",
+    "payload": {
+      "args": {
+        "mode": {},
+        "refspecs": [],
+        "remote": "origin",
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "remoteFetch",
+    "case": "populated",
+    "command": "remote_fetch",
+    "payload": {
+      "args": {
+        "mode": {
+          "prune": true,
+          "tags": "follow"
+        },
+        "refspecs": [
+          "+refs/heads/*:refs/remotes/origin/*"
+        ],
+        "remote": "origin",
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "remotePublishBranch",
+    "case": "defaults",
+    "command": "remote_publish_branch",
+    "payload": {
+      "args": {
+        "branch": "main",
+        "remote": "origin",
+        "repo": "repo-contract",
+        "setUpstream": false
+      }
+    }
+  },
+  {
+    "wrapper": "remotePublishBranch",
+    "case": "populated",
+    "command": "remote_publish_branch",
+    "payload": {
+      "args": {
+        "branch": "main",
+        "remote": "origin",
+        "repo": "repo-contract",
+        "setUpstream": true
+      }
+    }
+  },
+  {
+    "wrapper": "remotePull",
+    "case": "defaults",
+    "command": "remote_pull",
+    "payload": {
+      "args": {
+        "branch": null,
+        "opts": {},
+        "remote": "origin",
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "remotePull",
+    "case": "fastForwardOnly",
+    "command": "remote_pull",
+    "payload": {
+      "args": {
+        "branch": "main",
+        "opts": {
+          "mode": "fastForwardOnly"
+        },
+        "remote": "origin",
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "remotePull",
+    "case": "populated",
+    "command": "remote_pull",
+    "payload": {
+      "args": {
+        "branch": null,
+        "opts": {
+          "message": "",
+          "mode": "merge"
+        },
+        "remote": "origin",
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "remotePull",
+    "case": "rebase",
+    "command": "remote_pull",
+    "payload": {
+      "args": {
+        "branch": "main",
+        "opts": {
+          "mode": "rebase"
+        },
+        "remote": "origin",
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "repositoryCloneDestination",
+    "case": "populated",
+    "command": "repository_clone_suggest_destination",
+    "payload": {
+      "url": "https://example.com/meridian.git"
+    }
+  },
+  {
+    "wrapper": "repositoryClone",
+    "case": "defaults",
+    "command": "repository_clone",
+    "payload": {
+      "args": {
+        "destination": "",
+        "url": "https://example.com/meridian.git"
+      }
+    }
+  },
+  {
+    "wrapper": "repositoryClone",
+    "case": "populated",
+    "command": "repository_clone",
+    "payload": {
+      "args": {
+        "bare": false,
+        "destination": "/tmp/meridian-clone",
+        "initialBranch": "main",
+        "url": "https://example.com/meridian.git"
+      }
+    }
+  },
+  {
+    "wrapper": "repositoryDiscover",
+    "case": "defaults",
+    "command": "repository_discover",
+    "payload": {
+      "args": {
+        "root": "/tmp"
+      }
+    }
+  },
+  {
+    "wrapper": "repositoryDiscover",
+    "case": "populated",
+    "command": "repository_discover",
+    "payload": {
+      "args": {
+        "ignored": [
+          ".git"
+        ],
+        "maxDepth": 2,
+        "root": "/tmp"
+      }
+    }
+  },
+  {
+    "wrapper": "repositoryInit",
+    "case": "defaults",
+    "command": "repository_init",
+    "payload": {
+      "args": {
+        "path": "/tmp/meridian-init"
+      }
+    }
+  },
+  {
+    "wrapper": "repositoryInit",
+    "case": "populated",
+    "command": "repository_init",
+    "payload": {
+      "args": {
+        "bare": false,
+        "createGitignore": true,
+        "initialBranch": "main",
+        "path": "/tmp/meridian-init"
+      }
+    }
+  },
+  {
+    "wrapper": "repositoryOpen",
+    "case": "defaults",
+    "command": "repository_open",
+    "payload": {
+      "args": {
+        "path": "/tmp/meridian",
+        "sender": "dialogue"
+      }
+    }
+  },
+  {
+    "wrapper": "repositoryOpen",
+    "case": "populated",
+    "command": "repository_open",
+    "payload": {
+      "args": {
+        "path": "/tmp/meridian",
+        "sender": "dialogue"
+      }
+    }
+  },
+  {
+    "wrapper": "repositoryRefresh",
+    "case": "populated",
+    "command": "repository_refresh",
+    "payload": {
+      "args": {
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "repositoryRemotesLoad",
+    "case": "populated",
+    "command": "repository_remotes_load",
+    "payload": {
+      "args": {
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "stashSave",
+    "case": "defaults",
+    "command": "stash_save",
+    "payload": {
+      "args": {
+        "opts": {},
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "stashSave",
+    "case": "populated",
+    "command": "stash_save",
+    "payload": {
+      "args": {
+        "opts": {
+          "includeIgnored": false,
+          "includeUntracked": false,
+          "keepIndex": false,
+          "message": "sample",
+          "paths": []
+        },
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "wcChunkApply",
+    "case": "defaults",
+    "command": "wc_chunk_apply",
+    "payload": {
+      "args": {
+        "direction": "unstage",
+        "hunk": {
+          "header": "@@ -1 +1 @@",
+          "index": 0,
+          "newLines": 1,
+          "newStart": 1,
+          "oldLines": 1,
+          "oldStart": 1,
+          "path": "README.md",
+          "perspective": "workingTreeToIndex"
+        },
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "wcChunkApply",
+    "case": "populated",
+    "command": "wc_chunk_apply",
+    "payload": {
+      "args": {
+        "contextLines": 3,
+        "direction": "stage",
+        "hunk": {
+          "header": "@@ -1 +1 @@",
+          "index": 0,
+          "newLines": 1,
+          "newStart": 1,
+          "oldLines": 1,
+          "oldStart": 1,
+          "path": "README.md",
+          "perspective": "workingTreeToIndex"
+        },
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "wcChunkDiscard",
+    "case": "defaults",
+    "command": "wc_chunk_discard",
+    "payload": {
+      "args": {
+        "hunk": {
+          "header": "@@ -1 +1 @@",
+          "index": 0,
+          "newLines": 1,
+          "newStart": 1,
+          "oldLines": 1,
+          "oldStart": 1,
+          "path": "README.md",
+          "perspective": "workingTreeToIndex"
+        },
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "wcChunkDiscard",
+    "case": "populated",
+    "command": "wc_chunk_discard",
+    "payload": {
+      "args": {
+        "contextLines": 3,
+        "hunk": {
+          "header": "@@ -1 +1 @@",
+          "index": 0,
+          "newLines": 1,
+          "newStart": 1,
+          "oldLines": 1,
+          "oldStart": 1,
+          "path": "README.md",
+          "perspective": "workingTreeToIndex"
+        },
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "wcDiffLoad",
+    "case": "defaults",
+    "command": "wc_diff_load",
+    "payload": {
+      "args": {
+        "opts": {},
+        "path": null,
+        "perspective": "indexToBase",
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "wcDiffLoad",
+    "case": "populated",
+    "command": "wc_diff_load",
+    "payload": {
+      "args": {
+        "opts": {
+          "contextLines": 3,
+          "ignoreWhitespace": false,
+          "showFull": false,
+          "syntax": "markdown"
+        },
+        "path": "README.md",
+        "perspective": "workingTreeToIndex",
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "wcEntryAssumeUnchangedSet",
+    "case": "populated",
+    "command": "wc_entry_assume_unchanged_set",
+    "payload": {
+      "args": {
+        "paths": [
+          "README.md"
+        ],
+        "repo": "repo-contract",
+        "value": true
+      }
+    }
+  },
+  {
+    "wrapper": "wcEntryOpen",
+    "case": "populated",
+    "command": "wc_entry_open",
+    "payload": {
+      "args": {
+        "path": "README.md",
+        "repo": "repo-contract",
+        "target": "editor"
+      }
+    }
+  },
+  {
+    "wrapper": "wcImageDataLoad",
+    "case": "populated",
+    "command": "wc_image_data_load",
+    "payload": {
+      "args": {
+        "path": "image.png",
+        "repo": "repo-contract",
+        "side": "new"
+      }
+    }
+  },
+  {
+    "wrapper": "wcMergeStatusLoad",
+    "case": "defaults",
+    "command": "wc_merge_status_load",
+    "payload": {
+      "args": {
+        "repo": "repo-contract",
+        "revision": null
+      }
+    }
+  },
+  {
+    "wrapper": "wcMergeStatusLoad",
+    "case": "populated",
+    "command": "wc_merge_status_load",
+    "payload": {
+      "args": {
+        "repo": "repo-contract",
+        "revision": null
+      }
+    }
+  },
+  {
+    "wrapper": "wcPathsDiscard",
+    "case": "defaults",
+    "command": "wc_paths_discard",
+    "payload": {
+      "args": {
+        "opts": {},
+        "paths": [
+          "README.md"
+        ],
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "wcPathsDiscard",
+    "case": "populated",
+    "command": "wc_paths_discard",
+    "payload": {
+      "args": {
+        "opts": {
+          "confirmToken": "confirmed",
+          "includeUntracked": false
+        },
+        "paths": [
+          "README.md"
+        ],
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "wcStagePaths",
+    "case": "populated",
+    "command": "wc_stage_paths",
+    "payload": {
+      "args": {
+        "paths": [
+          "README.md"
+        ],
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "wcStatusLoad",
+    "case": "defaults",
+    "command": "wc_status_load",
+    "payload": {
+      "args": {
+        "opts": {},
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "wcStatusLoad",
+    "case": "populated",
+    "command": "wc_status_load",
+    "payload": {
+      "args": {
+        "opts": {
+          "includeDirs": false,
+          "includeIgnored": true
+        },
+        "repo": "repo-contract"
+      }
+    }
+  },
+  {
+    "wrapper": "wcUnstagePaths",
+    "case": "populated",
+    "command": "wc_unstage_paths",
+    "payload": {
+      "args": {
+        "paths": [
+          "README.md"
+        ],
+        "repo": "repo-contract"
+      }
+    }
+  }
+]

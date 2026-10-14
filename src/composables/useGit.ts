@@ -30,7 +30,16 @@ export function useGit() {
   }
 
   async function refreshAll(repo: RepoId): Promise<void> {
-    await Promise.all([branches.refresh(repo), workingCopy.refresh(repo), history.refresh(repo)]);
+    // The repository record carries HEAD. Refresh it alongside the other
+    // stores: a pull that moves HEAD leaves `repos.selected.headBranch` naming
+    // the old branch, and the next Push publishes that instead of the branch the
+    // user is actually on.
+    await Promise.all([
+      repos.refreshInfo(repo),
+      branches.refresh(repo),
+      workingCopy.refresh(repo),
+      history.refresh(repo),
+    ]);
   }
 
   async function run(action: (repo: RepoId) => Promise<unknown>): Promise<ErrorPayload | null> {
