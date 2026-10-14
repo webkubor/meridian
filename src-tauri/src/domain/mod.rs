@@ -6,6 +6,7 @@
 pub mod app;
 pub mod commit;
 pub mod conflict;
+pub mod diagnostics;
 pub mod error;
 pub mod history;
 pub mod ids;

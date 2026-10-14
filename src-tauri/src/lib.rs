@@ -33,22 +33,31 @@ pub mod commands;
 pub mod domain;
 pub mod engine;
 pub mod events;
+pub mod logging;
 pub mod queue;
 pub mod state;
 pub mod transform;
 pub mod validation;
 
 pub fn run() {
-    tauri::Builder::default()
-        // Opener backs "open in browser / Finder"; process backs the relaunch
-        // after a self-update; updater is inert until `plugins.updater` in
-        // tauri.conf.json carries a public key.
-        .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_process::init())
-        .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
-        .manage(state::AppState::new())
-        .invoke_handler(tauri::generate_handler![
+    let mut context = tauri::generate_context!();
+    logging::configure_context(&mut context);
+    // The handler is bound first so `log_invoke_handler` can wrap it: every
+    // command that reaches the web layer passes through the wrapper, which is
+    // what gives plain `#[tauri::command]` fns an entry line — their failures
+    // are otherwise only reported by the frontend wrapper.
+    let handler: Box<dyn Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + Send + Sync> =
+        Box::new(tauri::generate_handler![
+            // --- diagnostics -----------------------------------------------
+            commands::diagnostics_log_tail,
+            commands::diagnostics_log_write,
+            commands::diagnostics_debug_get,
+            commands::diagnostics_debug_set,
+            commands::diagnostics_reveal_logs,
+            commands::diagnostics_export,
+            commands::diagnostics_open_devtools,
+            commands::diagnostics_last_crash,
+            commands::diagnostics_dismiss_crash,
             // --- application (no repository) --------------------------------
             // The only family not addressed to a repository; see
             // `commands/app.rs` for why it does not go through `Command`.
@@ -196,7 +205,21 @@ pub fn run() {
             commands::conflict_hunks_load,
             commands::conflict_resolve_hunks,
             commands::diff_tool_invoke,
-        ])
-        .run(tauri::generate_context!())
+        ]);
+    tauri::Builder::default()
+        .setup(|app| {
+            logging::initialize(app.handle()).map_err(std::io::Error::other)?;
+            Ok(())
+        })
+        // Opener backs "open in browser / Finder"; process backs the relaunch
+        // after a self-update; updater is inert until `plugins.updater` in
+        // tauri.conf.json carries a public key.
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .manage(state::AppState::new())
+        .invoke_handler(logging::log_invoke_handler(handler))
+        .run(context)
         .expect("error while running meridian");
 }
