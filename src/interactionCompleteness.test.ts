@@ -166,3 +166,22 @@ describe("every button in a template is wired to something", () => {
     expect(inert).toEqual([]);
   });
 });
+describe("the document gives the app somewhere to mount", () => {
+  // Regression: a rewritten `index.html` lost `<div id="app">`. Vue reported a
+  // failed mount, rendered nothing, and no command ever ran — so the window was
+  // blank *and* the log was empty, which is the exact failure mode this file
+  // exists to prevent. `main.ts` mounts to "#app"; the element must be there.
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+
+  it('provides the mount target main.ts asks for', () => {
+    const mainTs = readFileSync(new URL("./main.ts", import.meta.url), "utf8");
+    const selector = mainTs.match(/mount\(\s*"([^"]+)"\s*\)/)?.[1];
+    expect(selector, "main.ts must mount through a string selector").toBe("#app");
+    expect(html).toContain('id="app"');
+  });
+
+  it("keeps the boot panel so a failed startup is still explained", () => {
+    expect(html).toContain('id="boot"');
+    expect(html).toContain("boot-guard.js");
+  });
+});

@@ -73,6 +73,10 @@
       <p id="boot-message"></p>
       <button id="boot-copy" type="button">复制 / Copy</button>
     </div>
+    <!-- The app's mount point. `main.ts` mounts to "#app"; without this element
+         Vue reports a failed mount and renders nothing at all, which looks
+         exactly like a hung app — blank window, empty log. -->
+    <div id="app"></div>
     <script src="/boot-guard.js"></script>
     <script type="module" src="/src/main.ts"></script>
   </body>
