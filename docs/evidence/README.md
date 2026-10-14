@@ -18,6 +18,22 @@
 | `../rea-out/ib-{aa..ag}.json` | 7 个批次的原始 REA 证据（可下钻） | 24 MB |
 | `binary-layout.json` | REA 能力受限（pwntools profile 仅支持 Linux x64），已用 otool 兜底 | 444 B |
 
+## 三处更正（分析 agent 复核后发现，以这里为准）
+
+原始采集说明里有三处不准确，已在后续分析中查实并纠正：
+
+1. **`ui-documents.txt` 的 `outlets:` / `actions:` 块实为空。** 真正的连接关系只存在于
+   `ui-graph.json`（`outlet` / `target_action` 节点与 `outlet_to` / `target_action` 边）。
+   量化结果：**1770 条 outlet 连接、263 个 action selector、331 条 target-action 边**。
+2. **`ui-all-classes.txt` 不是纯类名表**，而是类名与界面文案字符串的混合词表。纯界面类为
+   448 个 `GT*` 命名 + 58 个 Swift mangled 的 Tower 命名。
+3. **Action → Validator → Operation 是模式，不是不变式。** 数量上成立（194 Operation /
+   168 Action / 105 Validator），但存在例外：`GTGitLoadCommits` 无 Action，`GTGitClone` 未观察到 Validator。
+   复刻时按模式采纳，不要当成硬约束。
+
+另：`assets.json` / `assets2.json` 实际位于 `/tmp/rea-out/`，是同一份 1698 条 catalog 的
+offset 0 与 offset 1000 两页，两页均标记 `truncated: true`。
+
 ## 目标 bundle 结构（来自目录实勘）
 
 ```
