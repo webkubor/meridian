@@ -1,0 +1,96 @@
+import { ref } from "vue";
+
+import type { ErrorPayload, RepoId } from "../bridges/bindings";
+import * as commands from "../bridges/commands";
+import { useBranchesStore } from "../stores/branches";
+import { useHistoryStore } from "../stores/history";
+import { useReposStore } from "../stores/repos";
+import { useWorkingCopyStore } from "../stores/workingCopy";
+
+/**
+ * Repo-level git verbs (docs/03 §8 remote_*, §12 integrate_*): the actions the
+ * toolbar, the integration banner and the branch panes trigger. Each returns
+ * the backend `ErrorPayload` on failure (never a generic message) so the caller
+ * can surface exactly what the engine refused, or `null` on success.
+ *
+ * These verbs change refs / the working tree, so every success refreshes the
+ * branches, working-copy and history stores — the UI never has to guess.
+ */
+export function useGit() {
+  const repos = useReposStore();
+  const branches = useBranchesStore();
+  const workingCopy = useWorkingCopyStore();
+  const history = useHistoryStore();
+
+  const lastError = ref<ErrorPayload | null>(null);
+  const busy = ref(false);
+
+  function repoId(): RepoId | null {
+    return repos.selectedId;
+  }
+
+  async function refreshAll(repo: RepoId): Promise<void> {
+    await Promise.all([branches.refresh(repo), workingCopy.refresh(repo), history.refresh(repo)]);
+  }
+
+  async function run(action: (repo: RepoId) => Promise<unknown>): Promise<ErrorPayload | null> {
+    const id = repoId();
+    if (!id) return null;
+    busy.value = true;
+    lastError.value = null;
+    try {
+      await action(id);
+      await refreshAll(id);
+      return null;
+    } catch (error) {
+      lastError.value = error as ErrorPayload;
+      return lastError.value;
+    } finally {
+      busy.value = false;
+    }
+  }
+
+  return {
+    lastError,
+    busy,
+    fetch: () =>
+      run((id) => {
+        const remote = repos.defaultRemote;
+        if (!remote) throw missingRemote();
+        return commands.remoteFetch(id, remote);
+      }),
+    pull: () =>
+      run((id) => {
+        const remote = repos.defaultRemote;
+        if (!remote) throw missingRemote();
+        return commands.remotePull(id, remote);
+      }),
+    push: () =>
+      run((id) => {
+        const remote = repos.defaultRemote;
+        if (!remote) throw missingRemote();
+        const branch = repos.selected?.headBranch;
+        if (!branch) {
+          throw { code: "invalid_request", message: "HEAD is detached — check out a branch to push.", domain: "git", retryable: false } as ErrorPayload;
+        }
+        return commands.remotePublishBranch(id, remote, branch);
+      }),
+    stash: () => run((id) => commands.stashSave(id, {})),
+    merge: (name: string) =>
+      run((id) => commands.mergeStart(id, { kind: "branch", value: name }, { autoCommit: true })),
+    rebase: (name: string) =>
+      run((id) => commands.rebaseStart(id, { kind: "branch", value: name }, null, {})),
+    continueOperation: () => run((id) => commands.integrationContinue(id)),
+    abortOperation: () => run((id) => commands.mergeAbort(id)),
+    resolveConflict: (paths: string[]) => run((id) => commands.mergeToolInvoke(id, paths)),
+  };
+}
+
+function missingRemote(): ErrorPayload {
+  return {
+    code: "invalid_request",
+    message: "This repository has no remote configured.",
+    domain: "git",
+    retryable: false,
+  };
+}

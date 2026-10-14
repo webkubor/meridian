@@ -1,0 +1,274 @@
+/*
+ * Global baseline. Everything colour-bearing comes from tokens.css — no raw
+ * colour literals outside tokens.css (docs/04 §2, enforced by review).
+ *
+ * This file also carries the small set of *global* utility classes that the
+ * component layer shares (tone + file-status families, the chip, the mono
+ * face, scrollbars). Component-specific rules stay inside their SFCs.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--md-font-ui);
+  font-size: var(--md-text-md);
+  line-height: var(--md-leading-normal);
+  color: var(--md-fg);
+  background: var(--md-bg-canvas);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+input,
+textarea,
+select {
+  background: var(--md-bg-surface);
+  border: 1px solid var(--md-border-strong);
+  border-radius: var(--md-radius-md);
+  padding: var(--md-space-1) var(--md-space-2);
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  color: var(--md-fg-disabled);
+  background: var(--md-bg-sunken);
+}
+
+button {
+  border: 1px solid var(--md-border-strong);
+  border-radius: var(--md-radius-md);
+  background: var(--md-bg-surface);
+  padding: var(--md-space-1) var(--md-space-3);
+}
+
+button:hover:not(:disabled) {
+  background: var(--md-bg-hover);
+}
+
+button:disabled {
+  color: var(--md-fg-disabled);
+}
+
+/* A11y gate (docs/04 §1.7, §9): visible focus everywhere. */
+:focus-visible {
+  outline: 2px solid var(--md-accent);
+  outline-offset: 1px;
+  border-radius: var(--md-radius-sm);
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+::selection {
+  background: var(--md-bg-selected);
+}
+
+code,
+pre,
+.mono {
+  font-family: var(--md-font-mono);
+}
+
+/* ---- Tone utilities (UiStatusView.tone → colour) ------------------------- */
+
+.tone-neutral {
+  color: var(--md-fg-muted);
+}
+
+.tone-positive {
+  color: var(--md-success);
+}
+
+.tone-info {
+  color: var(--md-info);
+}
+
+.tone-warning {
+  color: var(--md-warning);
+}
+
+.tone-danger {
+  color: var(--md-danger);
+}
+
+.tone-muted {
+  color: var(--md-fg-subtle);
+}
+
+/* ---- File-status families (glyph + colour, never colour alone) ----------- */
+
+.status-added,
+.status-renamed {
+  background: var(--md-status-added-bg);
+  color: var(--md-status-added-fg);
+}
+
+.status-copied {
+  background: var(--md-status-copied-bg);
+  color: var(--md-status-copied-fg);
+}
+
+.status-modified {
+  background: var(--md-status-modified-bg);
+  color: var(--md-status-modified-fg);
+}
+
+.status-deleted {
+  background: var(--md-status-deleted-bg);
+  color: var(--md-status-deleted-fg);
+}
+
+.status-untracked {
+  background: var(--md-status-untracked-bg);
+  color: var(--md-status-untracked-fg);
+}
+
+.status-unmerged {
+  background: var(--md-status-unmerged-bg);
+  color: var(--md-status-unmerged-fg);
+}
+
+.status-ignored {
+  background: var(--md-status-ignored-bg);
+  color: var(--md-status-ignored-fg);
+}
+
+/* ---- Shared chrome bits -------------------------------------------------- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--md-space-1);
+  padding: 0 var(--md-space-2);
+  border-radius: var(--md-radius-sm);
+  background: var(--md-badge-bg);
+  color: var(--md-badge-fg);
+  font-size: var(--md-text-xs);
+  line-height: 18px;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Buttons: one vocabulary for the whole UI (docs/04 §1). `btn` is the neutral
+ * default already provided by the element baseline; the modifiers carry intent.
+ * Destructive primaries use the danger tone and are always the second step of
+ * a two-step flow (docs/04 §8.2). */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--md-space-1);
+  height: 24px;
+  font-size: var(--md-text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.btn.primary {
+  background: var(--md-accent);
+  border-color: var(--md-accent);
+  color: var(--md-accent-contrast);
+}
+
+.btn.primary:hover:not(:disabled) {
+  background: var(--md-accent-strong);
+  border-color: var(--md-accent-strong);
+}
+
+.btn.primary.danger {
+  background: var(--md-danger);
+  border-color: var(--md-danger);
+  color: var(--md-danger-contrast);
+}
+
+.btn.primary.danger:hover:not(:disabled) {
+  background: var(--md-danger);
+  opacity: 0.9;
+}
+
+.btn.ghost {
+  border-color: transparent;
+  background: transparent;
+}
+
+.btn.ghost:hover:not(:disabled) {
+  background: var(--md-bg-hover);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Thin scrollbars that read as macOS overlays. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--md-border-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--md-border-strong);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}

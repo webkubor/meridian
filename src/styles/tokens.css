@@ -1,0 +1,340 @@
+/*
+ * Meridian design tokens (docs/04 §2).
+ *
+ * Token NAMES are ours; the slot inventory is mapped to the evidence's
+ * semantic colour slots (`docs/evidence/git-tower-asset-names.txt`) so no state
+ * found in the evidence lacks a token. Every VALUE here is authored by us —
+ * nothing is copied from any other product.
+ *
+ * Structure: light values on `:root`, dark values on `.theme-dark`, and every
+ * light token has a dark counterpart, no exceptions. The only raw colour
+ * literals in the app live in this file.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ---- Colour: surfaces ---------------------------------------------------
+   * general_background_color / general_secondary_background_color /
+   * repository_blob_text_linenumber_background_color, text_view_off_page_background_color /
+   * general_header_background_color, general_secondary_header_background_color /
+   * general_alternate_row_background_color / general_hover_selection_background_color /
+   * selected_* + repository_pullrequests_conversation_selection_color
+   */
+  --md-bg-canvas: #f7f8fa;
+  --md-bg-surface: #ffffff;
+  --md-bg-sunken: #eef1f6;
+  --md-bg-header: #f2f4f8;
+  --md-bg-alt-row: #fafbfd;
+  --md-bg-hover: #e8ecf3;
+  --md-bg-selected: #dde7fd;
+  --md-bg-selected-muted: #eaf0fc;
+  /* general_header_background_color over scrolled content (sticky headers) */
+  --md-bg-header-translucent: rgba(242, 244, 248, 0.92);
+
+  /* ---- Colour: borders ----------------------------------------------------
+   * general_border_color / general_inactive_border_color / text_view_page_separator_color
+   */
+  --md-border: #dfe4ec;
+  --md-border-strong: #c6cedb;
+  --md-border-inactive: #eaedf3;
+
+  /* ---- Colour: text -------------------------------------------------------
+   * text_view_{primary,secondary}_disabled_text_color + observed text colours
+   */
+  --md-fg: #101828;
+  --md-fg-muted: #5a6478;
+  --md-fg-subtle: #8a93a6;
+  --md-fg-disabled: #b3bbc9;
+
+  /* ---- Colour: accent -----------------------------------------------------
+   * accent_primary_color / accent_secondary_color, carrying the brand palette
+   * (aurora blue + cyan, see design/make-icon.py). Light mode uses a shade
+   * deeper than the brand mark so body-sized accent text holds contrast on
+   * white; --md-sun is the mark's amber, and is the only place the app puts
+   * "where HEAD is right now".
+   */
+  --md-accent: #2f6fe4;
+  --md-accent-strong: #1d51b8;
+  --md-accent-contrast: #ffffff;
+  --md-accent-secondary: #0b7f96;
+  --md-sun: #f59e0b;
+  --md-sun-strong: #a35c00;
+
+  /* ---- Colour: semantics --------------------------------------------------
+   * success_tint_color / warning_tint_color / red_badge_background_color / hint backgrounds
+   */
+  --md-success: #2e9e5b;
+  --md-warning: #b57000;
+  --md-danger: #c43d2e;
+  --md-danger-contrast: #ffffff;
+  --md-info: #2f6fe4;
+
+  /* Hint banners (translucent) — general_info_background_color, general_warning_bg_color,
+   * {Blue,Green,Red,Yellow}HintBackgroundColor */
+  --md-bg-info-soft: rgba(47, 111, 228, 0.08);
+  --md-bg-success-soft: rgba(46, 158, 91, 0.1);
+  --md-bg-warning-soft: rgba(181, 112, 0, 0.1);
+  --md-bg-danger-soft: rgba(196, 61, 46, 0.09);
+
+  /* ---- Colour: file-status families --------------------------------------
+   * {blue,gray,green,red,yellow}_file_status_{background,text}_color +
+   * default_file_status_text_color
+   */
+  --md-status-added-bg: #e3f3e8;
+  --md-status-added-fg: #1e7a43;
+  --md-status-copied-bg: #e8eef9;
+  --md-status-copied-fg: #3b5fa8;
+  --md-status-modified-bg: #fbf0dc;
+  --md-status-modified-fg: #8a6410;
+  --md-status-deleted-bg: #fbe4e1;
+  --md-status-deleted-fg: #a33124;
+  --md-status-untracked-bg: #eeebe5;
+  --md-status-untracked-fg: #57524a;
+  --md-status-unmerged-bg: #f9dedb;
+  --md-status-unmerged-fg: #982717;
+  --md-status-ignored-bg: #f0eee9;
+  --md-status-ignored-fg: #948e83;
+
+  /* ---- Colour: badges -----------------------------------------------------
+   * sidebarBadgeBackgroundColor / general_sidebar_badge_bg_color /
+   * selected_badge_{background,text}_color / {red,yellow}_badge_glass_tint_color
+   */
+  --md-badge-bg: #e6e2da;
+  --md-badge-fg: #57524a;
+  --md-badge-selected-bg: #2f6fe4;
+  --md-badge-selected-fg: #ffffff;
+
+  /* ---- Colour: commit graph ----------------------------------------------
+   * nine *_history_graph_line_color tokens; lane = palette[lane % 9]
+   */
+  --md-graph-lane-1: #2f6fe4;
+  --md-graph-lane-2: #0b7f96;
+  --md-graph-lane-3: #2e9e5b;
+  --md-graph-lane-4: #8a7300;
+  --md-graph-lane-5: #c46a1e;
+  --md-graph-lane-6: #c43d2e;
+  --md-graph-lane-7: #b4437e;
+  --md-graph-lane-8: #7a4fbd;
+  --md-graph-lane-9: #4c5cb8;
+  /* repository_history_commit_bubble_{bg,border}_color */
+  --md-graph-bubble-bg: #ffffff;
+  --md-graph-bubble-border: #b9b3a8;
+
+  /* ---- Colour: diff -------------------------------------------------------
+   * repository_diff_{added,deleted}_block_{background,outline}_color
+   */
+  --md-diff-added-bg: rgba(46, 158, 91, 0.14);
+  --md-diff-added-outline: rgba(46, 158, 91, 0.38);
+  --md-diff-deleted-bg: rgba(196, 61, 46, 0.14);
+  --md-diff-deleted-outline: rgba(196, 61, 46, 0.38);
+  --md-diff-word-added-bg: rgba(46, 158, 91, 0.28);
+  --md-diff-word-deleted-bg: rgba(196, 61, 46, 0.28);
+  /* repository_diff_image_checkerboard_{background,square}_color */
+  --md-diff-checker-a: #ffffff;
+  --md-diff-checker-b: #e9e9e9;
+
+  /* ---- Colour: conflicts --------------------------------------------------
+   * repository_mergeconflict_tile_background_{light,dark}_color /
+   * repository_workingcopy_unmerged_item_bg_color
+   */
+  --md-conflict-tile: rgba(181, 112, 0, 0.14);
+  --md-conflict-tile-strong: rgba(181, 112, 0, 0.3);
+
+  /* ---- Colour: code (our own syntax register, docs/04 §S8) ---------------- */
+  --md-code-comment: #7c8672;
+  --md-code-string: #a1541c;
+  --md-code-keyword: #8a3bb8;
+  --md-code-number: #2f6bb0;
+
+  /* ---- Colour: blame ------------------------------------------------------
+   * our own addition for the blame view's per-hunk tint (alternating hunks)
+   */
+  --md-blame-tint: rgba(47, 91, 224, 0.05);
+  --md-blame-tint-alt: rgba(14, 143, 168, 0.05);
+
+  /* ---- Colour: overlay ----------------------------------------------------
+   * dialogue scrims; part of our elevation system
+   */
+  --md-overlay: rgba(27, 26, 23, 0.32);
+
+  /* ---- Colour: provider marks ---------------------------------------------
+   * Our own neutral approximations of each provider's brand hue, used as the
+   * background of the monogram tile only (docs/04 §3: our own marks, never
+   * provider artwork).
+   */
+  --md-provider-github: #24292f;
+  --md-provider-gitlab: #e24329;
+  --md-provider-bitbucket: #0052cc;
+  --md-provider-azuredevops: #0078d4;
+  --md-provider-stash: #172b4d;
+  --md-provider-beanstalk: #0b6e4f;
+  --md-provider-custom: #6e6960;
+  --md-provider-mark-fg: #ffffff;
+
+  /* ---- Elevation (values ours; two-layer hairline + soft blur) ----------- */
+  --md-shadow-1: 0 1px 2px rgba(20, 18, 12, 0.1), 0 0 0 1px rgba(20, 18, 12, 0.04);
+  --md-shadow-2: 0 8px 24px rgba(20, 18, 12, 0.18), 0 0 0 1px rgba(20, 18, 12, 0.06);
+
+  /* ---- Typography --------------------------------------------------------- */
+  --md-font-ui: system-ui, -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
+  --md-font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --md-text-xs: 11px;
+  --md-text-sm: 12px;
+  --md-text-md: 13px;
+  --md-text-lg: 15px;
+  --md-text-xl: 18px;
+  --md-leading-tight: 1.25;
+  --md-leading-normal: 1.45;
+  /* Editor surfaces only (docs/04 §2.2 "User overrides"): diff, blob, blame,
+   * commit editor. The shell can override these two at runtime (Appearance /
+   * Editor preferences). */
+  --md-font-size-editor: 12px;
+  --md-editor-leading: 1.55;
+
+  /* ---- Spacing, radii, density -------------------------------------------- */
+  --md-space-1: 4px;
+  --md-space-2: 8px;
+  --md-space-3: 12px;
+  --md-space-4: 16px;
+  --md-space-5: 24px;
+  --md-space-6: 32px;
+  --md-radius-sm: 5px;
+  --md-radius-md: 8px;
+  --md-radius-lg: 12px;
+  --md-row-compact: 24px;
+  --md-row-regular: 28px;
+  --md-row-comfortable: 34px;
+
+  /* ---- Commit-graph geometry ---------------------------------------------- */
+  --md-graph-lane-width: 14px;
+  --md-graph-lane-width-compact: 10px;
+  --md-graph-bubble-radius: 4px;
+
+  /* ---- Chrome geometry (ours; docs/04 §4.2 sizes are ours too) ------------ */
+  --md-chrome-height: 38px;
+  --md-toolbar-height: 42px;
+  --md-tab-height: 34px;
+  --md-sidebar-width: 216px;
+  --md-sidebar-min: 180px;
+  --md-sidebar-max: 320px;
+  --md-blame-gutter-width: 150px;
+  --md-diff-gutter-width: 48px;
+
+  /* ---- Layering (three levels only: flat, raised, floating) ---------------- */
+  --md-z-popover: 40;
+  --md-z-chrome: 50;
+  --md-z-toast: 60;
+  --md-z-dialog: 80;
+
+  /* ---- Motion (≤150 ms, suppressed under prefers-reduced-motion) ---------- */
+  --md-motion-fast: 120ms;
+  --md-motion-base: 150ms;
+}
+
+.theme-dark {
+  color-scheme: dark;
+
+  --md-bg-canvas: #0e131b;
+  --md-bg-surface: #151c28;
+  --md-bg-sunken: #090d14;
+  --md-bg-header: #1a232f;
+  --md-bg-alt-row: #121926;
+  --md-bg-hover: #212c3c;
+  --md-bg-selected: #23375c;
+  --md-bg-selected-muted: #1b2434;
+  --md-bg-header-translucent: rgba(26, 35, 47, 0.92);
+
+  --md-border: #26313f;
+  --md-border-strong: #384657;
+  --md-border-inactive: #1b2430;
+
+  --md-fg: #e5e9f0;
+  --md-fg-muted: #9aa5b8;
+  --md-fg-subtle: #6f7b8f;
+  --md-fg-disabled: #4c5666;
+
+  --md-accent: #6ea8ff;
+  --md-accent-strong: #93c0ff;
+  --md-accent-contrast: #0b1220;
+  --md-accent-secondary: #4dd0e8;
+  --md-sun: #ffb020;
+  --md-sun-strong: #ffc95c;
+
+  --md-success: #3fbf74;
+  --md-warning: #e5a32b;
+  --md-danger: #f0715f;
+  --md-danger-contrast: #0b1220;
+  --md-info: #6ea8ff;
+
+  --md-bg-info-soft: rgba(110, 168, 255, 0.12);
+  --md-bg-success-soft: rgba(63, 191, 116, 0.12);
+  --md-bg-warning-soft: rgba(229, 163, 43, 0.12);
+  --md-bg-danger-soft: rgba(240, 113, 95, 0.12);
+
+  --md-status-added-bg: #183225;
+  --md-status-added-fg: #7fd6a3;
+  --md-status-copied-bg: #1b2740;
+  --md-status-copied-fg: #93b1ef;
+  --md-status-modified-bg: #33290f;
+  --md-status-modified-fg: #e5bd62;
+  --md-status-deleted-bg: #381c19;
+  --md-status-deleted-fg: #f0958a;
+  --md-status-untracked-bg: #2a2d33;
+  --md-status-untracked-fg: #c9c5bc;
+  --md-status-unmerged-bg: #3d1b16;
+  --md-status-unmerged-fg: #ff9d8c;
+  --md-status-ignored-bg: #232529;
+  --md-status-ignored-fg: #7e7a72;
+
+  --md-badge-bg: #33373e;
+  --md-badge-fg: #cfcac1;
+  --md-badge-selected-bg: #6ea8ff;
+  --md-badge-selected-fg: #0b1220;
+
+  --md-graph-lane-1: #6ea8ff;
+  --md-graph-lane-2: #4dd0e8;
+  --md-graph-lane-3: #3fbf74;
+  --md-graph-lane-4: #c7a32b;
+  --md-graph-lane-5: #e58a45;
+  --md-graph-lane-6: #f0715f;
+  --md-graph-lane-7: #e36ba8;
+  --md-graph-lane-8: #a586e8;
+  --md-graph-lane-9: #7e8ee8;
+  --md-graph-bubble-bg: #1e2126;
+  --md-graph-bubble-border: #5a606a;
+
+  --md-diff-added-bg: rgba(63, 191, 116, 0.16);
+  --md-diff-added-outline: rgba(63, 191, 116, 0.4);
+  --md-diff-deleted-bg: rgba(240, 113, 95, 0.16);
+  --md-diff-deleted-outline: rgba(240, 113, 95, 0.4);
+  --md-diff-word-added-bg: rgba(63, 191, 116, 0.3);
+  --md-diff-word-deleted-bg: rgba(240, 113, 95, 0.3);
+  --md-diff-checker-a: #1e2126;
+  --md-diff-checker-b: #14161a;
+
+  --md-conflict-tile: rgba(229, 163, 43, 0.16);
+  --md-conflict-tile-strong: rgba(229, 163, 43, 0.3);
+
+  --md-code-comment: #8f9a83;
+  --md-code-string: #e0a06a;
+  --md-code-keyword: #c792ea;
+  --md-code-number: #7fb3e8;
+
+  --md-blame-tint: rgba(108, 139, 255, 0.07);
+  --md-blame-tint-alt: rgba(47, 182, 206, 0.07);
+
+  --md-overlay: rgba(0, 0, 0, 0.5);
+
+  --md-provider-github: #8b949e;
+  --md-provider-gitlab: #f0796a;
+  --md-provider-bitbucket: #558cf0;
+  --md-provider-azuredevops: #4da3ff;
+  --md-provider-stash: #8f9dc4;
+  --md-provider-beanstalk: #4fbf94;
+  --md-provider-custom: #a5a199;
+  --md-provider-mark-fg: #0b1220;
+
+  --md-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --md-shadow-2: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}

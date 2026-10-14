@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Default capability for the main window. Only `core:default` and the opener are granted: the updater and the process plugin are driven from Rust, so the webview never needs permission to call them. `opener:default` is exactly `https://`, `http://`, `mailto:` and `tel:` — the same four schemes `src/bridges/external.ts` refuses anything else to use — and nothing wider is granted for opening a release page or an issue form.",
+  "windows": ["main"],
+  "permissions": ["core:default", "opener:default"]
+}

@@ -3,6 +3,20 @@ dist/
 target/
 .DS_Store
 src-tauri/target/
+# Tauri-generated schemas/capabilities (read by the build, not authored here).
+src-tauri/gen/
+# Rejected logo drafts (~1.2 MB each). The chosen board is in design/brand/,
+# the vector master in design/final/, and the shipped icons in src-tauri/icons/.
+design/c1-*
+design/c2-*
+design/c3-*
+design/opt-*
+design/opt2/
+design/contact-sheet.png
+design/final/Meridian.iconset/
+design/final/icon*.png
+design/final/*.icns
+design/final/icon-museav.png
 *.log
 .env
 .env.local
