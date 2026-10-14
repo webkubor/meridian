@@ -38,8 +38,15 @@ pub struct CheckoutResult {
 
 /// Options for `branch_checkout` — the P0 subset of docs/03 §6. The auto-stash
 /// policy dialogue arrives with the `policy/` module in a later phase.
+///
+/// `#[serde(default)]` on the **container**, not just on the field inside
+/// `BranchCheckout`. A container-level `#[serde(default)]` only applies when
+/// the key is *absent*; the webview always sends `opts: {}`, and deserialising
+/// `{}` into a struct whose only field is required fails. So `{}` must parse,
+/// and `WorkingCopyStatusOptions`, `DiffOptions` and `DiscardOptions` already
+/// carry the container attribute for exactly this reason.
 #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(default, rename_all = "camelCase")]
 pub struct CheckoutOptions {
     pub detach: bool,
 }
