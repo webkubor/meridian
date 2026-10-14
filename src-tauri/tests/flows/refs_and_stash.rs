@@ -125,7 +125,6 @@ async fn branch_checkout_supports_local_and_detached_head() {
 ///
 /// The divergent branch is built with `commit_on_branch`, so this test
 /// isolates the dirty-file bug from the stale-index bug below.
-#[ignore = "BUG: branch_checkout silently succeeds over a locally modified tracked file the target branch also changes, leaving HEAD and the working tree in disagreement"]
 #[tokio::test]
 async fn branch_checkout_refuses_to_clobber_a_locally_modified_tracked_file() {
     let fixture = Fixture::new();
@@ -150,7 +149,6 @@ async fn branch_checkout_refuses_to_clobber_a_locally_modified_tracked_file() {
 /// branch tracks. Observed: `Ok(...)`, HEAD moves to `side`, and the untracked
 /// file becomes a tracked `WT_MODIFIED` entry. `git checkout side` refuses with
 /// "untracked working tree files would be overwritten".
-#[ignore = "BUG: branch_checkout takes over an untracked file the target branch tracks instead of refusing"]
 #[tokio::test]
 async fn branch_checkout_refuses_to_overwrite_an_untracked_file() {
     let fixture = Fixture::new();
@@ -172,11 +170,10 @@ async fn branch_checkout_refuses_to_overwrite_an_untracked_file() {
 }
 
 /// BUG: `branch_checkout` leaves the index holding an entry for a file the
-/// target branch does not contain. Observed after switching back to `main`:
-/// `incoming.txt` reports `INDEX_NEW` and is still on disk, so the tree is
-/// dirty and a later `merge_start` fast-forward fails with `CheckoutConflicts`.
-/// `git checkout main` removes the file and leaves a clean tree.
-#[ignore = "BUG: branch_checkout leaves a stale index entry and file on disk for paths the target branch lacks, dirtying the tree for later merges"]
+/// target branch does not contain. `git checkout main` removes the file and
+/// leaves a clean tree; libgit2's `checkout_tree` used to leave it behind with
+/// an `INDEX_NEW` entry, which then made a later `merge_start` fast-forward
+/// fail with `CheckoutConflicts`.
 #[tokio::test]
 async fn branch_checkout_clears_paths_the_target_branch_does_not_contain() {
     let fixture = Fixture::new();

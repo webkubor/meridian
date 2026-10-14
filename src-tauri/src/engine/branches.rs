@@ -233,6 +233,72 @@ pub fn resolve_branch(repo: &git2::Repository, name: &str) -> Result<ResolvedBra
 /// The name may be any form [`resolve_branch`] accepts, so the quick-open ids
 /// (`branch:` + the row's full refname) work. A local branch attaches HEAD; a
 /// remote-tracking ref cannot, so it detaches at that tip.
+/// What a checkout from the current HEAD to `target`'s tree would have to do to
+/// the working copy: the paths it would clobber, and the paths it should remove
+/// because the target no longer has them.
+fn checkout_plan<'repo>(
+    repo: &'repo git2::Repository,
+    target: &git2::Commit<'repo>,
+) -> Result<(Vec<String>, Vec<String>), ErrorPayload> {
+    let target_tree = target.tree()?;
+    let index = repo.index()?;
+    let mut git_opts = git2::StatusOptions::new();
+    git_opts
+        .include_untracked(true)
+        .include_ignored(false)
+        .include_unmodified(false)
+        .recurse_untracked_dirs(true)
+        .renames_head_to_index(true)
+        .renames_index_to_workdir(true);
+    let statuses = repo.statuses(Some(&mut git_opts))?;
+
+    let mut conflicts = Vec::new();
+    for entry in statuses.iter() {
+        let Ok(path) = entry.path() else { continue };
+        let flags = entry.status();
+        let tracked = index.get_path(std::path::Path::new(path), 0).is_some();
+        let target_has = target_tree.get_name(path).is_some();
+
+        let local_modified = flags.intersects(
+            git2::Status::WT_MODIFIED
+                | git2::Status::WT_DELETED
+                | git2::Status::WT_TYPECHANGE
+                | git2::Status::INDEX_MODIFIED
+                | git2::Status::INDEX_DELETED,
+        );
+        if tracked && local_modified && target_has {
+            conflicts.push(path.to_string());
+            continue;
+        }
+        if !tracked && flags.intersects(git2::Status::WT_NEW) && target_has {
+            conflicts.push(path.to_string());
+        }
+    }
+    conflicts.sort();
+
+    // Files HEAD tracks that the target does not. git removes an unmodified one
+    // and *keeps* a locally modified one, reporting it as deleted-and-modified
+    // rather than losing the edit.
+    let mut removals = Vec::new();
+    if let Some(head) = repo.head().ok().and_then(|h| h.peel_to_commit().ok()) {
+        let head_tree = head.tree()?;
+        for entry in head_tree.iter() {
+            let Ok(name) = entry.name() else { continue };
+            if target_tree.get_name(name).is_some() {
+                continue;
+            }
+            let deleted = statuses
+                .iter()
+                .any(|status| matches!(status.path(), Ok(path) if path == name));
+            if !deleted {
+                removals.push(name.to_string());
+            }
+        }
+    }
+    removals.sort();
+    Ok((conflicts, removals))
+}
+
 pub fn checkout(
     repo: &git2::Repository,
     name: &str,
@@ -251,10 +317,27 @@ pub fn checkout(
     let mut builder = git2::build::CheckoutBuilder::new();
     builder.safe();
 
+    // Refuse before moving HEAD, so a refusal is a no-op the user can retry
+    // after staging, committing or discarding.
+    let commit = repo.find_commit(oid)?;
+    let (conflicts, removals) = checkout_plan(repo, &commit)?;
+    if !conflicts.is_empty() {
+        return Err(ErrorPayload::new(
+            ErrorCode::CheckoutConflicts,
+            format!(
+                "{} local change(s) would be overwritten by checking out '{}'",
+                conflicts.len(),
+                resolved.name
+            ),
+        )
+        .with_domain(crate::domain::error::ErrorDomain::Git)
+        .with_detail(conflicts.join(", "))
+        .with_param("name", resolved.name.clone()));
+    }
+
     if opts.detach || resolved.is_remote {
         // A remote-tracking ref cannot anchor HEAD — detach at its tip.
         repo.set_head_detached(oid)?;
-        let commit = repo.find_commit(oid)?;
         repo.checkout_tree(commit.as_object(), Some(&mut builder))?;
         return Ok(CheckoutResult {
             branch: None,
@@ -264,8 +347,29 @@ pub fn checkout(
     }
 
     repo.set_head(&resolved.full_name)?;
-    let commit = repo.find_commit(oid)?;
     repo.checkout_tree(commit.as_object(), Some(&mut builder))?;
+    // `checkout_tree` writes the target tree but neither removes files the
+    // target lacks nor drops their index entries, so they survive as
+    // `INDEX_NEW` and make the tree look dirty for the next merge.
+    if let Some(workdir) = repo.workdir() {
+        for path in &removals {
+            let full = workdir.join(path);
+            if full.is_file() {
+                std::fs::remove_file(&full).map_err(|error| {
+                    ErrorPayload::new(
+                        ErrorCode::Io,
+                        format!(
+                            "Could not remove {} after checkout: {error}",
+                            full.display()
+                        ),
+                    )
+                })?;
+            }
+        }
+    }
+    // A mixed reset rewrites index entries to match HEAD. It does not touch the
+    // working tree, so the edits above and the checkout above are preserved.
+    repo.reset(commit.as_object(), git2::ResetType::Mixed, None)?;
     Ok(CheckoutResult {
         branch: Some(resolved.name),
         oid: oid.to_string(),
