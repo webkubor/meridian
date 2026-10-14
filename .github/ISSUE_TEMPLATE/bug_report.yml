@@ -1,0 +1,78 @@
+name: Bug report
+description: Something in Meridian does not work as expected.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not paste private repository contents, credentials, or tokens.**
+
+        Bug reports are public. Before submitting, remove anything from a private
+        repository (file contents, diffs, commit messages) and any credentials,
+        access tokens, or SSH key material. Replace real names and paths with
+        placeholders such as `<private-repo>`.
+
+  - type: input
+    id: version
+    attributes:
+      label: Meridian version
+      description: Shown in the app's About panel (Meridian → About Meridian).
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: macos-version
+    attributes:
+      label: macOS version
+      description: Shown in System Settings → General → About, or by running `sw_vers -productVersion`.
+      placeholder: "13.6"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: architecture
+    attributes:
+      label: Machine architecture
+      options:
+        - Apple silicon
+        - Intel
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Include the exact error message if there is one.
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-expected
+    attributes:
+      label: What you expected to happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: The smallest sequence of steps that shows the bug.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: sensitive-data
+    attributes:
+      label: Sensitive data
+      description: Bug reports are public — confirm the report is safe to publish.
+      options:
+        - label: I have removed all private repository contents, credentials, tokens, and other sensitive data from this report.
+          required: true

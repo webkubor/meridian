@@ -1,0 +1,100 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish the macOS release
+    runs-on: macos-14
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run the checks before publishing anything
+        run: |
+          pnpm typecheck
+          pnpm test
+
+      - name: Run the Rust checks
+        run: |
+          cargo fmt --all --check
+          cargo clippy --all-targets -- -D warnings
+          cargo test --all-targets
+        working-directory: src-tauri
+
+      # The release body is not decoration: the updater manifest carries it as
+      # `notes`, so this text is what a user sees in the app when a new version
+      # is offered. Pulling it from CHANGELOG.md means the GitHub release page
+      # and the in-app notice can never disagree, and that writing the entry is
+      # the only step needed to document a release.
+      - name: Extract this version's release notes
+        id: notes
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          body="$(awk -v ver="$version" '
+            $0 ~ "^## \\[" ver "\\]" { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md)"
+
+          if [ -z "$(printf '%s' "$body" | tr -d '[:space:]')" ]; then
+            echo "::warning::CHANGELOG.md has no '## [$version]' section; falling back to a generated body."
+            body="Meridian $version. See CHANGELOG.md for what changed."
+          fi
+
+          {
+            echo "body<<MERIDIAN_NOTES_EOF"
+            printf '%s\n' "$body"
+            echo ""
+            echo "---"
+            echo ""
+            echo "Universal macOS build. Requires macOS 13 (Ventura) or later, on Apple silicon or Intel."
+            echo "MERIDIAN_NOTES_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      # The release is a draft on purpose: `releases/latest` ignores drafts, so
+      # nothing reaches an installed copy until a person publishes it. That is
+      # the one gate between a bad build and every user's machine, and it is the
+      # reason the app can check for updates on launch without that being
+      # reckless.
+      - name: Build the app and create the release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          args: --target universal-apple-darwin
+          tagName: ${{ github.ref_name }}
+          releaseName: "Meridian ${{ github.ref_name }}"
+          releaseBody: ${{ steps.notes.outputs.body }}
+          releaseDraft: true
+          prerelease: false

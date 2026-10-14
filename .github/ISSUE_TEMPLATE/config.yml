@@ -1,0 +1,4 @@
+# Issue reporters must go through the structured forms (bug report / feature
+# request); blank issues are disabled so every report arrives with the fields
+# the form asks for.
+blank_issues_enabled: false
