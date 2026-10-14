@@ -37,6 +37,21 @@ export interface ErrorPayload {
   domain: ErrorDomain;
 }
 
+export interface DebugState {
+  enabled: boolean;
+  source: "env" | "setting" | "off";
+  logDir: string;
+  logFile: string;
+  level: "info" | "debug";
+}
+
+export interface CrashNote {
+  at: string;
+  message: string;
+  location: string | null;
+  backtraceExcerpt: string | null;
+}
+
 export type SenderTag =
   | "menu"
   | "toolbar"
@@ -482,7 +497,11 @@ export interface CommitResult {
 /* Remotes — `remote_*` (docs/03 §8)                                          */
 /* ========================================================================== */
 
+/** Per-repository fetch preferences, used only by remote config commands. */
 export type RemoteFetchMode = "default" | "prune" | "tags" | "pruneTags";
+
+/** Which refs a single `remote_fetch` operation fetches. */
+export type RemoteFetchExecutionMode = "all" | "specified";
 
 export interface PullOptions {
   mode?: "merge" | "rebase" | "ffOnly";
@@ -686,6 +705,8 @@ export interface FeedbackRequest {
   kind: FeedbackKind;
   /** A title the user typed, if any. Becomes a query parameter, nothing more. */
   summary?: string | null;
+  /** Compact diagnostics the user chooses to include with a report. */
+  context?: string | null;
 }
 
 /**

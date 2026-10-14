@@ -6,7 +6,11 @@
  * `invoke("branch_create", { args: { repo, name, start, checkout, sender } })`.
  */
 
-import { Channel, invoke } from "@tauri-apps/api/core";
+import { Channel, invoke as tauriInvoke } from "@tauri-apps/api/core";
+
+import type { DebugState, CrashNote } from "./bindings";
+import { captureFailure, configureFailureNet, normalizeError } from "../diagnostics/failures";
+import { recordCall, safeArgumentSummary } from "../diagnostics/recorder";
 
 import type {
   AppInfo,
@@ -39,7 +43,7 @@ import type {
   PullOptions,
   RebaseOptions,
   ReleaseNotes,
-  RemoteFetchMode,
+  RemoteFetchExecutionMode,
   RepoId,
   RepoInfo,
   RepoRoot,
@@ -58,20 +62,79 @@ import type {
   WcStatusOptions,
 } from "./bindings";
 
+/**
+ * The single instrumented path to the backend (docs/02 §13).
+ *
+ * Every wrapper below goes through it so that a failure is recorded, written to
+ * the local log and handed to the failure net exactly once — and so the caller
+ * still receives the *same* rejection the backend sent. A diagnostics command
+ * that fails is recorded but never logged, which is what stops the reporter
+ * from reporting itself in a loop.
+ */
+export async function call<T>(name: string, args?: Record<string, unknown>, opts: { handled?: boolean } = {}): Promise<T> {
+  const startedAt = new Date().toISOString();
+  const started = performance.now();
+  const summary = safeArgumentSummary(args, name);
+  try {
+    const value = await tauriInvoke<T>(name, args);
+    recordCall({ command: name, startedAt, durationMs: Math.round(performance.now() - started), ok: true, ...summary });
+    return value;
+  } catch (error) {
+    const payload = normalizeError(error);
+    recordCall({ command: name, startedAt, durationMs: Math.round(performance.now() - started), ok: false, errorCode: payload.code, errorDomain: payload.domain, ...summary });
+    captureFailure(error, name, { ...opts, newCall: true, payload });
+    throw error;
+  }
+}
+
+configureFailureNet({
+  log: ({ command, error }) => {
+    void diagnosticsLogWrite("error", JSON.stringify(error), command).catch(() => undefined);
+  },
+});
+
+export function diagnosticsLogTail(lines: number): Promise<string> {
+  return call<string>("diagnostics_log_tail", { args: { lines } });
+}
+export function diagnosticsLogWrite(level: "error" | "warn" | "info" | "debug", message: string, source?: string): Promise<void> {
+  return call<void>("diagnostics_log_write", { args: { level, message, source } });
+}
+export function diagnosticsDebugGet(): Promise<DebugState> {
+  return call<DebugState>("diagnostics_debug_get");
+}
+export function diagnosticsDebugSet(enabled: boolean): Promise<DebugState> {
+  return call<DebugState>("diagnostics_debug_set", { args: { enabled } });
+}
+export function diagnosticsRevealLogs(): Promise<void> {
+  return call<void>("diagnostics_reveal_logs");
+}
+export function diagnosticsExport(context?: string): Promise<{ path: string; bytes: number }> {
+  return call<{ path: string; bytes: number }>("diagnostics_export", { args: { context } });
+}
+export function diagnosticsOpenDevtools(): Promise<void> {
+  return call<void>("diagnostics_open_devtools");
+}
+export function diagnosticsLastCrash(): Promise<CrashNote | null> {
+  return call<CrashNote | null>("diagnostics_last_crash");
+}
+export function diagnosticsDismissCrash(): Promise<void> {
+  return call<void>("diagnostics_dismiss_crash");
+}
+
 export function repositoryOpen(path: string, sender: SenderTag = "dialogue"): Promise<RepoInfo> {
-  return invoke<RepoInfo>("repository_open", { args: { path, sender } });
+  return call<RepoInfo>("repository_open", { args: { path, sender } });
 }
 
 export function repositoryInit(
   path: string,
   options: RepositoryInitOptions = {},
 ): Promise<RepoInfo> {
-  return invoke<RepoInfo>("repository_init", { args: { path, ...options } });
+  return call<RepoInfo>("repository_init", { args: { path, ...options } });
 }
 
 /** Clones `url` and opens the result. Resolves once the transfer is done. */
 export function repositoryClone(url: string, options: RepositoryCloneOptions = {}): Promise<RepoInfo> {
-  return invoke<RepoInfo>("repository_clone", {
+  return call<RepoInfo>("repository_clone", {
     args: { url, destination: "", ...options },
   });
 }
@@ -85,7 +148,7 @@ export function repositoryClone(url: string, options: RepositoryCloneOptions = {
  * the command acts on.
  */
 export function repositoryCloneDestination(url: string): Promise<string> {
-  return invoke<string>("repository_clone_suggest_destination", { url });
+  return call<string>("repository_clone_suggest_destination", { url });
 }
 
 /**
@@ -97,21 +160,21 @@ export function repositoryDiscover(
   root: string,
   options: RepositoryDiscoverOptions = {},
 ): Promise<RepoRoot[]> {
-  return invoke<RepoRoot[]>("repository_discover", {
+  return call<RepoRoot[]>("repository_discover", {
     args: { root, ...options },
   });
 }
 
 export function wcStatusLoad(repo: RepoId, opts: WcStatusOptions = {}): Promise<StatusDelta> {
-  return invoke<StatusDelta>("wc_status_load", { args: { repo, opts } });
+  return call<StatusDelta>("wc_status_load", { args: { repo, opts } });
 }
 
 export function wcStagePaths(repo: RepoId, paths: string[]): Promise<StatusDelta> {
-  return invoke<StatusDelta>("wc_stage_paths", { args: { repo, paths } });
+  return call<StatusDelta>("wc_stage_paths", { args: { repo, paths } });
 }
 
 export function wcUnstagePaths(repo: RepoId, paths: string[]): Promise<StatusDelta> {
-  return invoke<StatusDelta>("wc_unstage_paths", { args: { repo, paths } });
+  return call<StatusDelta>("wc_unstage_paths", { args: { repo, paths } });
 }
 
 /** Set or clear git's assume-unchanged bit on paths. */
@@ -120,14 +183,14 @@ export function wcEntryAssumeUnchangedSet(
   paths: string[],
   value: boolean,
 ): Promise<StatusDelta> {
-  return invoke<StatusDelta>("wc_entry_assume_unchanged_set", { args: { repo, paths, value } });
+  return call<StatusDelta>("wc_entry_assume_unchanged_set", { args: { repo, paths, value } });
 }
 
 export function historyCommitsLoad(
   repo: RepoId,
   options: HistoryCommitsOptions = {},
 ): Promise<CommitPage> {
-  return invoke<CommitPage>("history_commits_load", { args: { repo, ...options } });
+  return call<CommitPage>("history_commits_load", { args: { repo, ...options } });
 }
 
 
@@ -136,7 +199,7 @@ export function branchList(
   filter: BranchFilter = "local",
   search?: string,
 ): Promise<BranchInfo[]> {
-  return invoke<BranchInfo[]>("branch_list", { args: { repo, filter, search } });
+  return call<BranchInfo[]>("branch_list", { args: { repo, filter, search } });
 }
 
 export function branchCreate(
@@ -146,7 +209,7 @@ export function branchCreate(
   checkout = true,
   sender: SenderTag = "dialogue",
 ): Promise<BranchInfo> {
-  return invoke<BranchInfo>("branch_create", { args: { repo, name, start, checkout, sender } });
+  return call<BranchInfo>("branch_create", { args: { repo, name, start, checkout, sender } });
 }
 
 export function branchCheckout(
@@ -154,7 +217,7 @@ export function branchCheckout(
   name: string,
   opts: CheckoutOptions = {},
 ): Promise<CheckoutResult> {
-  return invoke<CheckoutResult>("branch_checkout", { args: { repo, name, opts } });
+  return call<CheckoutResult>("branch_checkout", { args: { repo, name, opts } });
 }
 
 export function branchCheckoutRemote(
@@ -163,7 +226,7 @@ export function branchCheckoutRemote(
   localName?: string,
   track = true,
 ): Promise<BranchInfo> {
-  return invoke<BranchInfo>("branch_checkout_remote", {
+  return call<BranchInfo>("branch_checkout_remote", {
     args: { repo, remoteBranch, localName, track },
   });
 }
@@ -174,7 +237,7 @@ export function branchRename(
   next: string,
   force = false,
 ): Promise<BranchInfo> {
-  return invoke<BranchInfo>("branch_rename", { args: { repo, old, new: next, force } });
+  return call<BranchInfo>("branch_rename", { args: { repo, old, new: next, force } });
 }
 
 export function branchDelete(
@@ -183,7 +246,7 @@ export function branchDelete(
   force = false,
   sender: SenderTag = "dialogue",
 ): Promise<unknown> {
-  return invoke<unknown>("branch_delete", { args: { repo, names, force, sender } });
+  return call<unknown>("branch_delete", { args: { repo, names, force, sender } });
 }
 
 /* ---- working copy -------------------------------------------------------- */
@@ -193,11 +256,11 @@ export function wcPathsDiscard(
   paths: string[],
   opts: DiscardOptions = {},
 ): Promise<StatusDelta> {
-  return invoke<StatusDelta>("wc_paths_discard", { args: { repo, paths, opts } });
+  return call<StatusDelta>("wc_paths_discard", { args: { repo, paths, opts } });
 }
 
 export function wcEntryOpen(repo: RepoId, path: string, target: OpenTarget): Promise<void> {
-  return invoke<void>("wc_entry_open", { args: { repo, path, target } });
+  return call<void>("wc_entry_open", { args: { repo, path, target } });
 }
 
 /* ---- diff ---------------------------------------------------------------- */
@@ -208,7 +271,7 @@ export function wcDiffLoad(
   perspective: DiffPerspective,
   opts: DiffOptionsWire = {},
 ): Promise<DiffDocument> {
-  return invoke<DiffDocument>("wc_diff_load", { args: { repo, path, perspective, opts } });
+  return call<DiffDocument>("wc_diff_load", { args: { repo, path, perspective, opts } });
 }
 
 export function wcChunkApply(
@@ -217,23 +280,23 @@ export function wcChunkApply(
   direction: ChunkDirection,
   contextLines?: number,
 ): Promise<StatusDelta> {
-  return invoke<StatusDelta>("wc_chunk_apply", {
+  return call<StatusDelta>("wc_chunk_apply", {
     args: { repo, hunk, direction, contextLines },
   });
 }
 
 export function wcChunkDiscard(repo: RepoId, hunk: HunkRef, contextLines?: number): Promise<StatusDelta> {
-  return invoke<StatusDelta>("wc_chunk_discard", { args: { repo, hunk, contextLines } });
+  return call<StatusDelta>("wc_chunk_discard", { args: { repo, hunk, contextLines } });
 }
 
 export function wcImageDataLoad(repo: RepoId, path: string, side: ImageSide): Promise<ImageData> {
-  return invoke<ImageData>("wc_image_data_load", { args: { repo, path, side } });
+  return call<ImageData>("wc_image_data_load", { args: { repo, path, side } });
 }
 
 /* ---- history detail ------------------------------------------------------ */
 
 export function historyCommitLoad(repo: RepoId, oid: string): Promise<CommitDetail> {
-  return invoke<CommitDetail>("history_commit_load", { args: { repo, oid } });
+  return call<CommitDetail>("history_commit_load", { args: { repo, oid } });
 }
 
 export function historyChangesetLoad(
@@ -241,7 +304,7 @@ export function historyChangesetLoad(
   oid: string,
   detectRenames = true,
 ): Promise<Changeset> {
-  return invoke<Changeset>("history_changeset_load", {
+  return call<Changeset>("history_changeset_load", {
     args: { repo, oid, opts: { detectRenames } },
   });
 }
@@ -257,11 +320,11 @@ export function historyCompareSummary(
   left: Revision,
   right: Revision,
 ): Promise<CompareSummary> {
-  return invoke<CompareSummary>("history_merge_base", { args: { repo, left, right } });
+  return call<CompareSummary>("history_merge_base", { args: { repo, left, right } });
 }
 
 export function historyGraphCompute(repo: RepoId, oids: string[]): Promise<GraphLayout> {
-  return invoke<GraphLayout>("history_graph_compute", { args: { repo, oids } });
+  return call<GraphLayout>("history_graph_compute", { args: { repo, oids } });
 }
 
 /* ---- commits ------------------------------------------------------------- */
@@ -271,7 +334,7 @@ export function commitCreate(
   message: string,
   opts: CommitOptions = {},
 ): Promise<CommitResult> {
-  return invoke<CommitResult>("commit_create", { args: { repo, message, opts } });
+  return call<CommitResult>("commit_create", { args: { repo, message, opts } });
 }
 
 export function commitAmend(
@@ -279,22 +342,22 @@ export function commitAmend(
   message: string | null,
   opts: CommitOptions = {},
 ): Promise<CommitResult> {
-  return invoke<CommitResult>("commit_amend", { args: { repo, message, opts } });
+  return call<CommitResult>("commit_amend", { args: { repo, message, opts } });
 }
 
 /* ---- remotes ------------------------------------------------------------- */
 
 export function repositoryRemotesLoad(repo: RepoId): Promise<RepositoryRemotes> {
-  return invoke<RepositoryRemotes>("repository_remotes_load", { args: { repo } });
+  return call<RepositoryRemotes>("repository_remotes_load", { args: { repo } });
 }
 
 export function remoteFetch(
   repo: RepoId,
   remote: string,
   refspecs: string[] = [],
-  mode: RemoteFetchMode = "default",
+  mode: RemoteFetchExecutionMode = "all",
 ): Promise<unknown> {
-  return invoke<unknown>("remote_fetch", { args: { repo, remote, refspecs, mode } });
+  return call<unknown>("remote_fetch", { args: { repo, remote, refspecs, mode } });
 }
 
 export function remotePull(
@@ -303,7 +366,7 @@ export function remotePull(
   branch: string | null = null,
   opts: PullOptions = {},
 ): Promise<unknown> {
-  return invoke<unknown>("remote_pull", { args: { repo, remote, branch, opts } });
+  return call<unknown>("remote_pull", { args: { repo, remote, branch, opts } });
 }
 
 export function remotePublishBranch(
@@ -312,7 +375,7 @@ export function remotePublishBranch(
   branch: string,
   setUpstream = false,
 ): Promise<unknown> {
-  return invoke<unknown>("remote_publish_branch", {
+  return call<unknown>("remote_publish_branch", {
     args: { repo, remote, branch, setUpstream },
   });
 }
@@ -324,11 +387,11 @@ export function mergeStart(
   revision: Revision,
   opts: MergeOptions = {},
 ): Promise<IntegrationResult> {
-  return invoke<IntegrationResult>("merge_start", { args: { repo, revision, opts } });
+  return call<IntegrationResult>("merge_start", { args: { repo, revision, opts } });
 }
 
 export function mergeAbort(repo: RepoId): Promise<StatusDelta> {
-  return invoke<StatusDelta>("merge_abort", { args: { repo } });
+  return call<StatusDelta>("merge_abort", { args: { repo } });
 }
 
 export function rebaseStart(
@@ -337,51 +400,51 @@ export function rebaseStart(
   onto: Revision | null = null,
   opts: RebaseOptions = {},
 ): Promise<IntegrationResult> {
-  return invoke<IntegrationResult>("rebase_start", { args: { repo, upstream, onto, opts } });
+  return call<IntegrationResult>("rebase_start", { args: { repo, upstream, onto, opts } });
 }
 
 export function integrationContinue(repo: RepoId, message: string | null = null): Promise<IntegrationResult> {
-  return invoke<IntegrationResult>("integration_continue", { args: { repo, message } });
+  return call<IntegrationResult>("integration_continue", { args: { repo, message } });
 }
 
 export function integrationSkip(repo: RepoId): Promise<IntegrationResult> {
-  return invoke<IntegrationResult>("integration_skip", { args: { repo } });
+  return call<IntegrationResult>("integration_skip", { args: { repo } });
 }
 
 export function mergeToolInvoke(repo: RepoId, paths: string[]): Promise<unknown> {
-  return invoke<unknown>("merge_tool_invoke", { args: { repo, paths } });
+  return call<unknown>("merge_tool_invoke", { args: { repo, paths } });
 }
 
 export function wcMergeStatusLoad(repo: RepoId, revision: Revision | null = null): Promise<MergeStatus> {
-  return invoke<MergeStatus>("wc_merge_status_load", { args: { repo, revision } });
+  return call<MergeStatus>("wc_merge_status_load", { args: { repo, revision } });
 }
 
 /* ---- stash --------------------------------------------------------------- */
 
 export function stashSave(repo: RepoId, opts: StashSaveOptions = {}): Promise<unknown> {
-  return invoke<unknown>("stash_save", { args: { repo, opts } });
+  return call<unknown>("stash_save", { args: { repo, opts } });
 }
 
 /* ---- shared -------------------------------------------------------------- */
 
 /** `history_contributors_load` — retained for the compare/summary surfaces. */
 export function historyContributorsLoad(repo: RepoId): Promise<unknown> {
-  return invoke<unknown>("history_contributors_load", { args: { repo } });
+  return call<unknown>("history_contributors_load", { args: { repo } });
 }
 
 /* ---- application --------------------------------------------------------- */
 /* The only family with no `repo` argument. See `bindings.ts` for why.        */
 
 export function appInfoLoad(): Promise<AppInfo> {
-  return invoke<AppInfo>("app_info_load");
+  return call<AppInfo>("app_info_load");
 }
 
 export function appReleaseNotesLoad(locale?: string | null): Promise<ReleaseNotes> {
-  return invoke<ReleaseNotes>("app_release_notes_load", { args: { locale: locale ?? null } });
+  return call<ReleaseNotes>("app_release_notes_load", { args: { locale: locale ?? null } });
 }
 
 export function appUpdateCheck(): Promise<UpdateCheck> {
-  return invoke<UpdateCheck>("app_update_check");
+  return call<UpdateCheck>("app_update_check");
 }
 
 /**
@@ -398,11 +461,11 @@ export function appUpdateInstall(
 ): Promise<void> {
   const channel = new Channel<UpdateProgress>();
   channel.onmessage = onProgress;
-  return invoke<void>("app_update_install", { onProgress: channel });
+  return call<void>("app_update_install", { onProgress: channel });
 }
 
 export function appFeedbackCompose(request: FeedbackRequest): Promise<FeedbackTarget> {
-  return invoke<FeedbackTarget>("app_feedback_compose", { args: request });
+  return call<FeedbackTarget>("app_feedback_compose", { args: request });
 }
 
 /**
@@ -414,7 +477,7 @@ export function appFeedbackCompose(request: FeedbackRequest): Promise<FeedbackTa
  * the old process — the frontend calls it and stops caring.
  */
 export function relaunch(): Promise<void> {
-  return invoke<void>("app_relaunch");
+  return call<void>("app_relaunch");
 }
 
 /**
@@ -425,7 +488,7 @@ export function relaunch(): Promise<void> {
  * "Choose…" ends up showing an error toast to someone who changed their mind.
  */
 export function pickDirectory(): Promise<string | null> {
-  return invoke<string | null>("app_pick_directory");
+  return call<string | null>("app_pick_directory");
 }
 
 export type { AppInfo, FeedbackTarget, ReleaseNotes, UpdateCheck, UpdateProgress, UpdateStatus };
