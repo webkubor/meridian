@@ -134,6 +134,15 @@ pub fn initialize<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> Result<(), St
         .map_err(|error| error.to_string())?;
     fs::create_dir_all(&log_dir).map_err(|error| error.to_string())?;
     fs::create_dir_all(&config_dir).map_err(|error| error.to_string())?;
+    // Owner-only. A log line carries repository names, branch names and error
+    // details; every one of those is private to the machine that owns them.
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let dir_mode = fs::Permissions::from_mode(0o700);
+        let _ = fs::set_permissions(&log_dir, dir_mode.clone());
+        let _ = fs::set_permissions(&config_dir, dir_mode);
+    }
 
     let env_enabled = env_debug_enabled();
     let setting_enabled = read_setting(&config_dir.join(SETTING_FILE));
@@ -284,6 +293,13 @@ fn write_rotating(state: &mut LoggerState, line: &str) {
         .append(true)
         .open(&state.log_file)
     {
+        // The file is created with the process umask; narrow it before the
+        // first line lands, and on every open in case it was replaced.
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let _ = file.set_permissions(fs::Permissions::from_mode(0o600));
+        }
         if writeln!(file, "{line}").is_ok() {
             state.bytes = state.bytes.saturating_add(next_len);
         }
