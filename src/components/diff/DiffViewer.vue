@@ -2,6 +2,9 @@
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
+import { errorText } from "../../i18n";
+import { useFailureClaim } from "../../diagnostics/claim";
+
 import type {
   DiffDocument,
   DiffOptions,
@@ -59,6 +62,10 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+
+// The diff is rendered here when its error state is on screen, so this pane
+// claims the failure; a diff load that fails on another tab is toasted instead.
+useFailureClaim(computed(() => (props.state.status === "error" ? props.state.error : null)));
 
 /** The conflicted-file reason for the hunk buttons, in the active language. */
 const conflictedReason = computed(() =>
@@ -299,8 +306,8 @@ const errorPayload = computed(() => (props.state.status === "error" ? props.stat
       <!-- Error -->
       <div v-else-if="errorPayload" class="diff-error" role="alert">
         <Icon name="exclamationmark.circle" :size="18" class="tone-danger" />
-        <p class="diff-error-message">{{ errorPayload.message }}</p>
-        <p v-if="errorPayload.detail" class="diff-error-detail mono">{{ errorPayload.detail }}</p>
+        <p class="diff-error-message">{{ errorText(errorPayload) }}</p>
+        <p v-if="errorPayload.detail" class="diff-error-detail mono">{{ [errorPayload.code, errorPayload.detail].filter(Boolean).join(" · ") }}</p>
         <button type="button" @click="emit('retry')">{{ t("diff.tryAgain") }}</button>
       </div>
 

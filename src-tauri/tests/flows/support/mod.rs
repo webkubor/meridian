@@ -18,8 +18,34 @@ pub struct Fixture {
     pub repo_id: RepoId,
 }
 
+/// libgit2 reads the user's global config, XDG config and system config, and
+/// `core.excludesfile` among them. A developer whose global excludes contain
+/// `*.txt` would see unrelated flow tests fail, so every search path points at
+/// an empty directory before the first repository is opened. This is the only
+/// place the process-wide search paths are touched, and `Once` makes sure it
+/// happens before any fixture thread proceeds.
+fn isolate_libgit2_config() {
+    static ISOLATED: std::sync::Once = std::sync::Once::new();
+    ISOLATED.call_once(|| {
+        let empty =
+            std::env::temp_dir().join(format!("meridian-flows-gitconfig-{}", std::process::id()));
+        fs::create_dir_all(&empty).expect("create empty git config directory");
+        for level in [
+            git2::ConfigLevel::System,
+            git2::ConfigLevel::XDG,
+            git2::ConfigLevel::Global,
+        ] {
+            // SAFETY: documented as not thread-safe, which is why it runs once
+            // under `Once` before any repository is opened in this process.
+            unsafe { git2::opts::set_search_path(level, &empty) }
+                .expect("point libgit2 config search path at an empty directory");
+        }
+    });
+}
+
 impl Fixture {
     pub fn new() -> Self {
+        isolate_libgit2_config();
         let temp = tempfile::tempdir().expect("create isolated fixture directory");
         let root = temp.path().join("repo");
         fs::create_dir_all(&root).expect("create repository directory");
@@ -53,7 +79,7 @@ impl Fixture {
     }
 
     pub fn commit_file(&self, path: &str, contents: &str, message: &str) -> String {
-        fs::write(self.root.join(path), contents).expect("write fixture file");
+        self.write(path, contents);
         let repo = self.repo();
         let mut index = repo.index().expect("open fixture index");
         index.add_path(Path::new(path)).expect("stage fixture file");
@@ -113,7 +139,7 @@ impl Fixture {
             .peel_to_commit()
             .expect("branch has a commit");
 
-        fs::write(self.root.join(path), contents).expect("write scratch file");
+        self.write(path, contents);
         let mut index = repo.index().expect("open index");
         index.add_path(Path::new(path)).expect("stage scratch file");
         index.write().expect("write index");
@@ -169,7 +195,11 @@ impl Fixture {
     }
 
     pub fn write(&self, path: &str, contents: &str) {
-        fs::write(self.root.join(path), contents).expect("write fixture file");
+        let full = self.root.join(path);
+        if let Some(parent) = full.parent() {
+            fs::create_dir_all(parent).expect("create fixture directory");
+        }
+        fs::write(full, contents).expect("write fixture file");
     }
 
     pub fn read(&self, path: &str) -> String {

@@ -34,6 +34,12 @@ pub enum ErrorCode {
     ReferenceExists,
     ReferenceNotFound,
     OperationInProgress,
+    // Remotes. Without these, an unreachable host, a refused credential and a
+    // rejected push all collapsed into `io`/`unclassified`, and the UI could
+    // only say "a file operation failed" about a network problem.
+    NetworkUnreachable,
+    AuthRequired,
+    PushRejected,
     // Internal
     Cancelled,
     Unclassified,

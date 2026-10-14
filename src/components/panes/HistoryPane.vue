@@ -155,8 +155,7 @@ function patchSearch(patch: Partial<HistorySearchModel>): void {
     empty-icon="empty.noCommitSelected"
     :empty-title="t('history.emptyTitle')"
     :empty-caption="t('history.emptyCaption')"
-    :error-message="state.status === 'error' ? state.error.message : null"
-    :error-detail="state.status === 'error' ? state.error.detail : null"
+    :error="state.status === 'error' ? state.error : null"
     :loading-caption="t('history.loading')"
     @retry="emit('refresh')"
   >

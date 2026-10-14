@@ -147,14 +147,14 @@ impl ChainState {
                 return Ok(git2::Cred::username(&user)?);
             }
             return Err(ErrorPayload::new(
-                ErrorCode::InvalidRequest,
+                ErrorCode::AuthRequired,
                 format!("No username is available for '{url}'"),
             )
             .with_domain(ErrorDomain::Service)
             .with_param("class", "username_required"));
         }
         Err(ErrorPayload::new(
-            ErrorCode::InvalidRequest,
+            ErrorCode::AuthRequired,
             format!(
                 "The server asked for a credential type Meridian cannot provide \
                  (allowed = {allowed:?}); configure a git credential helper"
@@ -209,7 +209,7 @@ impl ChainState {
                 home.display()
             )
         };
-        Err(ErrorPayload::new(ErrorCode::InvalidRequest, message)
+        Err(ErrorPayload::new(ErrorCode::AuthRequired, message)
             .with_domain(ErrorDomain::Service)
             .with_param("class", "ssh_unavailable"))
     }
@@ -230,7 +230,7 @@ impl ChainState {
                     // which could hand back a stale credential the user just
                     // rejected.
                     return Err(ErrorPayload::new(
-                        ErrorCode::InvalidRequest,
+                        ErrorCode::AuthRequired,
                         format!(
                             "The credential helper for '{url}' refused to answer: the \
                              stored credential was rejected or has been removed."
@@ -254,7 +254,7 @@ impl ChainState {
 /// The error for "every helper was consulted and none produced a credential".
 fn credential_unavailable(url: &str) -> ErrorPayload {
     ErrorPayload::new(
-        ErrorCode::InvalidRequest,
+        ErrorCode::AuthRequired,
         format!(
             "No credential is available for '{url}'. Configure a git credential \
              helper (for example `git config --global credential.helper osxkeychain`)."
@@ -501,7 +501,7 @@ pub fn encode_credential_error(payload: &ErrorPayload) -> String {
 pub fn decode_credential_error(message: &str) -> Option<ErrorPayload> {
     let rest = message.strip_prefix(CLASS_MARKER)?;
     let (class, text) = rest.split_once('\u{1f}')?;
-    let payload = ErrorPayload::new(ErrorCode::InvalidRequest, text.to_string())
+    let payload = ErrorPayload::new(ErrorCode::AuthRequired, text.to_string())
         .with_domain(ErrorDomain::Service);
     Some(if class.is_empty() {
         payload

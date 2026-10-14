@@ -165,8 +165,7 @@ function onBulk(id: string, list: EntryStatus[]): void {
     empty-icon="empty.unchangedFile"
     :empty-title="t('workingCopy.emptyTitle')"
     :empty-caption="t('workingCopy.emptyCaption')"
-    :error-message="state.status === 'error' ? state.error.message : null"
-    :error-detail="state.status === 'error' ? state.error.detail : null"
+    :error="state.status === 'error' ? state.error : null"
     :loading-caption="t('workingCopy.loading')"
     @retry="emit('refresh')"
   >

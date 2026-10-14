@@ -70,41 +70,70 @@ release notes read offline and in either language.
 ### Privacy
 
 No telemetry, no account. The optional update check asks GitHub for the latest
-release tag and carries the app version only. When you choose to report a bug,
-Meridian builds a URL and opens it in your browser; if you include a diagnostics
-report, that report is in the URL. Meridian never submits the issue. Review the
-form and its URL before you choose to submit it in GitHub.
+release tag and carries the app version only. Nothing else in the app opens a
+network connection of its own: the window runs under a content-security policy
+whose only network destination is the app's own IPC bridge, and a test fails if
+the frontend ever grows a `fetch`, an `XMLHttpRequest` or a `WebSocket`.
+
+When you choose to report a bug, Meridian builds a URL and shows you exactly
+what will be in it before anything is opened. The query string reaches
+github.com as soon as that page loads — before you press Submit — so the
+confirmation is the review, and **取消 / Cancel** sends nothing at all. Meridian
+never submits the issue; you read the form and submit it yourself.
 
 ### Debugging and reporting
 
-Open **About Meridian → Diagnostics** to turn on debug mode, inspect recent
-failures and command calls, read the log, or copy/export a report. To start the
-installed app in debug mode from Terminal, run
-`MERIDIAN_DEBUG=1 /Applications/Meridian.app/Contents/MacOS/meridian`. The log is
-`~/Library/Logs/dev.meridian.app/meridian.log`; it rotates automatically, and
-logs and rotated files stay on your Mac.
+Open **Diagnostics** from the toolbar (or **About Meridian → 诊断**) to turn on
+debug mode, inspect recent failures and command calls, read the log, or
+copy/export a report. To start the installed app in debug mode from Terminal,
+run `MERIDIAN_DEBUG=1 /Applications/Meridian.app/Contents/MacOS/meridian`. The
+log is `~/Library/Logs/dev.meridian.app/meridian.log`; it rotates at 2 MB keeping
+the live file plus `.1` and `.2`, and logs, rotated files, the crash note and the
+debug-mode setting are readable by their owner only (`0600` in a `0700` folder).
+If the folder cannot be created, Meridian keeps logging in memory and says so in
+the log itself rather than failing to start.
 
-Logs record command names, outcomes, durations, error details and argument key
-names. Argument values are included only in debug mode for a small allowlist of
-harmless scalar fields. File contents, diffs, commit messages, credentials and
-credential-helper output are never logged. Reports mask your home folder, URL
-logins and token-shaped strings, but automatic redaction is not perfect: read a
-report before sharing it. Copy the report, or export it to Downloads and attach
-the `.txt` file to a bug report you review and submit yourself in GitHub. If the
-report does not fit in the issue URL, the form marks it as truncated and asks you
-to attach the exported file instead.
+Logs record command names, outcomes, durations, the error code, domain, message
+and detail, and argument *key names*. Argument values are included only in debug
+mode, only for a small allowlist of harmless scalar fields, and only for
+Meridian's own log targets — third-party crates stay at warnings. File contents,
+diffs, patch text, commit messages, remote URLs with credentials and
+credential-helper output are never logged. Reports mask home directories, URL
+logins and token-shaped strings on both sides of the app — the backend and the
+webview run the same redaction rules, checked against one shared test fixture —
+but automatic redaction is not perfect: read a report before sharing it. Copy the
+report, or export it to Downloads and attach the `.txt` file to a bug report you
+review and submit yourself in GitHub. If the report does not fit in the issue
+URL, the form marks it as truncated and asks you to attach the exported file
+instead.
 
-打开「关于 Meridian → 诊断」可开启调试模式、查看最近失败和命令调用、阅读日志，或
-复制/导出报告。也可以在终端运行
+**Every failure is visible.** A command that fails, a pane that cannot render
+its error, an exception inside the app's own code and a crash from the previous
+run all end up in the same place: the recorder, the local log, and something you
+can see — a toast with the reason, the inline error arm, or a crash banner at
+launch. The rule behind it: a failure is quiet only while something on screen is
+actually showing it.
+
+工具栏上的「诊断」（或「关于 Meridian → 诊断」）可开启调试模式、查看最近失败和命令调用、
+阅读日志，或复制/导出报告。也可以在终端运行
 `MERIDIAN_DEBUG=1 /Applications/Meridian.app/Contents/MacOS/meridian` 以调试模式启动应用。
-日志位于 `~/Library/Logs/dev.meridian.app/meridian.log`，会自动轮换；日志及轮换文件只保存在
-你的 Mac 上。
+日志位于 `~/Library/Logs/dev.meridian.app/meridian.log`；每到 2 MB 轮换一次，保留当前文件
+以及 `.1`、`.2` 两份。日志、轮换文件、崩溃记录和调试模式设置仅本人可读写（`0700` 目录中的
+`0600` 文件）。若日志目录无法创建，Meridian 会退回到仅在内存中记录，并在日志里说明原因，
+而不是拒绝启动。
 
-日志记录命令名称、结果、耗时、错误详情和参数键名。只有开启调试模式时，少量无害的标量
-参数值才会写入日志。文件内容、差异、提交说明、凭据和凭据助手输出绝不会记录。报告会遮盖
-主目录、URL 登录信息和类似令牌的字符串，但自动脱敏并不完美：分享前请先阅读报告。你可以
-复制报告，或将报告导出到「下载」文件夹，再把 `.txt` 文件附加到你自行检查并提交的 GitHub
-问题报告中。若报告无法完整放入问题链接，表单会标明内容已截断，并提示改为附上导出的文件。
+日志记录命令名称、结果、耗时、错误码与分类、错误信息与详情，以及参数**键名**。只有开启
+调试模式时，才会把少量无害的标量参数值写入日志，且只限 Meridian 自身的日志目标——第三方
+库最高只记录警告。文件内容、差异、补丁文本、提交说明、含凭据的远程地址和凭据助手输出绝
+不会记录。报告在前后端都会遮盖主目录、URL 登录信息和类似令牌的字符串——两侧使用同一套
+脱敏规则，并由同一份测试清单校验——但自动脱敏并不完美：分享前请先阅读报告。你可以复制
+报告，或将报告导出到「下载」文件夹，再把 `.txt` 文件附加到你自行检查并提交的 GitHub 问
+题报告中。若报告无法完整放入问题链接，表单会标明内容已截断，并提示改为附上导出的文件。
+
+**失败一定会被看见。** 命令失败、面板无法渲染错误、Meridian 自身代码抛出的异常，以及上次
+运行崩溃的记录，最终都会出现在同一处：记录器、本地日志，以及你能看到的界面——带原因
+的提示、内联错误提示，或启动时的崩溃横幅。背后的规则是：只有当确实有界面正在显示它时，
+失败才算安静。
 
 ### Not built yet
 
@@ -121,12 +150,14 @@ src-tauri/            Rust: Cargo workspace root
   src/engine/         git2-backed operations
   src/transform/      pure git2 ↔ domain mappings
   src/validation/     pure precondition validators
-  src/commands/       the Tauri command surface (docs/03)
+  src/commands/       the Tauri command surface (docs/03, §21 for diagnostics)
   src/queue.rs        one serialized queue per repository
   src/events.rs       app-wide event bus (Tauri emit)
+  src/logging.rs      local log, redaction, debug mode, crash notes
   src/state.rs        open-repository registry + the run sequence
 src/                  Vue 3 + TypeScript frontend
   bridges/            typed command wrappers + event subscription
+  diagnostics/        failure net, recorder, report, redaction, log sink
   composables/        the data layer (one per domain)
   components/         presentational panes and screens
   i18n/               the zh-CN and en catalogues
@@ -160,6 +191,18 @@ already caught a real omission:
   releases, and the crate version is documented.
 - `src-tauri/tests/github_metadata.rs` — the field ids the feedback form
   pre-fills still exist in the issue templates.
+- `src-tauri/tests/flows/` — headless command flows against real temporary
+  repositories: the wire JSON in, the repository state and emitted events out.
+- `src-tauri/tests/fixtures/redaction-contract.json` — the redaction rules both
+  sides of the app must agree on (the backend test and a vitest suite both read
+  it).
+- `src/flows/` — the same idea for the UI: the real `App.vue`, stores and
+  catalogues over a programmable Tauri backend, asserting what the user can see
+  after a failure.
+- `src/networkGuard.test.ts` — the web layer reaches no network, and the window
+  it runs in does not allow it to.
+- `src/diagnostics/claim.test.ts` — a failure is quiet only while something on
+  screen is showing it.
 
 ## Releasing
 

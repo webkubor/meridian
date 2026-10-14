@@ -9,7 +9,7 @@
 import { Channel, invoke as tauriInvoke } from "@tauri-apps/api/core";
 
 import type { DebugState, CrashNote } from "./bindings";
-import { captureFailure, configureFailureNet, normalizeError } from "../diagnostics/failures";
+import { captureFailure, normalizeError } from "../diagnostics/failures";
 import { recordCall, safeArgumentSummary } from "../diagnostics/recorder";
 
 import type {
@@ -71,7 +71,7 @@ import type {
  * that fails is recorded but never logged, which is what stops the reporter
  * from reporting itself in a loop.
  */
-export async function call<T>(name: string, args?: Record<string, unknown>, opts: { handled?: boolean } = {}): Promise<T> {
+export async function call<T>(name: string, args?: Record<string, unknown>): Promise<T> {
   const startedAt = new Date().toISOString();
   const started = performance.now();
   const summary = safeArgumentSummary(args, name);
@@ -82,16 +82,10 @@ export async function call<T>(name: string, args?: Record<string, unknown>, opts
   } catch (error) {
     const payload = normalizeError(error);
     recordCall({ command: name, startedAt, durationMs: Math.round(performance.now() - started), ok: false, errorCode: payload.code, errorDomain: payload.domain, ...summary });
-    captureFailure(error, name, { ...opts, newCall: true, payload });
+    captureFailure(error, name, { newCall: true, payload });
     throw error;
   }
 }
-
-configureFailureNet({
-  log: ({ command, error }) => {
-    void diagnosticsLogWrite("error", JSON.stringify(error), command).catch(() => undefined);
-  },
-});
 
 export function diagnosticsLogTail(lines: number): Promise<string> {
   return call<string>("diagnostics_log_tail", { args: { lines } });

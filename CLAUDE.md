@@ -63,9 +63,18 @@ Action → Validator → Operation triad. To add one:
 7. **Diagnostics and visible failures** — route frontend calls through the
    shared instrumentation in `src/bridges/commands.ts`, which records argument
    key names by default and only safe, allowlisted scalar values in debug mode.
-   Every failure path must reach the user through
-   a visible error state or message; logging an error alone is not handling it.
-   See `src/diagnostics/failures.ts` for the failure net and its fallback toast.
+   Catch blocks use `reportFailure(error, source)` and keep what it returns;
+   components that render an error call `useFailureClaim` (through `<ListShell>`'s
+   `error` prop, or directly) so a failure is quiet only while something on screen
+   is showing it. Logging an error alone is not handling it, and neither is
+   marking it handled from the catch block: the pane that would render it may not
+   be mounted. See `src/diagnostics/failures.ts` for the net, `claim.ts` for the
+   renderer's side, and `logSink.ts` for the bridge to the local log.
+   On the Rust side, every command writes an outcome line (`logging::instrument`),
+   the outcome log and the toast vocabulary both use `errors.byCode` /
+   `errors.byClass`, and the redaction rules are the ones in
+   `src-tauri/src/logging.rs` — kept equal to `src/diagnostics/recorder.ts` by the
+   shared fixture `src-tauri/tests/fixtures/redaction-contract.json`.
 
 Orchestration lives only in `AppState::run` (docs/02 §3): resolve RepoId →
 enqueue on the repo's queue → validate → (policy/snapshot hooks) → execute on a
@@ -93,9 +102,13 @@ command body.
 
 - Call graph: components → `composables/` (behaviour) → `stores/` (state) →
   `bridges/commands.ts` (the only `invoke` call site). Nothing else may call
-  `invoke` directly; `bridges/bindings.ts` is the typed mirror of the Rust
-  command surface (docs/02 §1 schedules `tauri-specta` to generate it — until
-  then, keep it in sync by hand in the same change that adds a command).
+  `invoke` directly — `src/networkGuard.test.ts` fails the build if one appears;
+  `bridges/bindings.ts` is the typed mirror of the Rust command surface
+  (docs/02 §1 schedules `tauri-specta` to generate it — until then, keep it in
+  sync by hand in the same change that adds a command).
+- The webview may not reach the network: `src/networkGuard.test.ts` pins that
+  too, alongside the CSP in `src-tauri/tauri.conf.json`. The one request the app
+  makes (the update check) is made from Rust.
 - Stores hold domain types only, one store per domain module. They react to
   `AppEvent`s from `bridges/events.ts`; they never poll.
 - Every async list renders the four-state contract from `stores/loadState.ts`

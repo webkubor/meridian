@@ -2,6 +2,8 @@ import { ref } from "vue";
 
 import type { ErrorPayload, RepoId } from "../bridges/bindings";
 import * as commands from "../bridges/commands";
+import { reportFailure } from "../diagnostics/failures";
+import type { IntegrationResult } from "../bridges/bindings";
 import { useBranchesStore } from "../stores/branches";
 import { useHistoryStore } from "../stores/history";
 import { useReposStore } from "../stores/repos";
@@ -11,7 +13,8 @@ import { useWorkingCopyStore } from "../stores/workingCopy";
  * Repo-level git verbs (docs/03 §8 remote_*, §12 integrate_*): the actions the
  * toolbar, the integration banner and the branch panes trigger. Each returns
  * the backend `ErrorPayload` on failure (never a generic message) so the caller
- * can surface exactly what the engine refused, or `null` on success.
+ * can surface exactly what the engine refused, or a `conflicted` flag when the
+ * engine stopped with conflicts to resolve.
  *
  * These verbs change refs / the working tree, so every success refreshes the
  * branches, working-copy and history stores — the UI never has to guess.
@@ -42,18 +45,18 @@ export function useGit() {
     ]);
   }
 
-  async function run(action: (repo: RepoId) => Promise<unknown>): Promise<ErrorPayload | null> {
+  async function run(action: (repo: RepoId) => Promise<unknown>): Promise<VerbResult> {
     const id = repoId();
-    if (!id) return null;
+    if (!id) return { error: null, conflicted: false };
     busy.value = true;
     lastError.value = null;
     try {
-      await action(id);
+      const result = await action(id);
       await refreshAll(id);
-      return null;
+      return { error: null, conflicted: isConflicted(result) };
     } catch (error) {
-      lastError.value = error as ErrorPayload;
-      return lastError.value;
+      lastError.value = reportFailure(error, "git verb");
+      return { error: lastError.value, conflicted: false };
     } finally {
       busy.value = false;
     }
@@ -100,6 +103,24 @@ export function useGit() {
     abortOperation: () => run((id) => commands.mergeAbort(id)),
     resolveConflict: (paths: string[]) => run((id) => commands.mergeToolInvoke(id, paths)),
   };
+}
+
+/**
+ * What a repo-level verb came back with.
+ *
+ * `conflicted` matters because `merge_start`/`rebase_start`/`pull` return
+ * `Ok(IntegrationResult{ outcome: Conflicted })` when conflicts stopped the
+ * operation: an `Ok` that means "not finished" must never be reported as a
+ * success.
+ */
+export interface VerbResult {
+  error: ErrorPayload | null;
+  conflicted: boolean;
+}
+
+function isConflicted(result: unknown): boolean {
+  const outcome = (result as IntegrationResult | undefined)?.outcome;
+  return typeof outcome === "object" && outcome !== null && "kind" in outcome && outcome.kind === "conflicted";
 }
 
 function missingRemote(): ErrorPayload {

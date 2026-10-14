@@ -12,6 +12,7 @@
 //! a preference — see the disclosure text in `updates.disclosure`.
 
 use std::env;
+use std::time::Instant;
 
 use serde::Deserialize;
 use tauri::{AppHandle, Runtime};
@@ -23,6 +24,7 @@ use crate::domain::app::{
     ReleaseNotes, UpdateCheck, UpdateStatus,
 };
 use crate::domain::error::{ErrorCode, ErrorPayload};
+use crate::logging;
 
 /// The project slug, baked in by `build.rs` from the `origin` remote. Not a
 /// literal anywhere in the source, so there is exactly one place that decides
@@ -163,7 +165,17 @@ pub fn app_release_notes_load<R: Runtime>(
 
 #[tauri::command]
 pub async fn app_update_check<R: Runtime>(app: AppHandle<R>) -> Result<UpdateCheck, ErrorPayload> {
-    let info = info_for(&app);
+    // These commands run outside `AppState::run`, so each logs its own outcome:
+    // an update that fails to check or install is exactly the failure that used
+    // to leave nothing in the log.
+    let started = Instant::now();
+    let result = update_check(&app).await;
+    logging::instrument("app_update_check", started, &result);
+    result
+}
+
+async fn update_check<R: Runtime>(app: &AppHandle<R>) -> Result<UpdateCheck, ErrorPayload> {
+    let info = info_for(app);
 
     if !info.updates_configured {
         return Ok(UpdateCheck::NotConfigured);
@@ -224,7 +236,17 @@ pub async fn app_update_install<R: Runtime>(
     app: AppHandle<R>,
     on_progress: tauri::ipc::Channel<UpdateProgress>,
 ) -> Result<(), ErrorPayload> {
-    let info = info_for(&app);
+    let started = Instant::now();
+    let result = update_install(&app, on_progress).await;
+    logging::instrument("app_update_install", started, &result);
+    result
+}
+
+async fn update_install<R: Runtime>(
+    app: &AppHandle<R>,
+    on_progress: tauri::ipc::Channel<UpdateProgress>,
+) -> Result<(), ErrorPayload> {
+    let info = info_for(app);
     if !info.can_self_update {
         return Err(ErrorPayload::new(
             ErrorCode::InvalidRequest,
@@ -320,6 +342,13 @@ pub fn app_relaunch<R: Runtime>(app: AppHandle<R>) {
 pub async fn app_pick_directory<R: Runtime>(
     app: AppHandle<R>,
 ) -> Result<Option<String>, ErrorPayload> {
+    let started = Instant::now();
+    let result = pick_directory(app).await;
+    logging::instrument("app_pick_directory", started, &result);
+    result
+}
+
+async fn pick_directory<R: Runtime>(app: AppHandle<R>) -> Result<Option<String>, ErrorPayload> {
     let (tx, rx) = tokio::sync::oneshot::channel();
     let dialog_app = app.clone();
 
@@ -424,7 +453,9 @@ fn feedback_target(info: &AppInfo, request: &FeedbackRequest) -> Option<Feedback
     push_param(&mut query, "template", template);
     if let Some(summary) = request.summary.as_deref().map(str::trim) {
         if !summary.is_empty() {
-            let title = fit_title(summary);
+            // Redact first, truncate second: cutting first could split a
+            // credential and leave a fragment the rules no longer recognise.
+            let title = fit_title(&logging::redact(summary));
             push_param(&mut query, "title", &title);
         }
     }
@@ -445,7 +476,11 @@ fn feedback_target(info: &AppInfo, request: &FeedbackRequest) -> Option<Feedback
     // would drop.
     let origin = format!("https://github.com/{slug}/issues/new?");
     if let (FeedbackKind::Bug, Some(context)) = (request.kind, request.context.as_deref()) {
-        let context = context.trim();
+        // The report text is built in the webview, and this URL is what leaves
+        // the process, so the Rust rules run here too — the only layer that
+        // sees every report, whatever produced it.
+        let context = logging::redact(context.trim());
+        let context = context.as_str();
         if !context.is_empty() {
             // `&` + `diagnostics` + `=` is what `push_param` will add.
             let overhead = origin.len() + query.len() + encode(FIELD_DIAGNOSTICS).len() + 2;
@@ -542,7 +577,16 @@ fn fit_context(context: &str, room: usize) -> Fitted {
         end = index + character.len_utf8();
     }
 
-    let kept = context[..end].trim_end();
+    let mut kept = context[..end].trim_end();
+    // Prefer a section boundary: a report cut in the middle of a JSON block is
+    // unreadable, while one that stops after a whole section is merely short.
+    // Only when that keeps at least half of what fits — otherwise one huge
+    // first section would be dropped entirely.
+    if let Some(boundary) = kept.rfind("\n\n") {
+        if boundary >= kept.len() / 2 {
+            kept = kept[..boundary].trim_end();
+        }
+    }
     Fitted::Truncated(if kept.is_empty() {
         TRUNCATION_MARKER.to_string()
     } else {
@@ -581,13 +625,16 @@ pub fn app_feedback_compose<R: Runtime>(
     app: AppHandle<R>,
     args: FeedbackRequest,
 ) -> Result<FeedbackTarget, ErrorPayload> {
+    let started = Instant::now();
     let info = info_for(&app);
-    feedback_target(&info, &args).ok_or_else(|| {
+    let result = feedback_target(&info, &args).ok_or_else(|| {
         ErrorPayload::new(
             ErrorCode::InvalidRequest,
             "This build does not know which project to report to.",
         )
-    })
+    });
+    logging::instrument("app_feedback_compose", started, &result);
+    result
 }
 
 // --- error helpers ---------------------------------------------------------
@@ -1005,5 +1052,29 @@ mod tests {
     fn both_changelogs_are_embedded_and_non_empty() {
         assert!(CHANGELOG_EN.contains("# Changelog"));
         assert!(CHANGELOG_ZH_CN.contains("# 版本日志"));
+    }
+
+    /// The report is built in the webview but the URL is built here, and the
+    /// URL is what leaves the process — so credentials are removed here too,
+    /// before the budget cut can split one into an unrecognisable fragment.
+    #[test]
+    fn credential_shaped_text_never_reaches_the_issue_url() {
+        // Built from fragments so this file holds no literal that looks like a
+        // real credential.
+        let token = ["ghp_", "abcdefghijklmnopqrstuvwxyz1234567890"].concat();
+        let password = ["hunter", "2pass"].concat();
+        let context = format!(
+            "clone failed: https://alice:{password}@example.com/r.git\nAuthorization: Bearer {}\nmy token {token}",
+            "abcdefghijklmnopqrstuvwxyz0123456789"
+        );
+        let target = bug_with(Some(format!("push failed with {token}")), Some(&context));
+
+        let url = decode(&target.url);
+        assert!(!url.contains(&password), "password reached the URL");
+        assert!(!url.contains(&token), "token reached the URL");
+        assert!(!url.contains("abcdefghijklmnopqrstuvwxyz0123456789"));
+        assert!(url.contains("clone failed: https://[redacted]@example.com/r.git"));
+        // The report is still a usable report: only the secret parts are gone.
+        assert!(url.contains("Authorization: [redacted]"));
     }
 }

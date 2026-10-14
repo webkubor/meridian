@@ -7,7 +7,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { VueWrapper } from "@vue/test-utils";
 
 import {
-  alertText,
   backend,
   clickInDialogue,
   clickSelector,
@@ -17,6 +16,7 @@ import {
   flushFlow,
   hasDangerToast,
   hasSuccessToast,
+  loggedToDiagnostics,
   mountApp,
   openRepositoryFixture,
   recordedFailures,
@@ -63,7 +63,7 @@ describe("working-copy operations", () => {
     expect(fileSection(wrapper, "暂存区").text()).toContain(fixtureFilePath);
   });
 
-  it("renders a stage failure inline and records the error without an unhandled rejection", async () => {
+  it("keeps the file list on a stage failure, toasts the reason, and records it", async () => {
     const wrapper = await openWorkingCopy();
     backend.failNext("wc_stage_paths", {
       code: "index_locked",
@@ -76,8 +76,15 @@ describe("working-copy operations", () => {
     await fileRow(wrapper, fixtureFilePath).get('button[title="暂存"]').trigger("click");
     await flushFlow(300);
 
-    expect(alertText()).toContain("索引正被另一个 Git 进程使用。");
+    // A failed mutation no longer replaces the list with an error arm: the
+    // staged-set state the user is looking at is still true, and the failure
+    // arrives as a toast with the engine's reason and a route into diagnostics.
+    expect(wrapper.find(".file-row").exists()).toBe(true);
+    expect(hasDangerToast("另一个 Git 进程正在使用该仓库")).toBe(true);
+    expect(hasDangerToast("索引正被另一个 Git 进程使用。")).toBe(true);
     expect(recordedFailures().some((failure) => failure.command === "wc_stage_paths")).toBe(true);
+    // And it reached the local log, which is where a bug report is assembled.
+    expect(loggedToDiagnostics()).toBe(true);
   });
 
   it("unstages one file and updates the list", async () => {
@@ -90,7 +97,7 @@ describe("working-copy operations", () => {
     expect(fileSection(wrapper, "已修改").text()).toContain(fixtureFilePath);
   });
 
-  it("renders an unstage error inline and records it", async () => {
+  it("keeps the list on an unstage failure, toasts it and records it", async () => {
     const wrapper = await openWorkingCopy();
     await stageFixtureFile(wrapper);
     backend.failNext("wc_unstage_paths", {
@@ -104,7 +111,8 @@ describe("working-copy operations", () => {
     await fileRow(wrapper, fixtureFilePath).get('button[title="取消暂存"]').trigger("click");
     await flushFlow(300);
 
-    expect(alertText()).toContain("无法从暂存区移除文件。");
+    expect(wrapper.find(".file-row").exists()).toBe(true);
+    expect(hasDangerToast("无法从暂存区移除文件。")).toBe(true);
     expect(recordedFailures().some((failure) => failure.command === "wc_unstage_paths")).toBe(true);
   });
 
@@ -117,8 +125,16 @@ describe("working-copy operations", () => {
     expect(wrapper.text()).toContain("暂存 1 个");
   });
 
-  it("shows a bulk-stage failure in the list error state", async () => {
-    const wrapper = await openWorkingCopy();
+  it("sends the whole selection in one command, so a failure cannot be erased by a later success", async () => {
+    // Two modified files, so the section's bulk control has two paths to send:
+    // one call per path raced, and a success landing after the failure
+    // overwrote the error state, leaving a file silently unstaged.
+    const wrapper = await mountApp();
+    backend.setEntries([
+      { path: "src/app.ts", code: "modified", staged: false, assumeUnchanged: false, view: { short: "M", text: "modified", tone: "info" } },
+      { path: "src/other.ts", code: "modified", staged: false, assumeUnchanged: false, view: { short: "M", text: "modified", tone: "info" } },
+    ]);
+    await openRepositoryFixture(wrapper);
     backend.failNext("wc_stage_paths", {
       code: "io",
       message: "无法暂存所选文件。",
@@ -130,7 +146,12 @@ describe("working-copy operations", () => {
     await fileSection(wrapper, "已修改").get("button.section-bulk").trigger("click");
     await flushFlow(300);
 
-    expect(alertText()).toContain("无法暂存所选文件。");
+    const stageCalls = backend.calls.filter((call) => call.name === "wc_stage_paths");
+    expect(stageCalls).toHaveLength(1);
+    expect((stageCalls[0]?.payload as { args: { paths: string[] } }).args.paths).toHaveLength(2);
+    // The list is still on screen and the failure is in the user's face.
+    expect(wrapper.findAll(".file-row").length).toBeGreaterThan(0);
+    expect(hasDangerToast("无法暂存所选文件。")).toBe(true);
     expect(recordedFailures().some((failure) => failure.command === "wc_stage_paths")).toBe(true);
   });
 
@@ -174,7 +195,7 @@ describe("working-copy operations", () => {
     await clickInDialogue("button.btn.danger");
     await flushFlow(300);
 
-    expect(hasDangerToast("无法放弃这些改动。")).toBe(true);
+    expect(hasDangerToast("无法放弃文件改动。")).toBe(true);
     expect(recordedFailures().some((failure) => failure.command === "wc_paths_discard")).toBe(true);
   });
 
@@ -207,7 +228,7 @@ describe("working-copy operations", () => {
     await clickSelector(".composer-foot .split-primary", wrapper);
     await flushFlow(300);
 
-    expect(hasDangerToast("无法创建该提交。")).toBe(true);
+    expect(hasDangerToast("提交钩子拒绝了这次提交。")).toBe(true);
     expect(recordedFailures().some((failure) => failure.command === "commit_create")).toBe(true);
   });
 
@@ -242,7 +263,7 @@ describe("working-copy operations", () => {
     await clickSelector(".composer-foot .split-primary", wrapper);
     await flushFlow(300);
 
-    expect(hasDangerToast("无法创建该提交。")).toBe(true);
+    expect(hasDangerToast("找不到修订：HEAD")).toBe(true);
     expect(recordedFailures().some((failure) => failure.command === "commit_amend")).toBe(true);
   });
 

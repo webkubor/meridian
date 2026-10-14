@@ -40,7 +40,7 @@ export const useDiffStore = defineStore("diff", () => {
       const wire = await commands.wcDiffLoad(repo, path, perspective, toDiffOptionsWire(options.value));
       document.value = { status: "data", data: toDiffDocument(wire, path) };
     } catch (error) {
-      document.value = errorState(error);
+      document.value = errorState(error, "wc_diff_load");
     }
   }
 
@@ -91,7 +91,9 @@ export const useDiffStore = defineStore("diff", () => {
       await reload();
       return delta;
     } catch (error) {
-      document.value = errorState(error);
+      // The diff pane renders this state while it is open; when it is not, the
+      // stale-hunk rejection still reaches the user through the net.
+      document.value = errorState(error, action === "discard" ? "wc_chunk_discard" : "wc_chunk_apply");
       return null;
     }
   }

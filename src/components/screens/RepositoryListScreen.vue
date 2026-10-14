@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 
-import type { RepoRoot } from "../../bridges/bindings";
+import { errorText } from "../../i18n";
+import { useFailureClaim } from "../../diagnostics/claim";
+
+import type { ErrorPayload, RepoRoot } from "../../bridges/bindings";
 import type { LoadState, RepoSummaryModel } from "../contracts";
 import EmptyState from "../common/EmptyState.vue";
 import Icon from "../common/Icon.vue";
@@ -31,9 +34,8 @@ const props = withDefaults(
     /** The recents filter — a separate model from `pathInput` (the Open/Create field). */
     filter?: string;
     busy?: boolean;
-    /** Set when the last open/clone attempt failed. */
-    errorMessage?: string | null;
-    errorDetail?: string | null;
+    /** Set when the last open/clone/init/discover attempt failed. */
+    error?: ErrorPayload | null;
     cloneUrl?: string;
     showNearby?: boolean;
     /**
@@ -46,8 +48,7 @@ const props = withDefaults(
   {
     filter: "",
     busy: false,
-    errorMessage: null,
-    errorDetail: null,
+    error: null,
     cloneUrl: "",
     showNearby: true,
     unavailable: null,
@@ -71,6 +72,10 @@ const emit = defineEmits<{
 }>();
 
 const mode = ref<"open" | "clone" | "create">("open");
+
+// The alert above is the launch screen's rendering of a failed open/init/
+// clone/scan, so while it is on screen the failure net stays quiet.
+useFailureClaim(computed(() => props.error));
 
 const filteredRecents = computed(() => {
   const needle = props.filter.trim().toLowerCase();
@@ -198,10 +203,11 @@ function labelOf(repo: RepoSummaryModel): string {
         </button>
       </form>
 
-      <p v-if="errorMessage" class="launch-error" role="alert">
+      <p v-if="error" class="launch-error" role="alert">
         <Icon name="exclamationmark.circle" :size="13" />
-        <span>{{ errorMessage }}</span>
-        <span v-if="errorDetail" class="launch-error-detail mono">{{ errorDetail }}</span>
+        <span>{{ errorText(error) }}</span>
+        <span v-if="error.message && error.message !== errorText(error)" class="launch-error-reason mono">{{ error.message }}</span>
+        <span v-if="error.detail || error.code" class="launch-error-detail mono">{{ [error.code, error.detail].filter(Boolean).join(" · ") }}</span>
       </p>
 
       <div class="launch-recents">
@@ -283,7 +289,7 @@ function labelOf(repo: RepoSummaryModel): string {
           :empty-title="$t('screens.repositories.nothingNearby')"
           :empty-caption="$t('screens.repositories.nothingNearbyCaption')"
           :loading-caption="$t('screens.repositories.scanning')"
-          :error-message="nearbyState.status === 'error' ? nearbyState.error.message : null"
+          :error="nearbyState.status === 'error' ? nearbyState.error : null"
           @retry="emit('refreshNearby')"
         >
           <ul class="nearby-list">
@@ -425,6 +431,7 @@ function labelOf(repo: RepoSummaryModel): string {
   color: var(--md-danger);
 }
 
+.launch-error-reason,
 .launch-error-detail {
   color: var(--md-fg-muted);
   font-size: var(--md-text-xs);

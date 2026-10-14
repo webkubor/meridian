@@ -7,9 +7,73 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Meridian</title>
+    <!-- Plain stylesheet, no inline style attributes: a CSP can allow both, but
+         this panel must be legible before any bundle has run. -->
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: #f6f5f2;
+        color: #23262b;
+        font: 14px/1.5 -apple-system, "Helvetica Neue", "PingFang SC", sans-serif;
+      }
+      #boot {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        text-align: center;
+      }
+      #boot h1 {
+        margin: 0;
+        font-size: 15px;
+      }
+      #boot p {
+        margin: 0;
+        max-width: 44em;
+      }
+      #boot-message {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+      }
+      #boot-copy {
+        font: inherit;
+        padding: 4px 10px;
+        border: 1px solid #b9bcc2;
+        border-radius: 6px;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+      }
+      @media (prefers-color-scheme: dark) {
+        html,
+        body {
+          background: #1c1f24;
+          color: #e6e8ec;
+        }
+        #boot-copy {
+          border-color: #4a4f57;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <!-- The static panel. It is what the user sees if the module bundle never
+         runs; `public/boot-guard.js` fills in the reason and the app hides it. -->
+    <div id="boot" role="status">
+      <h1>Meridian 正在启动 / Meridian is starting</h1>
+      <p>如果这个提示一直不消失，说明启动时出了问题。下面的信息可以复制后上报。</p>
+      <p>If this stays here, startup failed. Copy the message below and report it.</p>
+      <p id="boot-message"></p>
+      <button id="boot-copy" type="button">复制 / Copy</button>
+    </div>
+    <script src="/boot-guard.js"></script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

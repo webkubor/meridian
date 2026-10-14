@@ -14,26 +14,46 @@
 
 import { openUrl } from "@tauri-apps/plugin-opener";
 
+import { claimFailure } from "../diagnostics/failures";
+import { i18n } from "../i18n";
+
+export interface OpenResult {
+  /** Whether a browser was actually asked to open the link. */
+  opened: boolean;
+  /** Why not, in the user's language; the technical reason is in Diagnostics. */
+  reason?: string;
+}
+
 /**
  * Opens `url` in the default browser.
  *
  * Refuses anything that is not `http(s)` or `mailto`. The backend composes the
- * URLs this app opens, so the check should never fire — which is the point: if a
- * future change lets a remote string reach here, the failure is a refused link
+ * URLs this app opens, so the check should never fire — which is the point: if
+ * a future change lets a remote string reach here, the failure is a refused link
  * rather than a `file:` or `javascript:` URL handed to the system.
  *
- * Resolves to whether a browser was asked to open it; a false return is not an
- * error worth a modal, but the caller may want to offer the URL as text.
+ * A refusal (no browser handler, plugin error) used to be a `false` that every
+ * caller ignored, so "Report a problem" did nothing at all and said nothing.
+ * The attempt is now recorded through the failure net — claimed, because the
+ * caller decides what the user sees (a danger toast, a copyable URL) — and the
+ * caller gets the result. Never throw: the URL is in the caller's hands, and a
+ * thrown error would make the report path itself throw.
  */
-export async function openExternal(url: string): Promise<boolean> {
+export async function openExternal(url: string): Promise<OpenResult> {
   const trimmed = url.trim();
-  if (!/^(https?:|mailto:)/i.test(trimmed)) return false;
+  const failed = (technical: string): OpenResult => {
+    claimFailure(
+      { code: "unclassified", message: i18n.global.t("shell.toast.linkFailed"), detail: technical.slice(0, 200), retryable: true, domain: "internal" },
+      "opener.openUrl",
+    );
+    return { opened: false, reason: i18n.global.t("shell.toast.linkFailed") };
+  };
+  if (!/^(https?:|mailto:)/i.test(trimmed)) return failed("refused: not an http(s) or mailto URL");
   try {
     await openUrl(trimmed);
-    return true;
-  } catch {
-    // No registered handler, or the plugin refused it.
-    return false;
+    return { opened: true };
+  } catch (error) {
+    return failed(error instanceof Error ? error.message : String(error));
   }
 }
 

@@ -746,17 +746,33 @@ fn contains(outer: &HunkSpan, inner: &HunkSpan) -> bool {
         && outer.new_start + outer.new_lines.max(1) >= inner.new_start + inner.new_lines.max(1)
 }
 
+/// The coordinates of a hunk, `@@ -a,b +c,d @@`, built from the numeric fields.
+///
+/// `HunkRef::header` is libgit2's verbatim hunk header, whose tail is the
+/// nearest enclosing function line *from the file* — source code. A stale hunk
+/// is a routine outcome (stage a hunk after the file changed) and its error is
+/// logged at error level, so the text after the closing `@@` must never reach a
+/// message, a param or a log line. The numbers carry everything a bug report
+/// needs.
+fn hunk_coordinates(target: &HunkRef) -> String {
+    format!(
+        "@@ -{},{} +{},{} @@",
+        target.old_start, target.old_lines, target.new_start, target.new_lines
+    )
+}
+
 /// The error a stale hunk reference earns: refuse, never misapply.
 pub(crate) fn hunk_mismatch(target: &HunkRef) -> ErrorPayload {
+    let coordinates = hunk_coordinates(target);
     ErrorPayload::new(
         ErrorCode::InvalidRequest,
         format!(
-            "The hunk no longer exists in {} ({}); reload the diff",
-            target.path, target.header
+            "The hunk no longer exists in {} ({coordinates}); reload the diff",
+            target.path
         ),
     )
     .with_param("path", target.path.clone())
-    .with_param("hunk", target.header.clone())
+    .with_param("hunk", coordinates)
 }
 
 /// Apply exactly one hunk of `diff` to `location`; every other hunk is
@@ -1565,5 +1581,34 @@ mod tests {
         let new = image_data(&repo, "logo.png", ImageSide::New).unwrap();
         assert_eq!(new.size, 4);
         assert_eq!(new.data_base64, "BAUGBw==");
+    }
+
+    /// libgit2's hunk header ends with the enclosing function line of the file,
+    /// i.e. source code. A stale hunk is routine, and its error is logged, so
+    /// none of that text may survive in the message, the params or the log line.
+    #[test]
+    fn a_stale_hunk_error_never_carries_source_text_from_the_header() {
+        let source_line = "fn load_credentials(password: &str) -> Vec<u8> {";
+        let target = HunkRef {
+            path: "src/auth.rs".to_string(),
+            perspective: DiffPerspective::WorkingTreeToIndex,
+            index: 0,
+            old_start: 8,
+            old_lines: 7,
+            new_start: 8,
+            new_lines: 7,
+            header: format!("@@ -8,7 +8,7 @@ {source_line}"),
+        };
+        let error = hunk_mismatch(&target);
+        assert!(error.message.contains("@@ -8,7 +8,7 @@"));
+        assert!(!error.message.contains("load_credentials"));
+        assert_eq!(error.params["hunk"], "@@ -8,7 +8,7 @@");
+        for value in error.params.values() {
+            assert!(!value.contains("load_credentials"));
+        }
+        let (_, line) =
+            crate::logging::outcome_line::<()>("wc_chunk_apply", Default::default(), &Err(error));
+        assert!(!line.contains("load_credentials"), "log line: {line}");
+        assert!(!line.contains("password"), "log line: {line}");
     }
 }

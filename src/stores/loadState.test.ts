@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 
 import type { ErrorPayload } from "../bridges/bindings";
 import { dataState, errorState, type LoadState } from "./loadState";
+import { recentFailures } from "../diagnostics/recorder";
 
 const indexLocked: ErrorPayload = {
   code: "index_locked",
@@ -76,13 +77,25 @@ describe("errorState", () => {
     expect(describeState(state)).toBe("error:index_locked");
   });
 
-  it("hands anything thrown through as-is — it is a cast, not a converter", () => {
-    // The signature takes `unknown` and casts to ErrorPayload; nothing here
-    // normalises a raw `Error` into a code/message envelope. A caller that
-    // catches must therefore pass the wire payload, and this test pins that
-    // behaviour so a silent conversion is never assumed.
+  it("normalises anything thrown into a payload a renderer can show", () => {
+    // A store's catch also catches the app's own exceptions (a view-model
+    // mapper, an upsert), so the error arm must not hold a raw `Error`: the UI
+    // renders `errorText(payload)` and the recorder needs code and domain.
     const thrown = new Error("boom");
-    const state = errorState(thrown);
-    expect(state).toEqual({ status: "error", error: thrown });
+    const state = errorState(thrown, "history.loadDetail");
+    expect(state.status).toBe("error");
+    if (state.status !== "error") throw new Error("expected the error arm");
+    expect(state.error.code).toBe("unclassified");
+    expect(state.error.domain).toBe("internal");
+    expect(state.error.detail).toContain("boom");
+    // And the failure is recorded even though no command failed.
+    expect(recentFailures().map((failure) => failure.command)).toContain("history.loadDetail");
+  });
+
+  it("normalises a bare string rejection (Tauri's bad-argument error)", () => {
+    const state = errorState("invalid args `args` for command `wc_stage_paths`", "wc_stage_paths");
+    if (state.status !== "error") throw new Error("expected the error arm");
+    expect(state.error.code).toBe("unclassified");
+    expect(state.error.detail).toContain("invalid args");
   });
 });

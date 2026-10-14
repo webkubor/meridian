@@ -170,8 +170,27 @@ const zhCN: Catalog = {
       reference_exists: "「{name}」已存在。",
       reference_not_found: "「{name}」已不存在。",
       operation_in_progress: "该仓库还有另一个操作正在进行中。",
+      network_unreachable: "无法连接远程。请检查远程地址和本机网络。",
+      auth_required: "远程拒绝了凭据。请检查它使用的密钥或凭据助手。",
+      push_rejected: "远程拒绝了推送。请先拉取远程的提交，再重新推送。",
       cancelled: "已取消。",
       unclassified: "出了点问题。",
+    },
+    /**
+     * 同一个错误码可能是完全不同的事故：合并因冲突停下，并不等于签出会覆盖改动。
+     * `ErrorPayload.params.class` 指明具体情形，这里给出对应的一句话。
+     */
+    byClass: {
+      merge_conflicts: "合并「{name}」产生了冲突。请在工作区解决后继续。",
+      upstream_diverged: "「{name}」与远程已经分叉，无法快进。",
+      publish_rejected: "远程拒绝发布「{name}」。请先拉取远程的提交，再重新发布。",
+      push_rejected: "远程拒绝了这次推送。请先拉取远程的提交，再重新推送。",
+      force_push_lease_mismatch: "远程上的「{name}」在上次读取后已经移动，因此强制推送被拒绝。",
+      credential_unavailable: "这个远程没有可用凭据。请配置 git 凭据助手。",
+      credential_rejected: "已保存的凭据被远程拒绝，请重新登录。",
+      username_required: "远程要求用户名，但没有可用的用户名。",
+      unsupported_credential_type: "远程要求的凭据类型 Meridian 无法提供，请配置 git 凭据助手。",
+      ssh_unavailable: "找不到可用的 SSH 密钥。请把密钥加入 ssh-agent，或改用 HTTPS 远程。",
     },
   },
 };

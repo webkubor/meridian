@@ -1,10 +1,16 @@
 //! Headless command flows: JSON wire args, real temporary Git repositories,
 //! and the same validation/execution path production runs through AppState.
 
+#[path = "flows/checkout.rs"]
+mod checkout;
+#[path = "flows/diagnostics.rs"]
+mod diagnostics;
 #[path = "flows/history.rs"]
 mod history;
 #[path = "flows/lifecycle.rs"]
 mod lifecycle;
+#[path = "flows/probe.rs"]
+mod probe;
 #[path = "flows/refs_and_stash.rs"]
 mod refs_and_stash;
 #[path = "flows/support/mod.rs"]

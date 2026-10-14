@@ -17,7 +17,8 @@ vi.mock("@tauri-apps/api/core", () => ({
 import { Channel, invoke } from "@tauri-apps/api/core";
 import type { ErrorPayload } from "./bindings";
 import * as commands from "./commands";
-import { configureFailureNet, markHandled } from "../diagnostics/failures";
+import { configureFailureNet, markHandled, resetFailureNet } from "../diagnostics/failures";
+import { installFailureLog } from "../diagnostics/logSink";
 import { clearRecorder, recentCalls, recentFailures } from "../diagnostics/recorder";
 
 const invokeMock = vi.mocked(invoke);
@@ -32,6 +33,10 @@ const indexLocked: ErrorPayload = {
 beforeEach(() => {
   invokeMock.mockReset();
   clearRecorder();
+  // The same boot sequence the app and the flow harness run: the log sink is
+  // installed as a function, so a reset has to be followed by an install.
+  resetFailureNet();
+  installFailureLog();
 });
 
 describe("the invoke wrapper", () => {

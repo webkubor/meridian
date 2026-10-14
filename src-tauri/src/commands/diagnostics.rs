@@ -1,5 +1,4 @@
 use std::fs;
-use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager, Runtime};
@@ -60,9 +59,20 @@ pub fn diagnostics_debug_get() -> DebugState {
 }
 
 #[tauri::command]
-pub fn diagnostics_debug_set(args: DebugSetArgs) -> Result<DebugState, ErrorPayload> {
-    logging::set_debug(args.enabled)
-        .map_err(|error| io_error("Could not save debug setting", error))
+pub fn diagnostics_debug_set<R: Runtime>(
+    app: AppHandle<R>,
+    args: DebugSetArgs,
+) -> Result<DebugState, ErrorPayload> {
+    let state = logging::set_debug(args.enabled)
+        .map_err(|error| io_error("Could not save debug setting", error))?;
+    // The title is the at-a-glance debug indicator; it must follow the switch
+    // in this run, not only after the next launch.
+    if let Some(window) = app.get_webview_window("main") {
+        if let Ok(title) = window.title() {
+            let _ = window.set_title(&logging::debug_title(&title, state.enabled));
+        }
+    }
+    Ok(state)
 }
 
 #[tauri::command]
@@ -102,20 +112,31 @@ pub fn diagnostics_export<R: Runtime>(
         .map_err(|error| io_error("Could not find the Downloads folder", error))?;
     fs::create_dir_all(&download_dir)
         .map_err(|error| io_error("Could not prepare the Downloads folder", error))?;
-    let timestamp = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_err(|error| io_error("Could not read the current time", error))?
-        .as_secs();
-    let path = download_dir.join(format!("meridian-diagnostics-{timestamp}.txt"));
-    fs::write(&path, report.as_bytes())
+    let path = download_dir.join(report_file_name());
+    // Owner-only: the report quotes repository and branch names. The user
+    // chooses where it goes next, and a world-readable copy in Downloads is not
+    // that choice.
+    logging::write_private(&path, report.as_bytes())
         .map_err(|error| io_error("Could not write diagnostics report", error))?;
-    app.opener()
-        .reveal_item_in_dir(&path)
-        .map_err(|error| io_error("Could not reveal diagnostics report", error))?;
+    // The file exists now, so a failure to show it in Finder must not turn
+    // into "export failed": the owner would never learn the path of a file
+    // that is already on disk.
+    if let Err(error) = app.opener().reveal_item_in_dir(&path) {
+        log::warn!(target: "meridian::diagnostics", "exported the report but could not reveal it in Finder: {error}");
+    }
     Ok(ExportResult {
         path: logging::redact(&path.display().to_string()),
         bytes: report.len(),
     })
+}
+
+/// `meridian-diagnostics-20261015-143022.txt`: local time, because a person
+/// looking through Downloads thinks in their own clock, not in epoch seconds.
+fn report_file_name() -> String {
+    format!(
+        "meridian-diagnostics-{}.txt",
+        chrono::Local::now().format("%Y%m%d-%H%M%S")
+    )
 }
 
 /// The exported report, assembled purely so its shape is testable. Every part
@@ -211,7 +232,7 @@ fn redacted_crash(mut crash: CrashNote) -> CrashNote {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domain::diagnostics::{DebugLevel, DebugSource};
+    use crate::domain::diagnostics::{CrashKind, DebugLevel, DebugSource};
 
     fn debug_state() -> DebugState {
         DebugState {
@@ -220,6 +241,7 @@ mod tests {
             log_dir: "~/Library/Logs/dev.meridian.app".to_string(),
             log_file: "~/Library/Logs/dev.meridian.app/meridian.log".to_string(),
             level: DebugLevel::Debug,
+            devtools_ready: true,
         }
     }
 
@@ -230,6 +252,7 @@ mod tests {
             message: "index out of bounds".to_string(),
             location: Some("src/engine/graph.rs:41:9".to_string()),
             backtrace_excerpt: None,
+            kind: CrashKind::Panic,
         };
         let report = build_report(
             "Meridian 0.1.0 (abc123)",
@@ -269,5 +292,21 @@ mod tests {
         assert!(!report.contains("Reported context"));
         assert!(!report.contains("Last crash"));
         assert!(report.contains("Recent log"));
+    }
+
+    #[test]
+    fn the_report_file_name_is_a_readable_local_timestamp() {
+        let name = report_file_name();
+        let stamp = name
+            .strip_prefix("meridian-diagnostics-")
+            .and_then(|rest| rest.strip_suffix(".txt"))
+            .expect("prefix and suffix");
+        // 20261015-143022
+        assert_eq!(stamp.len(), 15, "{name}");
+        assert_eq!(stamp.as_bytes()[8], b'-');
+        assert!(stamp
+            .bytes()
+            .enumerate()
+            .all(|(index, byte)| index == 8 || byte.is_ascii_digit()));
     }
 }

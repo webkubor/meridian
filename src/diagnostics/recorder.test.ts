@@ -6,10 +6,14 @@
  * rather than trusted to review.
  */
 
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
 import { beforeEach, describe, expect, it } from "vitest";
 
 import type { ErrorPayload } from "../bridges/bindings";
 import {
+  clip,
   clearRecorder,
   recentCalls,
   recentFailures,
@@ -18,6 +22,7 @@ import {
   redactText,
   safeArgumentSummary,
   setRecorderDebug,
+  wellFormed,
 } from "./recorder";
 
 function payload(overrides: Partial<ErrorPayload> = {}): ErrorPayload {
@@ -66,6 +71,49 @@ describe("redaction", () => {
     expect(redactText("branch main is behind origin/main by 2 commits")).toBe(
       "branch main is behind origin/main by 2 commits",
     );
+  });
+});
+
+/**
+ * The same fixture the Rust redactor is tested against
+ * (`src-tauri/tests/fixtures/redaction-contract.json`). Two rule sets that
+ * disagree are two privacy promises, and the file, the crash note and the
+ * exported report are guarded by the Rust one while this side guards what the
+ * webview records and what goes into a link.
+ */
+describe("the shared redaction contract", () => {
+  const fixture = JSON.parse(readFileSync(resolve(process.cwd(), "src-tauri/tests/fixtures/redaction-contract.json"), "utf8")) as {
+    cases: Array<{ name: string; input: string | string[]; expected?: string | string[]; unchanged?: boolean; home?: string }>;
+  };
+  const joined = (value: string | string[]): string => (Array.isArray(value) ? value.join("") : value);
+
+  it("covers the shapes the design lists, and restraint as well as removal", () => {
+    expect(fixture.cases.length).toBeGreaterThanOrEqual(25);
+  });
+
+  it.each(fixture.cases.map((entry) => [entry.name, entry] as const))("%s", (_name, entry) => {
+    const input = joined(entry.input);
+    const expected = entry.unchanged === true ? input : joined(entry.expected ?? "");
+    expect(redactText(input, entry.home)).toBe(expected);
+    // Running the rules over their own output changes nothing, so a report can
+    // be redacted twice without mangling itself.
+    expect(redactText(expected, entry.home)).toBe(expected);
+  });
+});
+
+describe("clip", () => {
+  it("leaves a surrogate pair whole at the boundary", () => {
+    // A lone surrogate cannot cross IPC: serde_json rejects the escape, so the
+    // whole command fails with an opaque deserialisation error.
+    const text = `${"x".repeat(2499)}\u{1F600}rest`;
+    const cut = clip(text, 2500);
+    expect(cut).not.toMatch(/[\uD800-\uDBFF]$/);
+    expect(wellFormed(cut)).toBe(cut);
+    expect(JSON.parse(JSON.stringify({ cut }))).toEqual({ cut });
+  });
+
+  it("keeps a CJK character whole (they are single units anyway)", () => {
+    expect(clip("你好世界", 2)).toBe("你好");
   });
 });
 

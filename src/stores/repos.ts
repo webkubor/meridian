@@ -9,7 +9,7 @@ import type {
   RepositoryRemote,
 } from "../bridges/bindings";
 import * as commands from "../bridges/commands";
-import { markHandled } from "../diagnostics/failures";
+import { reportFailure } from "../diagnostics/failures";
 
 /**
  * Open repositories and the current selection. One store per domain module
@@ -24,6 +24,15 @@ export const useReposStore = defineStore("repos", () => {
   /** Remotes of the selected repository (`repository_remotes_load`). */
   const remotes = ref<RepositoryRemote[]>([]);
   const remotesLoading = ref(false);
+  /** A failed remotes read: the list is left as it was, and this says why. */
+  const remotesError = ref<ErrorPayload | null>(null);
+  /**
+   * True when a ref-moving verb succeeded but the repository's own HEAD could
+   * not be re-read. The toolbar's Push publishes `selected.headBranch`, so it
+   * must be disabled until HEAD is known again rather than publishing the
+   * branch that was checked out before.
+   */
+  const headStale = ref(false);
 
   const selected = computed(
     () => repositories.value.find((repo) => repo.id === selectedId.value) ?? null,
@@ -43,25 +52,37 @@ export const useReposStore = defineStore("repos", () => {
     }
   }
 
-  /** Re-read HEAD after a checkout, merge, rebase or pull moves it. */
+  /**
+   * Re-read HEAD after a checkout, merge, rebase or pull moves it.
+   *
+   * A failed refresh is reported, not swallowed: the caller says "the branch
+   * changed but the view could not follow", and `headStale` disables Push until
+   * HEAD is read again. Returning null used to be ignored, which left the
+   * toolbar publishing the previously checked-out branch.
+   */
   async function refreshInfo(repo: RepoId): Promise<RepoInfo | null> {
     try {
       const info = await commands.repositoryRefresh(repo);
       upsert(info);
+      headStale.value = false;
       return info;
     } catch (error) {
-      lastError.value = error as ErrorPayload;
-      markHandled(error);
+      lastError.value = reportFailure(error, "repository_refresh");
+      headStale.value = true;
       return null;
     }
   }
 
   async function loadRemotes(repo: RepoId): Promise<void> {
     remotesLoading.value = true;
+    remotesError.value = null;
     try {
       remotes.value = (await commands.repositoryRemotesLoad(repo)).remotes;
-    } catch {
-      remotes.value = [];
+    } catch (error) {
+      // The previous list stays: an emptied remotes list turns the toolbar's
+      // remote verbs off and tells the user "no remote configured", which is a
+      // statement about their repository that a read failure cannot make.
+      remotesError.value = reportFailure(error, "repository_remotes_load");
     } finally {
       remotesLoading.value = false;
     }
@@ -77,10 +98,9 @@ export const useReposStore = defineStore("repos", () => {
       await loadRemotes(info.id);
       return info;
     } catch (error) {
-      // The launch screen renders `lastError` as an alert, so this failure is
-      // already on screen; claiming it keeps the fallback toast from repeating it.
-      lastError.value = error as ErrorPayload;
-      markHandled(error);
+      // The launch screen renders `lastError` as an alert and claims it; if it
+      // is not on screen the failure net still shows it.
+      lastError.value = reportFailure(error, "repository_open");
       return null;
     } finally {
       busy.value = false;
@@ -97,8 +117,7 @@ export const useReposStore = defineStore("repos", () => {
       await loadRemotes(info.id);
       return info;
     } catch (error) {
-      lastError.value = error as ErrorPayload;
-      markHandled(error);
+      lastError.value = reportFailure(error, "repository_init");
       return null;
     } finally {
       busy.value = false;
@@ -144,8 +163,7 @@ export const useReposStore = defineStore("repos", () => {
       await loadRemotes(info.id);
       return info;
     } catch (error) {
-      lastError.value = error as ErrorPayload;
-      markHandled(error);
+      lastError.value = reportFailure(error, "repository_clone");
       return null;
     } finally {
       busy.value = false;
@@ -170,8 +188,7 @@ export const useReposStore = defineStore("repos", () => {
     } catch (error) {
       nearby.value = [];
       nearbyState.value = "empty";
-      lastError.value = error as ErrorPayload;
-      markHandled(error);
+      lastError.value = reportFailure(error, "repository_discover");
     }
   }
 
@@ -191,8 +208,7 @@ export const useReposStore = defineStore("repos", () => {
       await commands.wcEntryOpen(id, ".", "finder");
       return null;
     } catch (error) {
-      lastError.value = error as ErrorPayload;
-      markHandled(error);
+      lastError.value = reportFailure(error, "wc_entry_open");
       return lastError.value;
     }
   }
@@ -205,6 +221,8 @@ export const useReposStore = defineStore("repos", () => {
     lastError,
     remotes,
     remotesLoading,
+    remotesError,
+    headStale,
     defaultRemote,
     nearby,
     nearbyState,

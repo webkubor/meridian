@@ -76,7 +76,7 @@ function symbolUpstream(branch: BranchReviewInfo): string {
     :empty-title="t('branch.emptyTitle')"
     :empty-caption="t('branch.emptyCaption')"
     :empty-action-label="t('branch.emptyAction')"
-    :error-message="state.status === 'error' ? state.error.message : null"
+    :error="state.status === 'error' ? state.error : null"
     :loading-caption="t('branch.loading')"
     @retry="emit('refresh')"
     @empty-action="emit('create')"

@@ -98,7 +98,7 @@ const byProvider = computed(() => {
         :empty-title="$t('screens.account.emptyTitle')"
         :empty-caption="unavailable ?? $t('screens.account.emptyCaption')"
         :empty-action-label="unavailable ? undefined : $t('screens.account.add')"
-        :error-message="accounts.status === 'error' ? accounts.error.message : null"
+        :error="accounts.status === 'error' ? accounts.error : null"
         :loading-caption="$t('screens.account.loading')"
         @retry="emit('refresh')"
         @empty-action="emit('addAccount')"

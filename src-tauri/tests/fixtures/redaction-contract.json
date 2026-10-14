@@ -1,0 +1,158 @@
+{
+  "_comment": "One redaction contract for both sides. src-tauri/src/logging.rs and src/diagnostics/recorder.ts must turn every `input` into exactly `expected` (or leave it alone when `unchanged` is true). `input`/`expected` may be an array of fragments that are joined; credential-shaped inputs are split so no literal in this file looks like a real secret. `home` is the process $HOME handed to the redactor, where the case needs one.",
+  "cases": [
+    {
+      "name": "home directory of the current user collapses to ~",
+      "home": "/Users/alice",
+      "input": "open /Users/alice/dev/repo/.git/index.lock failed",
+      "expected": "open ~/dev/repo/.git/index.lock failed"
+    },
+    {
+      "name": "another user's home directory collapses too",
+      "input": "open /Users/jdoe/work/secret-project/.git failed",
+      "expected": "open ~/work/secret-project/.git failed"
+    },
+    {
+      "name": "linux-style home directory",
+      "input": "cannot read /home/jdoe/.ssh/config",
+      "expected": "cannot read ~/.ssh/config"
+    },
+    {
+      "name": "home directory inside a file URL and after =",
+      "input": "repo=file:///Users/jdoe/code/app path=/Users/jdoe/code/app",
+      "expected": "repo=file://~/code/app path=~/code/app"
+    },
+    {
+      "name": "a /home segment inside an ordinary URL path is not a home directory",
+      "input": "https://example.com/home/docs/readme",
+      "unchanged": true
+    },
+    {
+      "name": "a $HOME outside /Users or /home is replaced on a path boundary only",
+      "home": "/var/root",
+      "input": "/var/root/code and /var/rootkit/code",
+      "expected": "~/code and /var/rootkit/code"
+    },
+    {
+      "name": "a $HOME that is a prefix of another name is not cut in the middle",
+      "home": "/data/bob",
+      "input": "/data/bobby/x /data/bob/x",
+      "expected": "/data/bobby/x ~/x"
+    },
+    {
+      "name": "userinfo in a remote URL",
+      "input": "https://alice:s3cr3tvalue@example.com/team/repo.git",
+      "expected": "https://[redacted]@example.com/team/repo.git"
+    },
+    {
+      "name": "userinfo whose password contains @",
+      "input": "https://bob:p@ss@host.example/repo.git",
+      "expected": "https://[redacted]@host.example/repo.git"
+    },
+    {
+      "name": "userinfo whose password contains ? or #",
+      "input": "clone https://bob:pa?ss@host and https://bob:pa#ss@host/x.git",
+      "expected": "clone https://[redacted]@host and https://[redacted]@host/x.git"
+    },
+    {
+      "name": "a second URL on the line is not swallowed by the first",
+      "input": "from https://example.com/a to https://u:p@b.example/c",
+      "expected": "from https://example.com/a to https://[redacted]@b.example/c"
+    },
+    {
+      "name": "GitHub personal access token",
+      "input": ["ghp_", "abcdefghijklmnopqrstuvwxyz1234567890"],
+      "expected": "[redacted]"
+    },
+    {
+      "name": "GitHub server, user and refresh tokens",
+      "input": ["a ", "ghs_", "abcdefghijklmnopqrstuvwxyz1234567890", " b ", "ghu_", "abcdefghijklmnopqrstuvwxyz1234567890", " c ", "ghr_", "abcdefghijklmnopqrstuvwxyz1234567890"],
+      "expected": "a [redacted] b [redacted] c [redacted]"
+    },
+    {
+      "name": "GitHub fine-grained token",
+      "input": ["push rejected for ", "github_", "pat_", "abcdefghijklmnop", "qrstuvwxyz1234567890", " today"],
+      "expected": "push rejected for [redacted] today"
+    },
+    {
+      "name": "GitLab token",
+      "input": ["glpat-", "abcdefghijklmnopqrstuvwxyz1234567890"],
+      "expected": "[redacted]"
+    },
+    {
+      "name": "Slack tokens",
+      "input": ["xoxb-", "1234567890123-abcdefghijklmnop", " ", "xoxs-", "1234567890123-abcdefghijklmnop"],
+      "expected": "[redacted] [redacted]"
+    },
+    {
+      "name": "AWS access key id",
+      "input": ["AKIA", "ABCDEFGHIJKLMNOP"],
+      "expected": "[redacted]"
+    },
+    {
+      "name": "Authorization header with Bearer",
+      "input": ["Authorization: Bearer ", "abcdefghijklmnopqrstuvwxyz0123456789+/=="],
+      "expected": "Authorization: [redacted]"
+    },
+    {
+      "name": "Authorization header with Basic",
+      "input": "Authorization: Basic dXNlcjpoZXJlaXNwYXNzd29yZA==",
+      "expected": "Authorization: [redacted]"
+    },
+    {
+      "name": "authorization with = and a Token scheme",
+      "input": "authorization=basic dXNlcjpwYXNz and Authorization: token abc123",
+      "expected": "authorization=[redacted] and Authorization: [redacted]"
+    },
+    {
+      "name": "Proxy-Authorization",
+      "input": "Proxy-Authorization: Basic dXNlcjpwYXNz",
+      "expected": "Proxy-Authorization: [redacted]"
+    },
+    {
+      "name": "bare bearer credential",
+      "input": ["sent Bearer ", "abcdefghijklmnopqrstuvwxyz0123456789._~+/-", " to the server"],
+      "expected": "sent Bearer [redacted] to the server"
+    },
+    {
+      "name": "private_token and access_token query parameters",
+      "input": "https://gitlab.example.com/api?private_token=abc123def456&x=1 and https://host/r.git?access_token=zzz",
+      "expected": "https://gitlab.example.com/api?private_token=[redacted]&x=1 and https://host/r.git?access_token=[redacted]"
+    },
+    {
+      "name": "token, api_key and client_secret query parameters",
+      "input": "https://host/r.git?token=abc&api_key=def&client_secret=ghi&page=2",
+      "expected": "https://host/r.git?token=[redacted]&api_key=[redacted]&client_secret=[redacted]&page=2"
+    },
+    {
+      "name": "a bare key=value secret outside a URL",
+      "input": "password=hunter2 retrying",
+      "expected": "password=[redacted] retrying"
+    },
+    {
+      "name": "a quoted secret value",
+      "input": "config set api-key = \"abc def\" done",
+      "expected": "config set api-key = [redacted] done"
+    },
+    {
+      "name": "a key that merely starts with auth is not a secret",
+      "input": "author=Alice authors=2 authority=none",
+      "unchanged": true
+    },
+    {
+      "name": "scp-style remote, SHA, hex-looking branch and the word bearer survive",
+      "input": "remote=git@example.com:owner/repo.git branch=deadbeef1234 sha=0123456789abcdef0123456789abcdef01234567 note=bearer-token-rotation",
+      "unchanged": true
+    },
+    {
+      "name": "ordinary git text survives",
+      "input": "branch main is behind origin/main by 2 commits",
+      "unchanged": true
+    },
+    {
+      "name": "a stale-token sentence without a value survives",
+      "input": "the bearer token expired; ask for a new password",
+      "unchanged": true
+    }
+  ]
+}

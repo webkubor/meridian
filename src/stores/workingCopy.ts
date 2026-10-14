@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 
 import type { CommitResult, EntryStatus, ErrorPayload, OpenTarget, RepoId, StatusDelta, StatusSummary } from "../bridges/bindings";
 import * as commands from "../bridges/commands";
+import { reportFailure } from "../diagnostics/failures";
 import { dataState, errorState, type LoadState } from "./loadState";
 
 export interface CommitRequest {
@@ -28,23 +29,37 @@ export const useWorkingCopyStore = defineStore("workingCopy", () => {
     try {
       apply(await commands.wcStatusLoad(repo));
     } catch (error) {
-      state.value = errorState(error);
+      state.value = errorState(error, "wc_status_load");
     }
   }
 
-  async function stage(repo: RepoId, paths: string[]): Promise<void> {
+  /**
+   * Stage `paths` in one command and keep the list on screen when it fails.
+   *
+   * A failed mutation replaced the whole file list with an error arm, and the
+   * error arm marked the failure handled: the user's staged-set state vanished
+   * and no toast appeared. The list stays (it is still true), the failure is
+   * recorded and left to the net to toast.
+   */
+  async function stage(repo: RepoId, paths: string[]): Promise<boolean> {
     try {
       apply(await commands.wcStagePaths(repo, paths));
+      lastError.value = null;
+      return true;
     } catch (error) {
-      state.value = errorState(error);
+      lastError.value = reportFailure(error, "wc_stage_paths");
+      return false;
     }
   }
 
-  async function unstage(repo: RepoId, paths: string[]): Promise<void> {
+  async function unstage(repo: RepoId, paths: string[]): Promise<boolean> {
     try {
       apply(await commands.wcUnstagePaths(repo, paths));
+      lastError.value = null;
+      return true;
     } catch (error) {
-      state.value = errorState(error);
+      lastError.value = reportFailure(error, "wc_unstage_paths");
+      return false;
     }
   }
 
@@ -65,7 +80,7 @@ export const useWorkingCopyStore = defineStore("workingCopy", () => {
       );
       return true;
     } catch (error) {
-      lastError.value = error as ErrorPayload;
+      lastError.value = reportFailure(error, "wc_paths_discard");
       return false;
     }
   }
@@ -88,7 +103,7 @@ export const useWorkingCopyStore = defineStore("workingCopy", () => {
       await refresh(repo);
       return result;
     } catch (error) {
-      lastError.value = error as ErrorPayload;
+      lastError.value = reportFailure(error, request.amend ? "commit_amend" : "commit_create");
       return null;
     }
   }
@@ -99,7 +114,7 @@ export const useWorkingCopyStore = defineStore("workingCopy", () => {
     try {
       await commands.wcEntryOpen(repo, path, target);
     } catch (error) {
-      lastError.value = error as ErrorPayload;
+      lastError.value = reportFailure(error, "wc_entry_open");
     }
   }
 
@@ -115,7 +130,7 @@ export const useWorkingCopyStore = defineStore("workingCopy", () => {
       await refresh(repo);
       return true;
     } catch (error) {
-      lastError.value = error as ErrorPayload;
+      lastError.value = reportFailure(error, "wc_entry_assume_unchanged_set");
       return false;
     }
   }

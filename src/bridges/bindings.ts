@@ -25,6 +25,9 @@ export type ErrorCode =
   | "reference_exists"
   | "reference_not_found"
   | "operation_in_progress"
+  | "network_unreachable"
+  | "auth_required"
+  | "push_rejected"
   | "cancelled"
   | "unclassified";
 
@@ -43,13 +46,27 @@ export interface DebugState {
   logDir: string;
   logFile: string;
   level: "info" | "debug";
+  /**
+   * Whether the developer-tools window can be opened right now. The webview
+   * decides inspector support when the window is created, so debug mode turned
+   * on during this run is not enough: the UI offers a restart instead.
+   */
+  devtoolsReady: boolean;
 }
+
+/**
+ * What the crash note records: a panic nothing recovered, a panic inside a
+ * command that the app caught and carried on from, or a run that never reached
+ * a clean exit and left no panic behind (abort, a native crash, a force quit).
+ */
+export type CrashKind = "panic" | "recovered_panic" | "unclean_exit";
 
 export interface CrashNote {
   at: string;
   message: string;
   location: string | null;
   backtraceExcerpt: string | null;
+  kind: CrashKind;
 }
 
 export type SenderTag =

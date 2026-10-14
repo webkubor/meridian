@@ -44,6 +44,32 @@ describe("installGlobalErrorHandlers", () => {
     expect(recentFailures().map((failure) => failure.command)).toContain("internal:window.error");
   });
 
+  it("records a window error event that carries only a message", () => {
+    const uninstall = installGlobalErrorHandlers({ config: {} } as never);
+    window.dispatchEvent(new ErrorEvent("error", { message: "script error" }));
+    uninstall();
+    expect(recentFailures().map((failure) => failure.command)).toContain("internal:window.error");
+  });
+
+  it("ignores the browser's ResizeObserver notice", () => {
+    // It fires whenever a virtualised list re-measures itself in the same
+    // frame. As a danger toast it trains people to ignore the toast the real
+    // failures use — and it has no error object to act on.
+    const uninstall = installGlobalErrorHandlers({ config: {} } as never);
+    window.dispatchEvent(new ErrorEvent("error", { message: "ResizeObserver loop completed with undelivered notifications." }));
+    window.dispatchEvent(new ErrorEvent("error", { message: "ResizeObserver loop limit exceeded" }));
+    uninstall();
+
+    expect(recentFailures()).toHaveLength(0);
+  });
+
+  it("still records a real error that happens to be a ResizeObserver", () => {
+    const uninstall = installGlobalErrorHandlers({ config: {} } as never);
+    window.dispatchEvent(new ErrorEvent("error", { error: new Error("ResizeObserver loop failed for another reason"), message: "ResizeObserver loop failed for another reason" }));
+    uninstall();
+    expect(recentFailures()).toHaveLength(1);
+  });
+
   it("removes its listeners on uninstall", () => {
     const uninstall = installGlobalErrorHandlers({ config: {} } as never);
     uninstall();

@@ -119,7 +119,7 @@ const baseLabel = computed(() => {
       empty-icon="empty.noCommitSelected"
       :empty-title="t('compare.emptyTitle')"
       :empty-caption="t('compare.emptyCaption')"
-      :error-message="state.status === 'error' ? state.error.message : null"
+      :error="state.status === 'error' ? state.error : null"
       :loading-caption="t('compare.loading')"
       @retry="emit('refresh')"
     >

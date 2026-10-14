@@ -10,6 +10,7 @@ import type {
 } from "../bridges/bindings";
 import * as commands from "../bridges/commands";
 import type { Changeset, CommitDetail, GraphLayout } from "../components/contracts";
+import { claimFailure } from "../diagnostics/failures";
 import { dataState, errorState, type LoadState } from "./loadState";
 import { toChangeset, toCommitDetail, toGraphLayout } from "./viewModels";
 
@@ -76,8 +77,11 @@ export const useHistoryStore = defineStore("history", () => {
     }
     try {
       graph.value = toGraphLayout(await commands.historyGraphCompute(repo, oids));
-    } catch {
-      // The list stays usable without lanes; it is not an error worth a toast.
+    } catch (error) {
+      // The list stays usable without lanes, and nothing on screen says so, so
+      // this one is recorded for Diagnostics rather than toasted — but it is
+      // still recorded and logged, which the empty catch never did.
+      claimFailure(error, "history_graph_compute");
       graph.value = null;
     }
   }
@@ -89,7 +93,7 @@ export const useHistoryStore = defineStore("history", () => {
       apply(await commands.historyCommitsLoad(repo, query.value));
       await loadGraph(repo);
     } catch (error) {
-      state.value = errorState(error);
+      state.value = errorState(error, "history_commits_load");
       graph.value = null;
     }
   }
@@ -111,7 +115,7 @@ export const useHistoryStore = defineStore("history", () => {
       state.value = dataState(commits.value);
       await loadGraph(repo);
     } catch (error) {
-      state.value = errorState(error);
+      state.value = errorState(error, "history_commits_load");
     }
   }
 
@@ -128,7 +132,7 @@ export const useHistoryStore = defineStore("history", () => {
     try {
       detail.value = { status: "data", data: toCommitDetail(await commands.historyCommitLoad(repo, oid)) };
     } catch (error) {
-      detail.value = errorState(error);
+      detail.value = errorState(error, "history_commit_load");
     }
   }
 
@@ -136,7 +140,7 @@ export const useHistoryStore = defineStore("history", () => {
     try {
       changeset.value = { status: "data", data: toChangeset(await commands.historyChangesetLoad(repo, oid)) };
     } catch (error) {
-      changeset.value = errorState(error);
+      changeset.value = errorState(error, "history_changeset_load");
     }
   }
 

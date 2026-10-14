@@ -21,12 +21,11 @@ import * as commands from "../bridges/commands";
 import type {
   BranchInfo,
   CommitInfo,
-  ErrorPayload,
   RepoId,
   Revision,
 } from "../bridges/bindings";
 import type { Comparison, CompareEntry, LoadState, RefChoice } from "../components/contracts";
-import { markHandled } from "../diagnostics/failures";
+import { errorState } from "../stores/loadState";
 
 /**
  * A branch as a ref the compare screen can pick.
@@ -155,12 +154,11 @@ export function useCompare() {
       };
       state.value = { status: "data", data: comparison.value };
     } catch (error) {
-      // The compare pane renders this error in its `error` state (and drops a
-      // superseded request entirely), so the failure is already accounted for.
-      markHandled(error);
       if (token !== requestToken) return;
+      // The compare pane renders this state and claims it; while another tab is
+      // in front the net toasts instead, which is the point.
       comparison.value = null;
-      state.value = { status: "error", error: error as ErrorPayload };
+      state.value = errorState(error, "history_compare_summary");
     } finally {
       if (token === requestToken) busy.value = false;
     }

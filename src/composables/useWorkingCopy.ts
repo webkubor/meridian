@@ -40,6 +40,23 @@ export function useWorkingCopy() {
     if (id) await store.unstage(id, [path]);
   }
 
+  /**
+   * The whole selection in one command.
+   *
+   * One call per path meant a failure on the first of three was erased by the
+   * successes that followed: each applied its own status, so the last write won
+   * and a file that was never staged looked staged.
+   */
+  async function stagePaths(paths: string[]): Promise<void> {
+    const id = activeRepo();
+    if (id && paths.length > 0) await store.stage(id, paths);
+  }
+
+  async function unstagePaths(paths: string[]): Promise<void> {
+    const id = activeRepo();
+    if (id && paths.length > 0) await store.unstage(id, paths);
+  }
+
   async function discard(path: string, includeUntracked = false): Promise<boolean> {
     const id = activeRepo();
     if (!id) return false;
@@ -78,7 +95,9 @@ export function useWorkingCopy() {
     lastError,
     refresh,
     stage,
+    stagePaths,
     unstage,
+    unstagePaths,
     discard,
     commit,
     setAssumeUnchanged,

@@ -424,6 +424,12 @@ export interface SidebarSectionModel {
   collapsed: boolean;
   /** Rendered when the section has no rows (the filtered-empty state). */
   emptyCaption: string;
+  /**
+   * Rendered instead of `emptyCaption` when the section's data failed to load.
+   * "No commits yet" is a statement about the repository, and a failed load is
+   * not one — the sidebar must not say the first when it means the second.
+   */
+  errorCaption?: string;
   /** Pseudo-sections hold a single always-present row (Working copy). */
   pseudo?: boolean;
 }
@@ -457,6 +463,15 @@ export type DialogueRequest =
       items?: string[];
       confirmLabel: string;
       danger?: boolean;
+      /**
+       * Verbatim text the confirm button will cause to be transmitted or
+       * handed over, shown in a scrollable block so the person can read what
+       * is about to leave the machine *before* it does.
+       */
+      preview?: string;
+      previewLabel?: string;
+      /** A middle button beside Cancel/Confirm; resolves the dialogue with `value: "secondary"`. */
+      secondaryLabel?: string;
     }
   | {
       kind: "prompt";
@@ -485,7 +500,7 @@ export type DialogueRequest =
 export interface DialogueResult {
   id: string;
   kind: DialogueRequest["kind"];
-  /** prompt: the text; chooseBranch: the branch name; confirm: empty. */
+  /** prompt: the text; chooseBranch: the branch name; confirm: `""` or `"secondary"`. */
   value: string;
   /** prompt with an option row: the checkbox state. */
   optionChecked: boolean;

@@ -177,9 +177,33 @@ const en = {
       reference_exists: "“{name}” already exists.",
       reference_not_found: "“{name}” no longer exists.",
       operation_in_progress: "Another operation is still running in this repository.",
+      network_unreachable: "The remote could not be reached. Check its address and this machine's connection.",
+      auth_required: "The remote refused the credentials. Check the key or credential helper it uses.",
+      push_rejected: "The remote refused the push. Pull its commits first, then push again.",
       cancelled: "Cancelled.",
       unclassified: "Something went wrong.",
     } satisfies Record<ErrorCode, string>,
+    /**
+     * Some failures share a code but are a different story: a merge stopped on
+     * conflicts is not a checkout that would overwrite changes.
+     * `ErrorPayload.params.class` names the case; this is its sentence.
+     */
+    byClass: {
+      merge_conflicts: "Merging {name} produced conflicts. Resolve them in the working copy, then continue.",
+      upstream_diverged: "“{name}” has diverged from the remote, so it cannot be fast-forwarded.",
+      publish_rejected: "The remote refused to publish “{name}”. Pull its commits first, then publish again.",
+      push_rejected: "The remote refused to update this ref. Pull its commits first, then push again.",
+      force_push_lease_mismatch:
+        "“{name}” on the remote has moved since it was last read, so the forced push was refused.",
+      credential_unavailable:
+        "No credential is available for this remote. Configure a git credential helper.",
+      credential_rejected: "The stored credential was rejected by the remote. Sign in again.",
+      username_required: "The remote asked for a user name, and none is available for it.",
+      unsupported_credential_type:
+        "The remote asked for a kind of credential Meridian cannot provide. Configure a git credential helper.",
+      ssh_unavailable:
+        "No usable SSH key was found for this remote. Add a key to the agent, or use an HTTPS remote.",
+    },
   },
 };
 

@@ -18,6 +18,10 @@ const props = withDefaults(
     items?: string[];
     confirmLabel: string;
     cancelLabel?: string;
+    /** Verbatim text the confirm button will transmit; read before it does. */
+    preview?: string;
+    previewLabel?: string;
+    secondaryLabel?: string;
     danger?: boolean;
     busy?: boolean;
     progress?: { done: number; total: number; phase: string | null } | null;
@@ -29,7 +33,7 @@ const props = withDefaults(
   },
 );
 
-const emit = defineEmits<{ confirm: []; cancel: [] }>();
+const emit = defineEmits<{ confirm: []; cancel: []; secondary: [] }>();
 
 const { t } = useI18n();
 
@@ -45,7 +49,7 @@ const cancelText = computed(() => props.cancelLabel ?? t("common.cancel"));
   <DialogueShell
     :title="title"
     :danger="danger"
-    :size="items && items.length > 0 ? 'm' : 's'"
+    :size="items && items.length > 0 || preview ? 'm' : 's'"
     :busy="busy"
     @close="emit('cancel')"
   >
@@ -53,6 +57,11 @@ const cancelText = computed(() => props.cancelLabel ?? t("common.cancel"));
     <ul v-if="items && items.length > 0" class="confirm-items">
       <li v-for="(item, index) in items" :key="index">{{ item }}</li>
     </ul>
+
+    <div v-if="preview" class="confirm-preview">
+      <strong v-if="previewLabel">{{ previewLabel }}</strong>
+      <pre tabindex="0" aria-label="preview">{{ preview }}</pre>
+    </div>
 
     <div v-if="progress" class="confirm-progress">
       <ProgressTrack
@@ -66,6 +75,14 @@ const cancelText = computed(() => props.cancelLabel ?? t("common.cancel"));
     <template #footer>
       <button type="button" class="btn" :data-autofocus="danger ? '' : undefined" @click="emit('cancel')">
         {{ cancelText }}
+      </button>
+      <button
+        v-if="secondaryLabel"
+        type="button"
+        class="btn"
+        @click="emit('secondary')"
+      >
+        {{ secondaryLabel }}
       </button>
       <button
         type="button"
@@ -100,6 +117,26 @@ const cancelText = computed(() => props.cancelLabel ?? t("common.cancel"));
 
 .confirm-items li {
   overflow-wrap: anywhere;
+}
+
+.confirm-preview {
+  margin-top: var(--md-space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--md-space-1);
+}
+
+.confirm-preview pre {
+  margin: 0;
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: var(--md-space-2);
+  border-radius: var(--md-radius-md);
+  background: var(--md-bg-sunken);
+  font: var(--md-text-xs)/1.45 var(--md-font-mono);
+  user-select: text;
 }
 
 .confirm-progress {

@@ -196,14 +196,21 @@ describe("application and diagnostics operations", () => {
     expect(recordedFailures().some((failure) => failure.command === "internal:window.unhandledrejection")).toBe(true);
     expect(hasDangerToast("发生内部错误。")).toBe(true);
 
-    const details = [...document.querySelectorAll(".toast-action")].find((button) => button.textContent?.trim() === "详情");
+    // The action is named for where it goes ("诊断", not the context-free
+    // "详情"), and it lands on the failure this toast was about.
+    const details = [...document.querySelectorAll(".toast-action")].find((button) => button.textContent?.trim() === "诊断");
     expect(details).toBeDefined();
     (details as HTMLElement).dispatchEvent(new MouseEvent("click", { bubbles: true }));
     await flushFlow();
 
-    expect(window.location.hash).toBe("#/diagnostics");
+    const failureId = recordedFailures().find((failure) => failure.command === "internal:window.unhandledrejection")?.id;
+    expect(window.location.hash).toBe(`#/diagnostics?failure=${failureId}`);
     expect(wrapper.text()).toContain("诊断");
     expect(wrapper.text()).toContain("window.unhandledrejection");
+    // Expanded, not a collapsed list the owner has to go looking in.
+    expect(wrapper.find(".failure-toggle").attributes("aria-expanded")).toBe("true");
+    // One landmark: the shell's own `<main>`, not a second one inside it.
+    expect(wrapper.findAll("main")).toHaveLength(1);
   });
 
   it("keeps a launch-screen failure inline instead of double-reporting it as a toast", async () => {

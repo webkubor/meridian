@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 
 import type { BranchInfo, ErrorPayload, RepoId } from "../bridges/bindings";
 import * as commands from "../bridges/commands";
+import { reportFailure } from "../diagnostics/failures";
 import { dataState, errorState, type LoadState } from "./loadState";
 import { useReposStore } from "./repos";
 
@@ -34,9 +35,12 @@ export const useBranchesStore = defineStore("branches", () => {
       remoteBranches.value = remotes;
       state.value = dataState([...locals, ...remotes]);
     } catch (error) {
+      // The list is emptied on purpose: leaving the previous repository's
+      // branches under the new one's name would be worse. The error arm says
+      // why, and if the pane is not mounted the net still toasts.
       branches.value = [];
       remoteBranches.value = [];
-      state.value = errorState(error);
+      state.value = errorState(error, "branch_list");
     }
   }
 
@@ -55,7 +59,7 @@ export const useBranchesStore = defineStore("branches", () => {
       await refresh(repo);
       return info;
     } catch (error) {
-      lastError.value = error as ErrorPayload;
+      lastError.value = reportFailure(error, "branch_create");
       return null;
     }
   }
@@ -70,7 +74,7 @@ export const useBranchesStore = defineStore("branches", () => {
       await refresh(repo);
       return true;
     } catch (error) {
-      lastError.value = error as ErrorPayload;
+      lastError.value = reportFailure(error, "branch_checkout");
       return false;
     }
   }
@@ -87,7 +91,7 @@ export const useBranchesStore = defineStore("branches", () => {
       await refresh(repo);
       return true;
     } catch (error) {
-      lastError.value = error as ErrorPayload;
+      lastError.value = reportFailure(error, "branch_checkout_remote");
       return false;
     }
   }
@@ -100,7 +104,7 @@ export const useBranchesStore = defineStore("branches", () => {
       await refresh(repo);
       return info;
     } catch (error) {
-      lastError.value = error as ErrorPayload;
+      lastError.value = reportFailure(error, "branch_rename");
       return null;
     }
   }
@@ -113,7 +117,7 @@ export const useBranchesStore = defineStore("branches", () => {
       await refresh(repo);
       return true;
     } catch (error) {
-      lastError.value = error as ErrorPayload;
+      lastError.value = reportFailure(error, "branch_delete");
       return false;
     }
   }

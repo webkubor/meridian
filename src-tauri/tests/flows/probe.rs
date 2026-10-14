@@ -10,18 +10,23 @@ use meridian::commands::{BranchList, WcStagePaths, WcStatusLoad};
 use meridian::events::AppEvent;
 use serde_json::json;
 
-use super::support::{assert_error, assert_error_events, assert_ok, changed, refs_changed, Fixture};
+use super::support::{
+    assert_error, assert_error_events, assert_ok, changed, refs_changed, Fixture,
+};
 
 /// A command whose `RepoId` was never registered must fail loudly instead of
 /// silently answering an empty list.
 #[tokio::test]
 async fn an_unregistered_repository_is_refused_with_a_visible_error() {
     let fixture = Fixture::new();
-    let stranger = json!({ "repo": "/definitely/not/registered/.git" });
+    let stranger = json!("/definitely/not/registered/.git");
 
     let status = fixture.wire::<WcStatusLoad>(json!({ "repo": stranger, "opts": {} }));
     let (result, events) = fixture.run(status).await;
-    assert_error(result, meridian::domain::error::ErrorCode::InvalidRepository);
+    assert_error(
+        result,
+        meridian::domain::error::ErrorCode::InvalidRepository,
+    );
     assert_error_events(events, vec![]);
 }
 

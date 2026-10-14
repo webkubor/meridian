@@ -82,12 +82,13 @@ async function chooseToolbarBranchOption(wrapper: VueWrapper, optionText: string
 }
 
 /**
- * A repo-level git verb reports through `runVerb`, which shows one shared
- * fallback sentence plus the machine code and keeps the engine's own message in
- * the diagnostics recorder.
+ * A repo-level git verb reports through `runVerb`: the catalogue sentence for
+ * the failure's code, with the engine's own message under it, and the same
+ * message in the diagnostics recorder. One shared "the action failed" sentence
+ * used to be the whole of it, which is exactly what the owner complained about.
  */
 function expectVerbFailure(command: string, engineMessage: string): void {
-  expect(hasDangerToast("操作失败。")).toBe(true);
+  expect(hasDangerToast(engineMessage)).toBe(true);
   expect(recordedFailures().find((failure) => failure.command === command)?.error.message).toBe(engineMessage);
 }
 
@@ -140,7 +141,10 @@ describe("branch operations", () => {
     await confirmDialogue();
     await flushFlow(300);
 
-    expect(hasDangerToast("无法创建该分支。")).toBe(true);
+    // The catalogue sentence for the code, with the engine's own words under
+    // it: "无法创建该分支。" said nothing about which failure it was.
+    expect(hasDangerToast("「{name}」已存在。".replace("{name}", "feature/flow-checked"))).toBe(true);
+    expect(hasDangerToast("reference_exists")).toBe(true);
     expect(recordedFailures().some((failure) => failure.command === "branch_create")).toBe(true);
   });
 
@@ -169,7 +173,7 @@ describe("branch operations", () => {
     await confirmDirtyIfAsked();
     await flushFlow(300);
 
-    expect(hasDangerToast("无法签出该分支。")).toBe(true);
+    expect(hasDangerToast("签出会覆盖本地改动。")).toBe(true);
     expect(recordedFailures().find((failure) => failure.command === "branch_checkout")?.error.message).toBe("签出会覆盖本地改动。");
   });
 
@@ -229,7 +233,8 @@ describe("branch operations", () => {
     await confirmDirtyIfAsked();
     await flushFlow(300);
 
-    expect(hasDangerToast("无法签出该分支。")).toBe(true);
+    expect(hasDangerToast("远程分支已不存在。")).toBe(true);
+    expect(hasDangerToast("reference_not_found")).toBe(true);
     expect(recordedFailures().find((failure) => failure.command === "branch_checkout_remote")?.error.message).toBe("远程分支已不存在。");
   });
 
@@ -260,7 +265,7 @@ describe("branch operations", () => {
     await confirmDialogue();
     await flushFlow(300);
 
-    expect(hasDangerToast("无法重命名该分支。")).toBe(true);
+    expect(hasDangerToast("「{name}」不是合法的分支名或标签名。".replace("{name}", "feature/flow-renamed"))).toBe(true);
     expect(recordedFailures().some((failure) => failure.command === "branch_rename")).toBe(true);
   });
 
@@ -290,7 +295,8 @@ describe("branch operations", () => {
     await confirmDialogue();
     await flushFlow(300);
 
-    expect(hasDangerToast("无法删除该分支。")).toBe(true);
+    expect(hasDangerToast("Meridian 拒绝了这个请求。")).toBe(true);
+    expect(hasDangerToast("未合并的分支不能删除。")).toBe(true);
     expect(recordedFailures().some((failure) => failure.command === "branch_delete")).toBe(true);
   });
 

@@ -115,16 +115,10 @@ async fn branch_checkout_supports_local_and_detached_head() {
 }
 
 /// `branch_checkout` documents the safe strategy: local changes are never
-/// clobbered and a conflicting checkout surfaces as `CheckoutConflicts`.
-///
-/// Observed: `Ok(CheckoutResult { branch: Some("side") })` plus `RefsChanged`
-/// and `WorkingCopyChanged`, HEAD moved to `side`, and the file still holds the
-/// user's local edit while reporting `INDEX_MODIFIED | WT_MODIFIED`.
-/// `git checkout side` refuses with "your local changes would be overwritten"
-/// and leaves HEAD on `main`.
-///
-/// The divergent branch is built with `commit_on_branch`, so this test
-/// isolates the dirty-file bug from the stale-index bug below.
+/// clobbered and a conflicting checkout surfaces as `CheckoutConflicts`, with
+/// HEAD left on `main` — what `git checkout side` does ("your local changes
+/// would be overwritten"). The nested-path, staged and sibling-verb variants
+/// live in `checkout.rs`.
 #[tokio::test]
 async fn branch_checkout_refuses_to_clobber_a_locally_modified_tracked_file() {
     let fixture = Fixture::new();
@@ -145,10 +139,9 @@ async fn branch_checkout_refuses_to_clobber_a_locally_modified_tracked_file() {
     assert_eq!(fixture.read("file.txt"), "dirty local edit\n");
 }
 
-/// BUG: `branch_checkout` silently takes over an untracked file that the target
-/// branch tracks. Observed: `Ok(...)`, HEAD moves to `side`, and the untracked
-/// file becomes a tracked `WT_MODIFIED` entry. `git checkout side` refuses with
-/// "untracked working tree files would be overwritten".
+/// An untracked file that the target branch tracks must not be taken over:
+/// `git checkout side` refuses with "untracked working tree files would be
+/// overwritten", and so does Meridian.
 #[tokio::test]
 async fn branch_checkout_refuses_to_overwrite_an_untracked_file() {
     let fixture = Fixture::new();
@@ -169,11 +162,9 @@ async fn branch_checkout_refuses_to_overwrite_an_untracked_file() {
     assert_eq!(fixture.read("side-only.txt"), "MY UNTRACKED WORK\n");
 }
 
-/// BUG: `branch_checkout` leaves the index holding an entry for a file the
-/// target branch does not contain. `git checkout main` removes the file and
-/// leaves a clean tree; libgit2's `checkout_tree` used to leave it behind with
-/// an `INDEX_NEW` entry, which then made a later `merge_start` fast-forward
-/// fail with `CheckoutConflicts`.
+/// Switching back to a branch that lacks a file removes the file and its index
+/// entry and leaves a clean tree, as `git checkout main` does. (Directories are
+/// covered in `checkout.rs`.)
 #[tokio::test]
 async fn branch_checkout_clears_paths_the_target_branch_does_not_contain() {
     let fixture = Fixture::new();
@@ -218,10 +209,8 @@ async fn branch_checkout_clears_paths_the_target_branch_does_not_contain() {
 /// `integration_continue`, and `merge_abort` with no integration in flight.
 ///
 /// The divergent branches are built with `commit_on_branch`, which never leaves
-/// the checked-out branch. Without that, this flow would trip over the
-/// `branch_checkout` stale-index bug that
-/// `branch_checkout_clears_paths_the_target_branch_does_not_contain` records,
-/// and merge coverage would silently disappear along with it.
+/// the checked-out branch, so this flow stays about merging rather than about
+/// switching branches.
 #[tokio::test]
 async fn merge_fast_forward_true_merge_conflict_abort_and_continue_are_exercised() {
     let fixture = Fixture::new();

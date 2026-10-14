@@ -10,7 +10,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { reactive } from "vue";
 
 import type { ErrorPayload } from "../bridges/bindings";
-import { createFailureNet, normalizeError } from "./failures";
+import { createFailureNet, normalizeError, reportFailure } from "./failures";
 import { clearRecorder, recentFailures } from "./recorder";
 
 function gitError(overrides: Partial<ErrorPayload> = {}): ErrorPayload {
@@ -120,13 +120,48 @@ describe("the failure net", () => {
     expect(toasts).toHaveLength(2);
   });
 
-  it("caps the burst at five toasts in ten seconds", () => {
+  it("caps the burst at five toasts in ten seconds while still recording the rest", () => {
     const { net, toasts, flush } = harness();
     for (let index = 0; index < 8; index += 1) {
       net.capture(gitError({ code: "io", message: `Failure number ${index}` }), "wc_status_load");
     }
     flush();
     expect(toasts).toHaveLength(5);
+    // The three that were suppressed reached the recorder; the user is told.
+    expect(recentFailures().length).toBeGreaterThanOrEqual(8);
+  });
+
+  it("keeps two failures that merely share a sentence", () => {
+    // The same words under different codes are different events: "Meridian
+    // refused that request" covers invalid_request and auth_required alike.
+    const { net, toasts, flush } = harness();
+    net.capture(gitError({ code: "index_locked", message: "Refused." }), "wc_status_load");
+    net.capture(gitError({ code: "io", message: "Refused." }), "wc_stage_paths");
+    flush();
+    expect(toasts).toHaveLength(2);
+  });
+
+  it("treats the same primitive again after the window as a new failure", () => {
+    // A value-keyed cache made every second unhandled rejection of the same
+    // string invisible: no record, no log line, no toast.
+    const { net, toasts, flush, advance } = harness();
+    net.capture("boom", "internal:window.unhandledrejection");
+    flush();
+    advance(10_000);
+    net.capture("boom", "internal:window.unhandledrejection");
+    flush();
+    expect(toasts).toHaveLength(2);
+    expect(recentFailures().filter((failure) => failure.command === "internal:window.unhandledrejection")).toHaveLength(2);
+  });
+
+  it("keeps a failure pending until a toast sink exists", () => {
+    // A failure raised during bootstrap (before App.vue mounts) must not be
+    // dropped: it is shown as soon as the sink is configured.
+    const net = createFailureNet({ graceMs: 0, schedule: (callback) => { callback(); return 0; }, cancel: () => {} });
+    net.capture(gitError(), "wc_status_load");
+    const shown: ErrorPayload[] = [];
+    net.configure({ showToast: (payload) => shown.push(payload) });
+    expect(shown).toHaveLength(1);
   });
 
   it("reports a repeated rejection of the same object only once", () => {
@@ -184,7 +219,58 @@ describe("normalizeError", () => {
     expect(normalizeError(hostile).code).toBe("unclassified");
   });
 
-  it("does not mistake a payload-shaped object with an unknown domain for a wire error", () => {
-    expect(normalizeError({ code: "io", message: "x", domain: "made-up" }).code).toBe("unclassified");
+  it("keeps the code and the message of a payload from a newer backend", () => {
+    // Flattening it to "[object Object]" lost the message from the toast, the
+    // log write and the report; the domain falls back to internal instead.
+    const payload = normalizeError({ code: "io", message: "disk full", domain: "network" });
+    expect(payload.code).toBe("io");
+    expect(payload.message).toBe("disk full");
+    expect(payload.domain).toBe("internal");
+  });
+
+  it("keeps an unrecognised plugin error's content as JSON, not [object Object]", () => {
+    const payload = normalizeError({ plugin: "opener", reason: "no handler" });
+    expect(payload.detail).toContain("opener");
+    expect(payload.detail).toContain("no handler");
+    expect(payload.detail).not.toContain("[object Object]");
+  });
+
+  it("survives a circular object", () => {
+    const circular: Record<string, unknown> = { a: 1 };
+    circular.self = circular;
+    expect(normalizeError(circular).detail).toContain("circular");
+  });
+});
+
+describe("reportFailure / claimFailure", () => {
+  beforeEach(() => clearRecorder());
+
+  it("records an exception thrown by the app's own code", () => {
+    // A view-model mapper inside a store's try: no command failed, so the
+    // bridge never saw it and nothing was recorded anywhere. This is the
+    // owner's complaint — a bug with no error shown and no trace.
+    const payload = reportFailure(new TypeError("Cannot read properties of undefined (reading 'map')"), "history.loadDetail");
+    expect(payload.code).toBe("unclassified");
+    expect(payload.detail).toContain("Cannot read properties of undefined");
+    expect(recentFailures().map((failure) => failure.command)).toContain("history.loadDetail");
+  });
+
+  it("normalises a bare string rejection into something renderable", () => {
+    const payload = reportFailure("invalid args `args` for command `repository_open`", "repository_open");
+    expect(payload.message).toBeTruthy();
+    expect(payload.detail).toContain("invalid args");
+    expect(recentFailures().at(-1)?.error.code).toBe("unclassified");
+  });
+
+  it("hands the caller a payload it can put straight into state", () => {
+    const payload = reportFailure({ code: "io", message: "disk full", domain: "network" }, "wc_status_load");
+    expect(payload).toEqual({
+      code: "io",
+      message: "disk full",
+      detail: undefined,
+      params: undefined,
+      retryable: false,
+      domain: "internal",
+    });
   });
 });

@@ -9,7 +9,17 @@ const diagnostics = {
       disabled: "Only command names and argument keys are recorded.",
       envLocked: "Debug mode is enabled by MERIDIAN_DEBUG=1 and cannot be changed here.",
       source: "Mode source: {source}",
+      sourceValues: {
+        env: "the MERIDIAN_DEBUG environment variable",
+        setting: "this switch",
+        off: "off",
+      },
       chip: "debug",
+    },
+    devtools: {
+      /** The webview decides inspector support when the window is created. */
+      restartHint: "Developer tools need a restart of Meridian to become available.",
+      restart: "Restart to enable",
     },
     logs: {
       directory: "Log folder",
@@ -18,9 +28,17 @@ const diagnostics = {
       title: "Recent log entries",
       refresh: "Refresh log",
       empty: "No log entries are available.",
+      scrollLabel: "Log tail, scrollable",
     },
     crash: {
       title: "The previous run ended unexpectedly",
+      recoveredTitle: "A command hit an internal error last run",
+      uncleanTitle: "The previous run did not finish cleanly",
+      kind: {
+        panic: "a crash",
+        recovered_panic: "a recovered internal error",
+        unclean_exit: "an unclean exit",
+      },
       dismiss: "Dismiss",
       location: "Location",
       backtrace: "Backtrace excerpt",
@@ -30,9 +48,11 @@ const diagnostics = {
       empty: "No failures recorded.",
       report: "Report this problem",
       copy: "Copy details",
+      copyReport: "Copy full report",
       command: "Command",
       occurred: "Occurred",
       detail: "Technical detail",
+      focus: "Focused from the error you were shown",
     },
     calls: {
       title: "Recent commands",
@@ -44,18 +64,20 @@ const diagnostics = {
       arguments: "Argument keys",
       success: "Succeeded",
       failed: "Failed",
+      caption: "Recent commands, with their result and duration",
+      scrollLabel: "Recent commands, scrollable",
     },
     actions: {
       copyReport: "Copy diagnostic report",
       export: "Export diagnostics file",
       openDevtools: "Open developer tools",
       report: "Report a problem",
-      details: "Details",
-      copied: "Diagnostic report copied.",
+      details: "Diagnostics",
+      /** Shown when the toast cap hid failures; they are all in the recorder. */
+      suppressed: "{count} more errors were recorded — open diagnostics to see them.",
       exported: "Diagnostics exported to {path}",
     },
     internalError: "An internal error occurred. Open diagnostics for details.",
-    loadFailed: "Could not load diagnostics.",
   },
 };
 

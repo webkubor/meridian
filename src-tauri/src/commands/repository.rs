@@ -15,6 +15,7 @@
 //! this module's namespace and cannot collide with theirs.
 
 use std::path::{Path, PathBuf};
+use std::time::Instant;
 
 use serde::Deserialize;
 use tauri::{AppHandle, State};
@@ -29,6 +30,7 @@ use crate::domain::repository::{
 use crate::domain::sender::SenderTag;
 use crate::engine;
 use crate::events::{self, AppEvent};
+use crate::logging;
 use crate::state::AppState;
 use crate::validation::{self, ValidateCx, Violation};
 
@@ -44,7 +46,23 @@ pub struct RepositoryOpenArgs {
 
 impl RepositoryOpenArgs {
     /// Opens and registers a repository through the lifecycle command path.
+    ///
+    /// The lifecycle commands run before a `RepoId` exists, so they bypass
+    /// `AppState::run` and its outcome line; each logs its own here, because
+    /// opening a repository is the first thing anyone does and used to leave no
+    /// trace when it failed.
     pub fn execute(
+        self,
+        state: &AppState,
+        sink: &dyn crate::events::EventSink,
+    ) -> Result<RepoInfo, ErrorPayload> {
+        let started = Instant::now();
+        let result = self.open(state, sink);
+        logging::instrument("repository_open", started, &result);
+        result
+    }
+
+    fn open(
         self,
         state: &AppState,
         sink: &dyn crate::events::EventSink,
@@ -89,6 +107,17 @@ fn default_initial_branch() -> String {
 impl RepositoryInitArgs {
     /// Validates, initializes, and registers a repository.
     pub fn execute(
+        self,
+        state: &AppState,
+        sink: &dyn crate::events::EventSink,
+    ) -> Result<RepoInfo, ErrorPayload> {
+        let started = Instant::now();
+        let result = self.init(state, sink);
+        logging::instrument("repository_init", started, &result);
+        result
+    }
+
+    fn init(
         self,
         state: &AppState,
         sink: &dyn crate::events::EventSink,
@@ -156,6 +185,17 @@ pub struct RepositoryCloneArgs {
 impl RepositoryCloneArgs {
     /// Clones and registers a repository through the lifecycle command path.
     pub async fn execute(
+        self,
+        state: &AppState,
+        sink: &dyn crate::events::EventSink,
+    ) -> Result<RepoInfo, ErrorPayload> {
+        let started = Instant::now();
+        let result = self.clone_into(state, sink).await;
+        logging::instrument("repository_clone", started, &result);
+        result
+    }
+
+    async fn clone_into(
         self,
         state: &AppState,
         sink: &dyn crate::events::EventSink,
@@ -255,16 +295,22 @@ pub async fn repository_discover(
     _state: State<'_, AppState>,
     args: RepositoryDiscoverArgs,
 ) -> Result<Vec<RepoRoot>, ErrorPayload> {
+    let started = Instant::now();
     let root = PathBuf::from(&args.root);
-    validate_discover_root(&root).map_err(ErrorPayload::from)?;
-    engine::discovery::discover(
-        &root,
-        &engine::discovery::DiscoverOptions {
-            max_depth: args.max_depth,
-            ignored: args.ignored,
-            ..Default::default()
-        },
-    )
+    let result = validate_discover_root(&root)
+        .map_err(ErrorPayload::from)
+        .and_then(|()| {
+            engine::discovery::discover(
+                &root,
+                &engine::discovery::DiscoverOptions {
+                    max_depth: args.max_depth,
+                    ignored: args.ignored,
+                    ..Default::default()
+                },
+            )
+        });
+    logging::instrument("repository_discover", started, &result);
+    result
 }
 
 #[derive(Clone, Debug, Deserialize)]

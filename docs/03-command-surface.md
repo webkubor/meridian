@@ -59,7 +59,8 @@ process) because libgit2 does not implement it — the observed `FNGit*Command` 
 | `workflows` | 23 | (Graphite/GitFlow/SVN/Gerrit) |
 | `settings` | 24 | `GTUserDefaults*` (190 keys) |
 | `system` | 13 | (app shell, updates, CLI, deep links) |
-| **Total** | **291** | |
+| `diagnostics` | 9 | (our own: local log, debug mode, crash note, report) |
+| **Total** | **300** | |
 
 Counts verified mechanically against the tables below (see §19).
 
@@ -548,3 +549,43 @@ CAP-G18-06 updates are served by `system_update_check` with our own mechanism.
 `PromptRequest` is the only interactive round-trip in the surface: the engine pauses on a oneshot
 channel while the UI shows the askpass-style dialogue (our counterpart of the observed
 `TowerAskpass` helper). Prompts carry a `duration_ms` hint and expire to a cancellation.
+
+## 21. `diagnostics` — local logs, debug mode, crash notes, reports
+
+Built, not evidence-derived: the observed `system_logging_set` / `system_log_export` /
+`system_diagnostic_report` rows in §18 describe the Tower mechanism; these nine are what Meridian
+ships. They are plain `#[tauri::command]` functions (no repository), registered in `lib.rs`, and
+reached only through `call()` in `src/bridges/commands.ts`. Commands with parameters take one struct
+named `args`.
+
+| Command | Args | Returns | Mapping | Validator | Notes |
+|---|---|---|---|---|---|
+| `diagnostics_log_tail` | `args{lines}` | `String` | the in-memory ring (seeded from the file at launch), redacted, newest last, ≤ 256 KB | — | never reads the disk after startup |
+| `diagnostics_log_write` | `args{level, message, source?}` | `()` | `record_frontend` → the same log | — | message ≤ 2 KB, redacted, line breaks escaped |
+| `diagnostics_debug_get` | — | `DebugState{enabled, source: env\|setting\|off, logDir, logFile, level, devtoolsReady}` | logger state | — | paths are home-redacted |
+| `diagnostics_debug_set` | `args{enabled}` | `DebugState` | persists `diagnostics.json` (0600) and switches the level at runtime; updates the window title | — | `MERIDIAN_DEBUG=1` wins and cannot be switched off from the UI |
+| `diagnostics_reveal_logs` | — | `()` | reveal the log folder in Finder | folder exists | — |
+| `diagnostics_export` | `args{context?}` | `{path, bytes}` | writes a redacted `.txt` report to Downloads (0600) and reveals it | — | the file is kept even if revealing fails |
+| `diagnostics_open_devtools` | — | `()` | opens the webview inspector | debug mode on **and** the window was created with inspector support (`devtoolsReady`) | otherwise `InvalidRequest` with `params.reason` = `debug_off` / `restart_required` / `no_window` |
+| `diagnostics_last_crash` | — | `CrashNote?{at, message, location?, backtraceExcerpt?, kind: panic\|recovered_panic\|unclean_exit}` | `last-crash.json` | — | `unclean_exit` is detected from a run marker left behind (release builds) |
+| `diagnostics_dismiss_crash` | — | `()` | removes the note | — | — |
+
+**What the log may contain** (the rules a reviewer checks, enforced in `src-tauri/src/logging.rs`):
+command names, outcomes, durations, the error `code`/`domain`/`message`/`detail`, and argument *key
+names*. Argument values only in debug mode and only for an allowlist of harmless scalars. Never file
+contents, diffs, patch text, commit messages, remote URLs with credentials, or tokens — which is why
+a stale-hunk error quotes the hunk's coordinates and not its header line. The redaction rule table is
+shared with `src/diagnostics/recorder.ts` and pinned by `src-tauri/tests/fixtures/redaction-contract.json`.
+
+**Files** (all owner-only, `0600` in a `0700` directory): `~/Library/Logs/dev.meridian.app/meridian.log`
+plus `.1` and `.2` (2 MB each, oldest dropped), `diagnostics.json` and `last-crash.json` in the app
+config directory.
+
+**Outcome lines** are written for every `Command` by `AppState::run`, and by the commands that run
+outside it (`repository_open/init/clone/discover`, `app_update_check`, `app_update_install`,
+`app_pick_directory`, `app_feedback_compose`). At debug level `AppState::run` also logs the queue
+wait, the validation result and the execute time, and a command still running after 15 s is logged
+at `warn` while it runs.
+
+**Error codes added for remote failures:** `network_unreachable` (retryable), `auth_required`,
+`push_rejected` — carried with the finer `params.class` where one exists.

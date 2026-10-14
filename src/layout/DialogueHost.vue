@@ -55,8 +55,12 @@ function confirmBranch(name: string): void {
     :items="confirmRequest.items"
     :confirm-label="confirmRequest.confirmLabel"
     :danger="confirmRequest.danger"
+    :preview="confirmRequest.preview"
+    :preview-label="confirmRequest.previewLabel"
+    :secondary-label="confirmRequest.secondaryLabel"
     :busy="busy"
     @confirm="resolve(confirmRequest.id, 'confirm', '', false)"
+    @secondary="resolve(confirmRequest.id, 'confirm', 'secondary', false)"
     @cancel="emit('cancel', confirmRequest.id)"
   />
 

@@ -13,8 +13,15 @@ import type { AppearanceMode, DialogueRequest, DialogueResult, ToastModel } from
 const THEME_KEY = "meridian.appearance";
 
 function readStoredMode(): AppearanceMode {
-  const stored = window.localStorage.getItem(THEME_KEY);
-  return stored === "light" || stored === "dark" || stored === "auto" ? stored : "auto";
+  // A locked-down webview that refuses reads throws from `getItem`; `i18n`
+  // guards the same call, and this runs at module evaluation — an unguarded
+  // read here is a blank window with no message.
+  try {
+    const stored = window.localStorage.getItem(THEME_KEY);
+    return stored === "light" || stored === "dark" || stored === "auto" ? stored : "auto";
+  } catch {
+    return "auto";
+  }
 }
 
 const themeMode = ref<AppearanceMode>(readStoredMode());
@@ -31,7 +38,11 @@ const resolvedTheme = computed<"light" | "dark">(() =>
 watch(
   themeMode,
   (mode) => {
-    window.localStorage.setItem(THEME_KEY, mode);
+    try {
+      window.localStorage.setItem(THEME_KEY, mode);
+    } catch {
+      // Not being able to remember the choice is not a reason to refuse it.
+    }
   },
   { immediate: true },
 );
@@ -55,10 +66,19 @@ export function usePersistedNumber(
   min: number,
   max: number,
 ): WritableComputedRef<number> {
-  const stored = Number(window.localStorage.getItem(key));
+  let stored = Number.NaN;
+  try {
+    stored = Number(window.localStorage.getItem(key));
+  } catch {
+    stored = Number.NaN;
+  }
   const value = ref(Number.isFinite(stored) && stored > 0 ? stored : initial);
   watch(value, (next) => {
-    window.localStorage.setItem(key, String(next));
+    try {
+      window.localStorage.setItem(key, String(next));
+    } catch {
+      // Same as the theme: the width simply is not remembered this session.
+    }
   });
   return computed({
     get: () => value.value,

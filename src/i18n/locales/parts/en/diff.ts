@@ -281,31 +281,41 @@ const diffEn = {
     commitAndPush: "Commit & Push",
 
     toast: {
+      /** A tab whose data failed to load; the sidebar section says why. */
+      tabFailed: "failed to load",
+      settingsNotSaved: "This choice could not be saved and will be forgotten when Meridian quits.",
       linkFailed: "Could not open that link.",
+      linkNotOpened:
+        "The link could not be opened, so nothing has been sent. The address is in the clipboard.",
+      reportPreviewTitle: "Review the report before it is opened",
+      reportPreviewMessage:
+        "The report below goes into the address of the issue form. The address is sent to github.com as soon as that page loads — before you press Submit — so read it here first.",
+      reportPreviewCopy: "Copy report",
+      reportOpen: "Open GitHub",
+      reportOpened:
+        "Opened GitHub with {count} detail filled in. | Opened GitHub with {count} details filled in.",
       noBranchSelected: "Select a branch first.",
+      /** A verb that succeeded as far as git is concerned but stopped on conflicts. */
+      conflicted: "Stopped with conflicts. Resolve them in the working copy, then continue.",
+      headStale:
+        "The branch changed, but this view could not be refreshed. Push is disabled until the branch is re-read.",
+      pushStale: "The checked-out branch could not be re-read, so push is disabled.",
       feedbackOpened: "Opened GitHub with {count} detail filled in. | Opened GitHub with {count} details filled in.",
       revealed: "Revealed in the file manager.",
       copied: "Copied to the clipboard.",
       copyFailed: "Could not copy to the clipboard.",
-      actionFailed: "The action failed.",
       fetched: "Fetched.",
       pulled: "Pulled.",
       pushed: "Pushed {branch}.",
       stashed: "Stashed the working copy.",
       branchCreated: "Created branch {branch}.",
-      branchCreateFailed: "Could not create the branch.",
       branchRenamed: "Renamed to {branch}.",
-      branchRenameFailed: "Could not rename the branch.",
       merged: "Merged {branch}.",
       rebased: "Rebased onto {branch}.",
       branchDeleted: "Deleted {branch}.",
-      branchDeleteFailed: "Could not delete the branch.",
       checkedOut: "Checked out {branch}.",
-      checkoutFailed: "Could not check out the branch.",
       discarded: "Discarded the file's changes.",
-      discardFailed: "Could not discard the changes.",
       committed: "Committed.",
-      commitFailed: "Could not create the commit.",
       committedAndPushed: "Committed and pushed.",
       conflictResolved: "Conflict resolved.",
       commitMessageRequired: "Write a commit message first.",

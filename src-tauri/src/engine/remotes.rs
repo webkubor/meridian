@@ -448,6 +448,15 @@ pub fn fetch(
     if repo.find_remote(name).is_err() {
         return Err(remote_not_found(name));
     }
+    // The remote's name and counts only: its URL can carry credentials, and a
+    // refspec can name any ref in the repository.
+    log::debug!(
+        target: "meridian::engine",
+        "fetch remote={name} refspecs={} prune={} depth={:?}",
+        refspecs.len(),
+        mode.prune,
+        mode.depth
+    );
 
     let updates: RefCell<Vec<RefUpdate>> = RefCell::new(Vec::new());
     let specs: Vec<&str> = refspecs.iter().map(String::as_str).collect();
@@ -607,6 +616,13 @@ pub fn pull(
 
     let annotated = repo.find_annotated_commit(remote_tip)?;
     let (analysis, _) = repo.merge_analysis(&[&annotated])?;
+    log::debug!(
+        target: "meridian::engine",
+        "pull remote={name} branch={branch} analysis: fast_forward={} normal={} mode={:?}",
+        analysis.is_fast_forward(),
+        analysis.is_normal(),
+        opts.mode
+    );
 
     if analysis.is_fast_forward() {
         fast_forward_branch(repo, branch, remote_tip)?;
@@ -796,6 +812,11 @@ pub fn push(
     // push refspecs here, and refuse if there are none.
     let owned = resolve_push_refspecs(repo, name, refspecs)?;
     let specs: Vec<&str> = owned.iter().map(String::as_str).collect();
+    log::debug!(
+        target: "meridian::engine",
+        "push remote={name} refspecs={}",
+        specs.len()
+    );
 
     let accepted: RefCell<Vec<String>> = RefCell::new(Vec::new());
     let rejected: RefCell<Vec<PushRejection>> = RefCell::new(Vec::new());
@@ -987,7 +1008,7 @@ pub fn publish_branch(
     // against a remote that never received the commits.
     if !push.rejected.is_empty() {
         return Err(ErrorPayload::new(
-            ErrorCode::InvalidRequest,
+            ErrorCode::PushRejected,
             format!(
                 "The remote rejected '{branch}': {}",
                 push.rejected[0].message
@@ -1168,23 +1189,26 @@ fn fast_forward_branch(
     target: git2::Oid,
 ) -> Result<(), ErrorPayload> {
     let object = repo.find_object(target, None)?;
-    repo.reference(
-        &format!("refs/heads/{branch}"),
-        target,
-        true,
-        &format!("meridian: fast-forward {branch}"),
-    )?;
     let is_head = repo
         .head()
         .ok()
         .and_then(|head| head.shorthand().ok().map(str::to_string))
         .as_deref()
         == Some(branch);
+    // Working copy first, ref second: after the ref moves HEAD already points
+    // at the target, so a checkout would have nothing to compare local edits
+    // against and could neither detect a conflict nor update a file.
     if is_head {
         let mut builder = git2::build::CheckoutBuilder::new();
         builder.safe();
         repo.checkout_tree(&object, Some(&mut builder))?;
     }
+    repo.reference(
+        &format!("refs/heads/{branch}"),
+        target,
+        true,
+        &format!("meridian: fast-forward {branch}"),
+    )?;
     Ok(())
 }
 
@@ -1560,7 +1584,9 @@ mod tests {
         orphan_commit(repo, "refs/heads/feature", "divergent");
 
         let err = publish_branch(repo, "origin", "feature", true).unwrap_err();
-        assert_eq!(err.code, ErrorCode::InvalidRequest);
+        // A rejected push has its own code, so the UI can say what happened
+        // instead of "the request was refused".
+        assert_eq!(err.code, ErrorCode::PushRejected);
         assert_eq!(
             err.params.get("class").map(String::as_str),
             Some("publish_rejected")

@@ -30,8 +30,10 @@ pub trait EventSink: Send + Sync {
 
 impl<R: Runtime> EventSink for AppHandle<R> {
     fn emit(&self, event: AppEvent) {
+        // A dropped RefsChanged/WorkingCopyChanged leaves the UI showing stale
+        // data, so it goes to the log (stderr is invisible in a GUI app).
         if let Err(err) = Emitter::emit(self, EVENT_NAME, event) {
-            eprintln!("meridian: failed to emit {EVENT_NAME}: {err}");
+            log::warn!(target: "meridian::events", "failed to emit {EVENT_NAME}: {err}");
         }
     }
 

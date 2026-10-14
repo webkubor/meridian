@@ -161,8 +161,16 @@ export function errorText(payload: {
   message?: string;
   params?: Record<string, string>;
 }): string {
+  const params = payload.params ?? {};
+  // The class first: a merge stopped on conflicts and a checkout that would
+  // overwrite changes share `checkout_conflicts`, and only the class says which.
+  const failureClass = params["class"];
+  if (failureClass && i18n.global.te(`errors.byClass.${failureClass}`)) {
+    const byClass = i18n.global.t(`errors.byClass.${failureClass}`, params);
+    if (typeof byClass === "string" && byClass !== "") return byClass;
+  }
   const key = `errors.byCode.${payload.code}`;
-  const translated = i18n.global.t(key, payload.params ?? {});
+  const translated = i18n.global.t(key, params);
   // vue-i18n returns the key itself when it is missing.
   return translated === key ? (payload.message ?? i18n.global.t("errors.byCode.unclassified")) : translated;
 }

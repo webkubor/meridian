@@ -34,7 +34,7 @@ import {
 import { openExternal } from "../bridges/external";
 import type { LoadState } from "../stores/loadState";
 import { errorState } from "../stores/loadState";
-import { markHandled } from "../diagnostics/failures";
+import { claimFailure, reportFailure } from "../diagnostics/failures";
 import { currentLocale } from "../i18n";
 
 const AUTO_CHECK_KEY = "meridian.updates.autoCheck";
@@ -43,8 +43,14 @@ function readAutoCheck(): boolean {
   // Default on: an application that can update itself and never checks is an
   // application that quietly rots. The disclosure in Settings says in full what
   // the check sends, and the switch turns it off for good.
-  const stored = window.localStorage.getItem(AUTO_CHECK_KEY);
-  return stored === null ? true : stored === "true";
+  try {
+    const stored = window.localStorage.getItem(AUTO_CHECK_KEY);
+    return stored === null ? true : stored === "true";
+  } catch {
+    // A locked-down webview that refuses reads is treated as "never chose";
+    // failing here would take the whole app down at boot.
+    return true;
+  }
 }
 
 /* ---- state --------------------------------------------------------------- */
@@ -108,7 +114,7 @@ async function loadInfo(): Promise<void> {
   try {
     info.value = { status: "data", data: await appInfoLoad() };
   } catch (error) {
-    info.value = errorState(error);
+    info.value = errorState(error, "app_info_load");
   }
 }
 
@@ -123,7 +129,7 @@ async function loadReleaseNotes(locale: string = currentLocale()): Promise<void>
     const document = await appReleaseNotesLoad(locale);
     notes.value = { status: "data", data: document };
   } catch (error) {
-    notes.value = errorState(error);
+    notes.value = errorState(error, "app_release_notes_load");
   }
 }
 
@@ -138,7 +144,7 @@ async function checkForUpdates(): Promise<void> {
       check.value = { status: "data", data: await appUpdateCheck() };
       lastCheckedAt.value = Date.now();
     } catch (error) {
-      check.value = errorState(error);
+      check.value = errorState(error, "app_update_check");
     } finally {
       inFlight = null;
     }
@@ -200,15 +206,16 @@ async function installUpdate(): Promise<void> {
       install.value = { ...install.value, phase: "readyToRestart" };
     }
   } catch (error) {
-    const payload = error as { message?: string } | null;
+    const payload = reportFailure(error, "app_update_install");
     install.value = {
       phase: "failed",
       received: install.value.received,
       total: install.value.total,
-      error: payload?.message ?? null,
+      error: payload.message,
     };
-    // The update panel states the failure itself; a second toast would repeat it.
-    markHandled(error);
+    // Deliberately not claimed: the About screen is the only place this state
+    // renders, and the user may be anywhere when an install fails. The net
+    // raises the toast unless the panel is the one showing it.
   }
 }
 
@@ -218,7 +225,12 @@ async function installUpdate(): Promise<void> {
  * The app never posts anything: it composes a URL, the browser opens it, and the
  * user reads and edits the form before pressing Submit. `title` is the only text
  * taken from the user, and it goes into that URL — so it is never secret, which
- * the Feedback panel says out loud.
+ * the Feedback panel says out loud, together with the fact that the URL reaches
+ * github.com as soon as the page loads.
+ *
+ * A browser that refuses the link is a result, not a success: `opened` tells the
+ * caller to show the URL instead (the panel keeps it), and the refusal is
+ * already recorded by `openExternal`.
  */
 async function composeFeedback(kind: FeedbackKind, title: string): Promise<FeedbackTarget | null> {
   feedbackBusy.value = true;
@@ -228,25 +240,38 @@ async function composeFeedback(kind: FeedbackKind, title: string): Promise<Feedb
       summary: title.trim() === "" ? null : title.trim(),
     });
     feedbackTarget.value = target;
-    await openExternal(target.url);
+    const opened = await openExternal(target.url);
+    lastOpen = { target, opened: opened.opened, reason: opened.reason };
     return target;
   } catch (error) {
     feedbackTarget.value = null;
-    // The About screen shows `feedbackFailed`; claiming the error here keeps the
-    // fallback toast from saying the same thing twice.
-    markHandled(error);
+    // Feedback is only composed from the About screen, and that screen states
+    // the failure itself (`feedbackFailed`), so this one is claimed: recorded and
+    // logged, but not toasted on top of the panel that already says it.
+    claimFailure(error, "app_feedback_compose");
     return null;
   } finally {
     feedbackBusy.value = false;
   }
 }
 
+/** How the last composed link fared, so the screen can say the link did not open. */
+export interface FeedbackOpen {
+  target: FeedbackTarget;
+  opened: boolean;
+  reason?: string;
+}
+let lastOpen: FeedbackOpen | null = null;
+
 function setAutoCheck(value: boolean): void {
   autoCheck.value = value;
   try {
     window.localStorage.setItem(AUTO_CHECK_KEY, String(value));
-  } catch {
-    // Not being able to remember the choice is not a reason to refuse it.
+  } catch (error) {
+    // This choice carries the privacy meaning ("never contact the update
+    // endpoint"), so a failure to remember it is reported: the next launch
+    // would check again, against what the user just said.
+    reportFailure(error, "settings.autoCheck");
   }
 }
 
@@ -267,6 +292,7 @@ export function useApp() {
     notes,
     feedbackTarget,
     feedbackBusy,
+    lastFeedbackOpen: () => lastOpen,
 
     loadInfo,
     loadReleaseNotes,

@@ -9,6 +9,9 @@ import { createPinia } from "pinia";
 import { nextTick } from "vue";
 
 import "./setup";
+import { externalBoundaries } from "./setup";
+
+const { clipboard, opener } = externalBoundaries;
 import {
   backend,
   FakeBackend,
@@ -25,10 +28,11 @@ import { useShell } from "../layout/useShell";
 import { clearRecorder, recentCalls, recentFailures, setRecorderDebug } from "../diagnostics/recorder";
 import { installGlobalErrorHandlers } from "../diagnostics/global";
 import { resetFailureNet } from "../diagnostics/failures";
+import { installFailureLog } from "../diagnostics/logSink";
 import type { ErrorPayload } from "../bridges/bindings";
 import App from "../App.vue";
 
-export { backend, FakeBackend, fixtureBranchName, fixtureFilePath, fixtureRemoteBranch, fixtureRepoId, fixtureRepoPath, makeError };
+export { backend, clipboard, opener, FakeBackend, fixtureBranchName, fixtureFilePath, fixtureRemoteBranch, fixtureRepoId, fixtureRepoPath, makeError };
 export type { ErrorPayload };
 export const failure = (command: string, payload?: Partial<ErrorPayload>): ErrorPayload => FakeBackendFailure(command, payload);
 
@@ -72,8 +76,16 @@ export function resetShell(): void {
   shell.setThemeMode("auto");
 }
 
-/** Recreate module-owned UI state and mount the real application shell. */
-export async function mountApp(path = "/repos"): Promise<VueWrapper> {
+/**
+ * Recreate module-owned UI state and mount the real application shell.
+ *
+ * `prepare` runs after the backend reset and before the mount, which is the
+ * only window in which a *boot-time* failure can be injected: `backend.reset()`
+ * clears the failure queue, so anything queued before this call is gone — and
+ * the commands the app issues in `onMounted` (app info, diagnostics) happen
+ * before the test can touch anything.
+ */
+export async function mountApp(path = "/repos", prepare?: () => void): Promise<VueWrapper> {
   localStorage.clear();
   setLocale("zh-CN");
   document.documentElement.lang = "zh-CN";
@@ -83,8 +95,13 @@ export async function mountApp(path = "/repos"): Promise<VueWrapper> {
   resetShell();
   backend.reset();
   clearRecorder();
+  // The app installs the log sink at boot; `resetFailureNet` drops it, so the
+  // harness has to do the same or "a failure reaches the local log" is never
+  // exercised by the integrated suite.
   resetFailureNet();
+  installFailureLog();
   setRecorderDebug(false);
+  prepare?.();
   await vi.advanceTimersByTimeAsync(0);
   navigate(path, { replace: true });
   await nextTick();
@@ -195,6 +212,11 @@ export function hasSuccessToast(text: string): boolean {
   return toasts("success").some((toast) => toast.includes(text));
 }
 
+/** True when some warning toast contains `text`. */
+export function hasWarningToast(text: string): boolean {
+  return toasts("warning").some((toast) => toast.includes(text));
+}
+
 /** The active modal dialogue, which also renders through a body-level teleport. */
 export function dialogue(): HTMLElement {
   const panel = document.querySelector('[role="dialog"]');
@@ -284,8 +306,7 @@ export async function setChecked(selector: string, checked: boolean): Promise<vo
   await flushFlow();
 }
 
-/** Mark the named invoke failure handled and tick the app's grace timer. */
-
+/** Fail the next invocation of `command`, then let the net's grace period run. */
 export async function settleFailure(command: string, payload?: Partial<ErrorPayload>): Promise<void> {
   backend.failNext(command, failure(command, payload));
   await flushFlow(300);
@@ -304,6 +325,19 @@ export function recordedFailures() {
 /** Return frontend call history exposed to diagnostics. */
 export function recordedBridgeCalls() {
   return [...recentCalls()];
+}
+
+/**
+ * Whether a failure was written to the local log (`diagnostics_log_write`).
+ *
+ * "A failure reaches the log" is half the promise the whole feature rests on,
+ * and the sink is installed by the harness the same way the app installs it —
+ * so this is an end-to-end claim, not a unit-level one.
+ */
+export function loggedToDiagnostics(command?: string): boolean {
+  return backend.calls.some(
+    (call) => call.name === "diagnostics_log_write" && (command === undefined || JSON.stringify(call.payload).includes(command)),
+  );
 }
 
 /** Unmount the shell and reset timer state for the next test. */

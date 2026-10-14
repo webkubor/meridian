@@ -3,9 +3,29 @@
  * 路由：src/flows 流程测试
  * API：为真实 Vue 应用提供浏览器宿主与可编程 Tauri 命令后端
  */
-import { vi } from "vitest";
+import { beforeEach, vi } from "vitest";
 
 import { backend } from "./backend";
+
+const opener = vi.hoisted(() => ({ calls: [] as string[], fail: false }));
+const clipboard = vi.hoisted(() => ({ writes: [] as string[] }));
+
+
+
+beforeEach(() => {
+  opener.calls.splice(0);
+  opener.fail = false;
+  clipboard.writes.splice(0);
+});
+
+vi.mock("@tauri-apps/plugin-opener", () => ({
+  openUrl: async (url: string) => {
+    opener.calls.push(url);
+    if (opener.fail) throw new Error("no handler registered for this URL");
+  },
+}));
+
+
 
 export { backend };
 
@@ -95,12 +115,11 @@ if (typeof window !== "undefined") {
     return nativeGetContext.call(this, kind as "2d");
   } as unknown as HTMLCanvasElement["getContext"];
 
-  if (!navigator.clipboard) {
-    Object.defineProperty(navigator, "clipboard", {
-      configurable: true,
-      value: { writeText: async () => undefined },
-    });
-  }
+  clipboard.writes.splice(0);
+  Object.defineProperty(navigator, "clipboard", {
+    configurable: true,
+    value: { writeText: async (text: string) => { clipboard.writes.push(text); } },
+  });
 }
 
 vi.mock("@tauri-apps/api/core", () => ({
@@ -114,6 +133,10 @@ vi.mock("@tauri-apps/api/event", () => ({
   listen: async () => () => undefined,
 }));
 
-vi.mock("@tauri-apps/plugin-opener", () => ({
-  openUrl: async () => undefined,
-}));
+/**
+ * The two boundaries a test cannot click: the system opener and the clipboard.
+ * `vi.hoisted` so the mock factories below can reach them (mock factories are
+ * hoisted above imports).
+ */
+/** The two boundaries a test cannot click: the system opener and the clipboard. */
+export const externalBoundaries = { opener, clipboard };

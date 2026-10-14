@@ -46,11 +46,14 @@ async function pushFromBranchPane(wrapper: VueWrapper): Promise<void> {
 }
 
 /**
- * A repo-level git verb reports through `runVerb`: one shared fallback sentence
- * plus the machine code on screen, the engine's own message in diagnostics.
+ * A repo-level git verb reports through `runVerb`: the catalogue sentence for
+ * the failure's code, with the engine's own message under it, and the same
+ * message in the diagnostics recorder. One shared "操作失败。" used to be the
+ * whole of it — visible, but not actionable, and the complaint the work exists
+ * for.
  */
 function expectVerbFailure(command: string, engineMessage: string): void {
-  expect(hasDangerToast("操作失败。")).toBe(true);
+  expect(hasDangerToast(engineMessage)).toBe(true);
   expect(recordedFailures().find((failure) => failure.command === command)?.error.message).toBe(engineMessage);
 }
 

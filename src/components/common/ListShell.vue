@@ -1,4 +1,11 @@
 <script setup lang="ts">
+import { computed, inject } from "vue";
+import { useI18n } from "vue-i18n";
+
+import type { ErrorPayload } from "../../bridges/bindings";
+import { failureIdFor } from "../../diagnostics/failures";
+import { OPEN_DIAGNOSTICS, useFailureClaim } from "../../diagnostics/claim";
+import { errorText } from "../../i18n";
 import EmptyState from "./EmptyState.vue";
 import Icon from "./Icon.vue";
 
@@ -8,8 +15,13 @@ import Icon from "./Icon.vue";
  * Every asynchronous list renders exactly four states plus the orthogonal
  * large-content warning. Making it a component means no list can forget a
  * state: the parent passes `status`, the shell renders the arm.
+ *
+ * The error arm is where a failure becomes visible, so it is also where the
+ * shell claims it: while this component is on screen with an error, the failure
+ * net stays quiet; when a pane is not mounted, the net's fallback toast is what
+ * the user gets instead of a pane that silently says "no commits".
  */
-withDefaults(
+const props = withDefaults(
   defineProps<{
     status: "loading" | "empty" | "error" | "data";
     /** Empty arm. */
@@ -17,9 +29,8 @@ withDefaults(
     emptyTitle?: string;
     emptyCaption?: string;
     emptyActionLabel?: string;
-    /** Error arm. */
-    errorMessage?: string | null;
-    errorDetail?: string | null;
+    /** Error arm: the whole payload, so the shell can translate it and name the code. */
+    error?: ErrorPayload | null;
     /** Loading arm text. */
     loadingCaption?: string;
     /** Large-content gate (diff/list): shown as a banner above the content. */
@@ -29,13 +40,36 @@ withDefaults(
     emptyIcon: "empty.noFileSelected",
     emptyTitle: "Nothing here",
     loadingCaption: "Loading…",
+    error: null,
+    warning: null,
   },
 );
 
-defineEmits<{
+const emit = defineEmits<{
   retry: [];
   emptyAction: [];
 }>();
+
+const { t } = useI18n();
+const openDiagnostics = inject(OPEN_DIAGNOSTICS, undefined);
+
+useFailureClaim(computed(() => (props.status === "error" ? props.error : null)));
+
+/** The catalogue sentence for the code (or the class), not the backend's English. */
+const headline = computed(() => (props.error ? errorText(props.error) : t("errors.title")));
+
+/** The engine's own words, when they add to the sentence above. */
+const reason = computed(() => {
+  const message = props.error?.message ?? "";
+  return message && message !== headline.value ? message : "";
+});
+
+/** What the log and the report can use: code, then the raw detail. */
+const detailLine = computed(() => [props.error?.code, props.error?.detail].filter(Boolean).join(" · "));
+
+function onDetails(): void {
+  openDiagnostics?.(props.error ? failureIdFor(props.error) : undefined);
+}
 </script>
 
 <template>
@@ -58,14 +92,18 @@ defineEmits<{
         :title="emptyTitle"
         :caption="emptyCaption"
         :action-label="emptyActionLabel"
-        @action="$emit('emptyAction')"
+        @action="emit('emptyAction')"
       />
 
       <div v-else-if="status === 'error'" class="list-error" role="alert">
         <Icon name="exclamationmark.circle" :size="18" class="tone-danger" />
-        <p class="list-error-message">{{ errorMessage ?? "Something went wrong." }}</p>
-        <p v-if="errorDetail" class="list-error-detail mono">{{ errorDetail }}</p>
-        <button type="button" @click="$emit('retry')">Try again</button>
+        <p class="list-error-message">{{ headline }}</p>
+        <p v-if="reason" class="list-error-reason mono">{{ reason }}</p>
+        <p v-if="detailLine" class="list-error-detail mono">{{ detailLine }}</p>
+        <div class="list-error-actions">
+          <button type="button" class="ghost" @click="emit('retry')">{{ t('common.retry') }}</button>
+          <button v-if="openDiagnostics" type="button" class="ghost" @click="onDetails">{{ t('diagnostics.actions.details') }}</button>
+        </div>
       </div>
 
       <slot v-else />
@@ -149,12 +187,19 @@ defineEmits<{
   max-width: 420px;
 }
 
+.list-error-reason,
 .list-error-detail {
   margin: 0;
   font-size: var(--md-text-xs);
   color: var(--md-fg-subtle);
   max-width: 420px;
   overflow-wrap: anywhere;
+  user-select: text;
+}
+
+.list-error-actions {
+  display: flex;
+  gap: var(--md-space-3);
 }
 
 .ghost {

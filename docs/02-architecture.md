@@ -46,7 +46,7 @@ on a behavior we could not observe.
 | Syntax highlighting | Shiki with CSS themes | Evidence shows CSS-theme-driven highlighting (`EV:analysis/visual-design#F8`); Shiki is CSS-theme-native |
 | Virtual lists | TanStack Virtual | Commit lists, file lists, PR timelines are all virtualized |
 | File watching | `notify` | External git usage must trigger a refresh; Tower has explicit reload actions and a debug auto-reload default (`EV:strings/GTUserDefaultsDebugAutoReloadRepository`) |
-| Logging | `tracing` + rolling file appender | A "detailed logging" toggle exists in the evidence (`EV:strings/GTUserDefaultsDetailedLoggingEnabled`) |
+| Logging | `log` facade + a local rotating-file backend (`src-tauri/src/logging.rs`) | A "detailed logging" toggle exists in the evidence (`EV:strings/GTUserDefaultsDetailedLoggingEnabled`); the switch is `diagnostics_debug_set` and it changes the level at runtime |
 
 Dependency rules:
 
@@ -63,6 +63,7 @@ meridian/
 ├── src/                           # web UI (Vue 3 + TS)
 │   ├── app/                       # shell: window, routing, menus, command palette wiring
 │   ├── bridges/                   # generated bindings + typed invoke/Channel helpers
+│   ├── diagnostics/               # failure net, recorder, report, redaction, log sink
 │   ├── stores/                    # Pinia stores (repos, workingCopy, history, branches, …)
 │   ├── components/                # pane components + the shared dialogue shell
 │   ├── design/                    # tokens.css, theme runtime, icon registry
@@ -96,6 +97,7 @@ meridian/
     │   ├── services/              # ServiceAdapter trait + adapters + oauth + poller
     │   ├── workflows/             # git_flow, git_flow_next, custom, graphite, gerrit, svn
     │   ├── events.rs              # app-wide notification bus (Tauri emit)
+    │   ├── logging.rs             # local log, redaction, debug mode, crash notes
     │   └── state.rs               # AppState: registries, pools, config
     ├── tauri.conf.json
     └── capabilities/              # Tauri permission scopes (fs, shell, deep-link)
@@ -426,6 +428,11 @@ pub struct ErrorPayload {
 }
 ```
 
+The catalogue's current codes, with the remote ones that were previously `io`/`unclassified`:
+`network_unreachable` (retryable), `auth_required`, `push_rejected`. Some failures share a code but
+differ in meaning; `params["class"]` names which, and `errors.byClass` in the frontend catalogue gives
+it its own sentence (a merge stopped on conflicts is not a checkout that would overwrite changes).
+
 `ErrorCode` carries the 50 observed engine error classes as *classes* (not names): index-locked,
 invalid-repository, no-working-copy, authentication, push-rejected, keychain-item-not-found,
 private-key-not-found, ssh-agent-not-running, gpg-binary-not-found, gpg-signature-missing/untrusted/
@@ -457,7 +464,15 @@ verbatim.
 ## 16. Security and privacy
 
 - Secrets live only in Keychain; the Rust process never writes them to SQLite or logs. Log redaction
-  is a compile-time-tested filter list (token-shaped strings, `https://user:pass@` in URLs).
+  is one rule table applied on the single write path (token shapes, `https://user:pass@`
+  in URLs, query-string secrets, home directories), and the table is duplicated — deliberately,
+  because the backend and the webview write different files — into
+  `src/diagnostics/recorder.ts`; both sides are pinned by the same fixture,
+  `src-tauri/tests/fixtures/redaction-contract.json`. Log, settings, crash note and exported report
+  files are `0600` in a `0700` folder.
+- The window runs under a content-security policy whose only network destination is the app's own
+  IPC bridge (`tauri.conf.json` → `app.security.csp`), and the update check is made from Rust.
+  A test fails if the webview ever grows a `fetch`, `XMLHttpRequest` or `WebSocket`.
 - `shell` plugin scope is limited to the exact executables configured (git, git-lfs, diff/merge
   tools, terminal app, ssh programs); no arbitrary shell.
 - Deep links are parsed by a closed verb table; anything unrecognised is refused and logged

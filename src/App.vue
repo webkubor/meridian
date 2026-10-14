@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, provide, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 import type {
@@ -45,7 +45,10 @@ import { useHistory } from "./composables/useHistory";
 import { useRepositories } from "./composables/useRepositories";
 import { useWorkingCopy } from "./composables/useWorkingCopy";
 import { useDiagnostics } from "./composables/useDiagnostics";
-import { captureFailure, configureFailureNet, normalizeError } from "./diagnostics/failures";
+import type { VerbResult } from "./composables/useGit";
+import { claimFailure, configureFailureNet, failureIdFor, reportFailure, type FailureRecord } from "./diagnostics/failures";
+import { describeLink } from "./diagnostics/report";
+import { OPEN_DIAGNOSTICS } from "./diagnostics/claim";
 import { errorText } from "./i18n";
 import AboutScreen from "./components/screens/AboutScreen.vue";
 import DiagnosticsScreen from "./components/screens/DiagnosticsScreen.vue";
@@ -74,6 +77,7 @@ import {
   activityPath,
   blamePath,
   diagnosticsPath,
+  diagnosticsFailurePath,
   isWorkspaceTab,
   repositoriesPath,
   repositoryPath,
@@ -85,6 +89,7 @@ import { navigate, useRoute } from "./router";
 import { currentLocale, setLocale, type Locale } from "./i18n";
 import { openExternal } from "./bridges/external";
 import { pickDirectory, relaunch } from "./bridges/commands";
+import { installFailureLog } from "./diagnostics/logSink";
 import {
   askDialogue,
   cancelDialogue,
@@ -137,11 +142,35 @@ const git = useGit();
 const diagnostics = useDiagnostics({
   appInfo: () => appInfo.value.status === "data" ? appInfo.value.data : null,
   routeName: () => route.value.name,
+  focusId: () => route.value.query.failure ?? null,
   copy: copyText,
   notify: (text) => shell.pushToast({ kind: "info", text }),
+  notifyOpenFailed: (url, reason) => {
+    // The browser refused the link, so nothing was sent; the URL goes to the
+    // clipboard instead, and the failure is already recorded.
+    void navigator.clipboard
+      .writeText(url)
+      .catch(() => shell.pushToast({ kind: "danger", text: t("shell.toast.copyFailed") }));
+    shell.pushToast({ kind: "danger", text: reason || t("shell.toast.linkNotOpened") });
+  },
+  relaunch: () => relaunch(),
 });
 const diagnosticsState = diagnostics.state;
 const diagnosticsDebugEnabled = diagnostics.debugEnabled;
+const crashNote = computed(() => diagnostics.state.value.crash);
+
+/**
+ * Where every "详情" control in the app lands: the Diagnostics screen, with
+ * the failure expanded when the toast carried its id. The heading takes focus
+ * so keyboard and screen-reader users are not left on the old element.
+ */
+function openDiagnostics(failureId?: string): void {
+  navigate(failureId ? diagnosticsFailurePath(failureId) : diagnosticsPath());
+  void nextTick(() => {
+    document.getElementById("diagnostics-heading")?.focus();
+  });
+}
+provide(OPEN_DIAGNOSTICS, openDiagnostics);
 
 /**
  * Extra chrome for the fallback error toast: the machine code in small text and
@@ -150,25 +179,49 @@ const diagnosticsDebugEnabled = diagnostics.debugEnabled;
  * Kept beside the shell's toast queue rather than inside it because the shell
  * owns *when* a toast disappears, not what a failure wants to say about itself.
  */
-const toastMeta = ref<Record<string, { detail?: string; diagnostics?: boolean }>>({});
+const toastMeta = ref<Record<string, { detail?: string; failureId?: string }>>({});
 
 const toastViews = computed(() =>
   shell.toasts.value.map((toast) => ({ ...toast, detail: toastMeta.value[toast.id]?.detail })),
 );
 
-/** The last resort: a failure nobody claimed is still shown, with its code. */
-function showErrorToast(payload: ErrorPayload, fallback?: string): void {
+/**
+ * The last resort: a failure nobody claimed is still shown, with its code and
+ * a way into the diagnostics screen focused on it.
+ *
+ * The headline is the catalogue's sentence for the code (or the finer class),
+ * never one generic "the action failed": the engine's own words — a rejected
+ * push, a credential the server refused, conflicts to resolve — are the thing
+ * that makes the toast actionable, and they ride along in the small line under
+ * it.
+ */
+function showErrorToast(payload: ErrorPayload, failureId?: string): void {
+  const headline = payload.code === "unclassified" ? t("diagnostics.internalError") : errorText(payload);
+  // The reason line is what tells two failures apart: the engine's own words
+  // for a classified failure, the exception's first line for an internal one.
+  const reason = payload.code === "unclassified"
+    ? payload.detail?.split("\n")[0]
+    : payload.message === headline ? undefined : payload.message;
+  const detail = [payload.code, reason].filter(Boolean).join(" · ");
   const id = shell.pushToast({
     kind: "danger",
-    text: fallback ?? (payload.code === "unclassified" ? t("diagnostics.internalError") : errorText(payload)),
+    text: headline,
     actionLabel: t("diagnostics.actions.details"),
   });
-  toastMeta.value = { ...toastMeta.value, [id]: { detail: payload.code, diagnostics: true } };
+  toastMeta.value = { ...toastMeta.value, [id]: { detail, failureId } };
 }
-configureFailureNet({ showToast: (payload) => showErrorToast(payload) });
+configureFailureNet({
+  showToast: (payload, record) => showErrorToast(payload, record.id),
+  showSummary: (count) => {
+    const id = shell.pushToast({ kind: "danger", text: t("diagnostics.actions.suppressed", { count }) });
+    toastMeta.value = { ...toastMeta.value, [id]: {} };
+  },
+});
+installFailureLog();
 
 function onToastAction(id: string): void {
-  if (toastMeta.value[id]?.diagnostics) navigate(diagnosticsPath());
+  const failureId = toastMeta.value[id]?.failureId;
+  if (failureId !== undefined || toastMeta.value[id]) openDiagnostics(failureId);
   onToastDismiss(id);
 }
 
@@ -201,17 +254,26 @@ function changeLocale(next: Locale): void {
   void app.loadReleaseNotes(next);
 }
 
+async function onDismissCrash(): Promise<void> {
+  await diagnostics.dismissCrash();
+}
+
+async function onExportReport(failure: FailureRecord | null): Promise<void> {
+  await diagnostics.exportReport(failure);
+}
+
 async function restartToUpdate(): Promise<void> {
   // macOS installs the new bundle beside the running one; the process has to
   // come back up to be running it. Nothing else about this session survives,
-  // which is why the button is behind an explicit "Ready" state.
+  // which is why the button is behind an explicit "Ready" state. The same
+  // button relaunches for developer tools, which the webview can only add at
+  // the next launch.
   await relaunch();
 }
 
 async function openExternalLink(url: string): Promise<void> {
-  if (!(await openExternal(url))) {
-    shell.pushToast({ kind: "danger", text: t("shell.toast.linkFailed") });
-  }
+  const result = await openExternal(url);
+  if (!result.opened) shell.pushToast({ kind: "danger", text: result.reason ?? t("shell.toast.linkFailed") });
 }
 
 /** Set when a feedback URL could not be built, so the screen can say so. */
@@ -226,6 +288,45 @@ async function onFeedback(kind: FeedbackKind, title: string): Promise<void> {
     kind: "info",
     text: t("shell.toast.feedbackOpened", { count: target.prefilled.length }),
   });
+  const opened = app.lastFeedbackOpen();
+  // A link the system would not open is a failure the user must know about:
+  // nothing was sent, and the URL is on screen to copy instead.
+  if (opened && !opened.opened) {
+    shell.pushToast({ kind: "danger", text: opened.reason ?? t("shell.toast.linkNotOpened") });
+  }
+}
+
+/**
+ * The Diagnostics screen's "Report a problem".
+ *
+ * The report is built and the URL composed first, then a confirmation shows
+ * exactly what will be in the link: the query string reaches github.com on the
+ * first GET, before anything is submitted, so the review comes before the
+ * content leaves the machine. Copy puts the report on the clipboard instead, and
+ * cancelling sends nothing at all.
+ */
+async function onReportProblem(failure: FailureRecord | null): Promise<void> {
+  // Built once so the preview, the copy and the link carry the same text.
+  const report = diagnostics.reportText(failure);
+  const link = await diagnostics.composeReportLink(report);
+  if (!link) return;
+  const choice = await askDialogue({
+    kind: "confirm",
+    id: dialogueId(),
+    title: t("shell.toast.reportPreviewTitle"),
+    message: t("shell.toast.reportPreviewMessage"),
+    preview: describeLink(link.url),
+    confirmLabel: t("shell.toast.reportOpen"),
+    secondaryLabel: t("shell.toast.reportPreviewCopy"),
+  });
+  if (!choice) return;
+  if (choice.value === "secondary") {
+    await copyText(report);
+    return;
+  }
+  if (await diagnostics.openReportLink(link)) {
+    shell.pushToast({ kind: "info", text: t("shell.toast.reportOpened", { count: link.prefilled.length }) });
+  }
 }
 
 /** The diagnostics text, or a placeholder when the info has not loaded. */
@@ -239,6 +340,33 @@ onMounted(() => {
   // GitHub once. `start` owns that decision rather than the shell, so there is
   // one place that knows when a request is allowed to happen.
   void app.start();
+  // The crash note and the debug state are read at boot, not only when the
+  // Diagnostics screen is opened: a crash from the previous run has to reach
+  // the owner without them going looking for it.
+  void diagnostics.refresh();
+});
+
+// A failure recorded while the Diagnostics screen is open pulls the freshest
+// log tail into it; the tail read at launch predates the failure being looked
+// at, which was the complaint.
+watch(
+  () => diagnostics.state.value.failures.length,
+  (count, before) => {
+    if (count > (before ?? 0) && route.value.name === "diagnostics") void diagnostics.refresh();
+  },
+);
+
+watch(
+  () => route.value.name,
+  (name) => {
+    if (name === "diagnostics") void diagnostics.refresh();
+  },
+);
+
+// HEAD moved but the repository could not be re-read: say so once, and keep
+// Push disabled until it can be.
+watch(repositories.headStale, (stale) => {
+  if (stale) shell.pushToast({ kind: "warning", text: t("shell.toast.headStale") });
 });
 
 /* ---- route-derived ------------------------------------------------------- */
@@ -287,6 +415,25 @@ const selectedSidebarId = ref<string | null>(null);
 const localBranches = computed<BranchInfo[]>(() =>
   branches.branches.value.filter((branch) => !branch.isRemote),
 );
+
+/**
+ * The error caption a sidebar section shows instead of "nothing here".
+ *
+ * "No commits yet" is a statement about the repository, and a failed load is
+ * not one — the empty caption would be a false thing to show.
+ */
+function sectionError(state: LoadState<unknown>): string | undefined {
+  return state.status === "error" ? errorText(state.error) : undefined;
+}
+
+const failedTabs = computed<WorkspaceTab[]>(() => {
+  const failed: WorkspaceTab[] = [];
+  if (workingCopy.state.value.status === "error") failed.push("working-copy");
+  if (history.state.value.status === "error") failed.push("history");
+  if (branches.state.value.status === "error") failed.push("branches");
+  if (compare.state.value.status === "error") failed.push("compare");
+  return failed;
+});
 
 const workingCopyTotal = computed(() => {
   const value = workingCopy.summary.value;
@@ -337,6 +484,7 @@ const sidebarSections = computed<SidebarSectionModel[]>(() => {
       pseudo: true,
       collapsed: false,
       emptyCaption: t("shell.sidebar.emptyWorkingCopy"),
+      errorCaption: sectionError(workingCopy.state.value),
       rows: [
         {
           id: "sidebar:working-copy",
@@ -363,6 +511,7 @@ const sidebarSections = computed<SidebarSectionModel[]>(() => {
       icon: "nav.history",
       collapsed: false,
       emptyCaption: t("shell.sidebar.emptyHistory"),
+      errorCaption: sectionError(history.state.value),
       // The filter matches what the section is *called* on screen, not an
       // English literal — otherwise typing 中文 in the filter finds nothing.
       rows:
@@ -386,6 +535,7 @@ const sidebarSections = computed<SidebarSectionModel[]>(() => {
       icon: "nav.branch",
       collapsed: false,
       emptyCaption: t("shell.sidebar.emptyBranches"),
+      errorCaption: sectionError(branches.state.value),
       rows: branchRows,
     },
     {
@@ -394,6 +544,7 @@ const sidebarSections = computed<SidebarSectionModel[]>(() => {
       icon: "cloud",
       collapsed: true,
       emptyCaption: t("shell.sidebar.emptyRemotes"),
+      errorCaption: repositories.remotesError.value ? errorText(repositories.remotesError.value) : undefined,
       rows: remoteRows,
     },
     {
@@ -560,7 +711,7 @@ async function checkoutSelectedBranch(): Promise<void> {
   if (ok) {
     shell.pushToast({ kind: "success", text: t("shell.toast.checkedOut", { branch: branch.name }) });
   } else if (branches.lastError.value) {
-    reportError(branches.lastError.value, t("shell.toast.checkoutFailed"));
+    reportError(branches.lastError.value);
   }
 }
 
@@ -597,12 +748,14 @@ function onOpenRequested(path: string): void {
 
 /* ---- shell helpers ------------------------------------------------------- */
 
-function reportError(error: unknown, fallback: string): void {
-  // A store that returns its error rather than throwing has already recorded it
-  // through the bridge; claiming it here stops the fallback toast from firing a
-  // second time for the one failure the user is already being told about.
-  captureFailure(error, "ui", { handled: true, payload: normalizeError(error) });
-  showErrorToast(normalizeError(error), fallback);
+/**
+ * Report a failure the caller is about to show itself: recorded and logged,
+ * then a toast — claimed, so the net does not raise a second one for the same
+ * failure.
+ */
+function reportError(error: unknown): void {
+  const payload = claimFailure(error, "ui");
+  showErrorToast(payload, failureIdFor(payload));
 }
 
 /** Copy text (hashes, branch names, keys) to the clipboard. */
@@ -625,19 +778,31 @@ async function copyText(text: string): Promise<void> {
  * snapshot of one taken a moment before the user switched.
  */
 async function runVerb(
-  action: () => Promise<ErrorPayload | null>,
+  action: () => Promise<VerbResult | ErrorPayload | null>,
   success: string,
   labelKey = "shell.activity.genericOperation",
 ): Promise<void> {
   const id = activity.start(labelKey);
-  const error = await action();
+  const outcome = await action();
+  const error = outcome && "error" in outcome ? outcome.error : (outcome as ErrorPayload | null);
   if (error) {
-    activity.finish(id, "failed", error.message);
-    reportError(error, t("shell.toast.actionFailed"));
-  } else {
-    activity.finish(id, "done");
-    shell.pushToast({ kind: "success", text: success });
+    // The activity list is read by the person who just clicked; its reason is
+    // the same sentence the toast shows, not the backend's English.
+    activity.finish(id, "failed", error.code === "unclassified" ? error.message : errorText(error));
+    reportError(error);
+    return;
   }
+  const conflicted = outcome !== null && "conflicted" in outcome && outcome.conflicted;
+  activity.finish(id, conflicted ? "failed" : "done");
+  if (conflicted) {
+    // `merge_start`/`rebase_start` come back `Ok` with `outcome: conflicted`
+    // when conflicts stopped them: a success toast here would say "merged" for
+    // an operation that is waiting for a human.
+    shell.pushToast({ kind: "warning", text: t("shell.toast.conflicted") });
+    goTab("working-copy");
+    return;
+  }
+  shell.pushToast({ kind: "success", text: success });
 }
 
 /* ---- toolbar ------------------------------------------------------------- */
@@ -655,11 +820,13 @@ const toolbarVerbs = computed<ToolbarVerbModel[]>(() => {
       : t("shell.toolbar.noRemote");
   const pushReason = !hasRepo
     ? t("shell.toolbar.noRepository")
-    : !hasRemote
-      ? t("shell.toolbar.noRemote")
-      : !hasHead
-        ? t("shell.toolbar.detachedHead")
-        : undefined;
+    : repositories.headStale.value
+      ? t("shell.toast.pushStale")
+      : !hasRemote
+        ? t("shell.toolbar.noRemote")
+        : !hasHead
+          ? t("shell.toolbar.detachedHead")
+          : undefined;
 
   const branchOptions: SplitActionOption[] = [
     { id: "branch.new", label: t("shell.toolbar.newBranch"), disabled: !hasRepo },
@@ -684,6 +851,10 @@ const toolbarVerbs = computed<ToolbarVerbModel[]>(() => {
 
     { id: "quickOpen", label: t("shell.toolbar.quickOpen"), icon: "action.quickOpen", group: "utility", disabled: false },
     { id: "quickActions", label: t("shell.toolbar.quickActions"), icon: "action.quickActions", group: "utility", disabled: false },
+    // Always present, not only while the debug chip is lit: this screen is
+    // where a failure, a crash note and a report live, and "open it after a
+    // crash" must not depend on a mode the user has not turned on.
+    { id: "diagnostics", label: t("diagnostics.open"), icon: "exclamationmark.bubble", group: "utility", disabled: false },
     { id: "settings", label: t("shell.toolbar.settings"), icon: "nav.settings", group: "utility", disabled: false },
     { id: "account", label: t("shell.toolbar.account"), icon: "nav.services", group: "utility", disabled: false },
     { id: "about", label: t("shell.toolbar.about"), icon: "info.circle", group: "utility", disabled: false },
@@ -745,6 +916,9 @@ async function onToolbarRun(id: string): Promise<void> {
     case "account":
       navigate(accountPath());
       return;
+    case "diagnostics":
+      openDiagnostics();
+      return;
     case "about":
       navigate(aboutPath());
       return;
@@ -792,7 +966,7 @@ async function newBranchFlow(): Promise<void> {
   if (created) {
     shell.pushToast({ kind: "success", text: t("shell.toast.branchCreated", { branch: created.name }) });
   } else if (branches.lastError.value) {
-    reportError(branches.lastError.value, t("shell.toast.branchCreateFailed"));
+    reportError(branches.lastError.value);
   }
 }
 
@@ -851,7 +1025,7 @@ async function renameBranchFlow(preset?: string | null): Promise<void> {
     selectedBranchName.value = renamed.fullName;
     shell.pushToast({ kind: "success", text: t("shell.toast.branchRenamed", { branch: renamed.name }) });
   } else if (branches.lastError.value) {
-    reportError(branches.lastError.value, t("shell.toast.branchRenameFailed"));
+    reportError(branches.lastError.value);
   }
 }
 
@@ -885,7 +1059,7 @@ async function deleteBranch(name: string | null): Promise<void> {
 
   const ok = await branches.remove(branch?.name ?? name);
   if (ok) shell.pushToast({ kind: "success", text: t("shell.toast.branchDeleted", { branch: label }) });
-  else if (branches.lastError.value) reportError(branches.lastError.value, t("shell.toast.branchDeleteFailed"));
+  else if (branches.lastError.value) reportError(branches.lastError.value);
 }
 
 /**
@@ -922,7 +1096,7 @@ async function checkoutFlow(preset?: string): Promise<void> {
         text: t("shell.toast.checkedOut", { branch: branch.name }),
       });
     } else if (branches.lastError.value) {
-      reportError(branches.lastError.value, t("shell.toast.checkoutFailed"));
+      reportError(branches.lastError.value);
     }
     return;
   }
@@ -933,7 +1107,7 @@ async function checkoutFlow(preset?: string): Promise<void> {
 
   const ok = await branches.checkout(branch?.name ?? name);
   if (ok) shell.pushToast({ kind: "success", text: t("shell.toast.checkedOut", { branch: name }) });
-  else if (branches.lastError.value) reportError(branches.lastError.value, t("shell.toast.checkoutFailed"));
+  else if (branches.lastError.value) reportError(branches.lastError.value);
 }
 
 /** The dirty-tree confirmation. True when there is nothing to confirm. */
@@ -959,7 +1133,7 @@ async function confirmDirtyCheckout(): Promise<boolean> {
 async function clearAssumeUnchanged(path: string): Promise<void> {
   const ok = await workingCopy.setAssumeUnchanged([path], false);
   if (!ok && workingCopy.lastError.value) {
-    reportError(workingCopy.lastError.value, t("shell.toast.actionFailed"));
+    reportError(workingCopy.lastError.value);
   }
 }
 
@@ -979,7 +1153,7 @@ async function discardEntry(path: string): Promise<void> {
   );
   const ok = await workingCopy.discard(path, includeUntracked);
   if (ok) shell.pushToast({ kind: "success", text: t("shell.toast.discarded") });
-  else reportError(workingCopy.lastError.value, t("shell.toast.discardFailed"));
+  else reportError(workingCopy.lastError.value);
 }
 
 /* ---- working copy -------------------------------------------------------- */
@@ -1070,7 +1244,7 @@ async function commitNow(): Promise<boolean> {
     shell.pushToast({ kind: "success", text: t("shell.toast.committed") });
     await history.refresh();
   } else {
-    reportError(workingCopy.lastError.value, t("shell.toast.commitFailed"));
+    reportError(workingCopy.lastError.value);
   }
   return ok;
 }
@@ -1189,15 +1363,29 @@ watch(
 
 function setSetting(key: string, value: SettingValue): void {
   storedSettings.value = { ...storedSettings.value, [key]: value };
-  window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(storedSettings.value));
+  persistSettings();
   if (key === "shell.appearance") shell.setThemeMode(value as "auto" | "light" | "dark");
+}
+
+/**
+ * Settings carry privacy and safety meanings (confirm before switching, theme),
+ * so a failed write is reported rather than swallowed: the choice would be
+ * forgotten at the next launch without the user ever knowing.
+ */
+function persistSettings(): void {
+  try {
+    window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(storedSettings.value));
+  } catch (error) {
+    reportFailure(error, "settings.persist");
+    shell.pushToast({ kind: "warning", text: t("shell.toast.settingsNotSaved") });
+  }
 }
 
 function resetSetting(key: string): void {
   const next = { ...storedSettings.value };
   delete next[key];
   storedSettings.value = next;
-  window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+  persistSettings();
 }
 
 const settingsDocument = computed<SettingsDocument>(() => ({
@@ -1461,6 +1649,17 @@ watch(
 
 <template>
   <AppShell :title="windowTitle" :subtitle="windowSubtitle" :sidebar-width="sidebarWidth">
+    <!-- The crash note from the previous run, until it is dismissed: after a
+         crash the app relaunches looking normal, and the Diagnostics screen is
+         the only place the note used to exist. -->
+    <div v-if="crashNote" class="crash-banner" role="alert">
+      <strong>{{ t("diagnostics.crash." + (crashNote.kind === "recovered_panic" ? "recoveredTitle" : crashNote.kind === "unclean_exit" ? "uncleanTitle" : "title")) }}</strong>
+      <span class="crash-message">{{ crashNote.message }}</span>
+      <button type="button" class="banner-verb" @click="openDiagnostics()">{{ t("diagnostics.open") }}</button>
+      <button type="button" class="banner-verb" @click="onReportProblem(null)">{{ t("diagnostics.actions.report") }}</button>
+      <button type="button" class="banner-verb" @click="onDismissCrash()">{{ t("diagnostics.crash.dismiss") }}</button>
+    </div>
+
     <template #toolbar>
       <AppToolbar
         :verbs="toolbarVerbs"
@@ -1503,8 +1702,7 @@ watch(
       :clone-url="repositories.cloneUrl.value"
       :filter="recentsFilter"
       :busy="repositories.busy.value"
-      :error-message="repositories.lastError.value?.message ?? null"
-      :error-detail="repositories.lastError.value?.detail ?? null"
+      :error="repositories.lastError.value"
       :unavailable="null"
       @update:path-input="repositories.pathInput.value = $event"
       @update:clone-url="repositories.cloneUrl.value = $event"
@@ -1526,6 +1724,7 @@ watch(
       v-else-if="routeName === 'repository'"
       :summary="summary"
       :tab="activeTab"
+      :failed-tabs="failedTabs"
       @update:tab="goTab"
       @continue-operation="() => void runVerb(() => git.continueOperation(), t('shell.toast.operationContinued'))"
       @abort-operation="() => void runVerb(() => git.abortOperation(), t('shell.toast.operationAborted'))"
@@ -1560,8 +1759,8 @@ watch(
           @unstage="(path) => void workingCopy.unstage(path)"
           @discard="(path) => void discardEntry(path)"
           @clear-assume-unchanged="(path) => void clearAssumeUnchanged(path)"
-          @bulk-stage="(paths) => paths.forEach((path) => void workingCopy.stage(path))"
-          @bulk-unstage="(paths) => paths.forEach((path) => void workingCopy.unstage(path))"
+          @bulk-stage="(paths) => void workingCopy.stagePaths(paths)"
+          @bulk-unstage="(paths) => void workingCopy.unstagePaths(paths)"
           @update:conflicted-only="conflictedOnly = $event"
           @update:detail-width="detailWidth = $event"
           @update:diff-mode="diffMode = $event"
@@ -1782,14 +1981,17 @@ watch(
     <DiagnosticsScreen
       v-else-if="routeName === 'diagnostics'"
       v-bind="diagnosticsState"
+      :call-for="diagnostics.callFor"
       @refresh="diagnostics.refresh"
       @set-debug="diagnostics.setDebug"
       @reveal-logs="diagnostics.revealLogs"
-      @dismiss-crash="diagnostics.dismissCrash"
+      @dismiss-crash="onDismissCrash"
+      @copy-details="diagnostics.copyFailureDetails"
       @copy-report="diagnostics.copyReport"
-      @export-report="diagnostics.exportReport"
+      @export-report="onExportReport"
       @open-devtools="diagnostics.openDevtools"
-      @report-problem="diagnostics.reportProblem"
+      @relaunch="restartToUpdate"
+      @report-problem="onReportProblem"
     />
 
     <AboutScreen
@@ -1855,3 +2057,42 @@ watch(
     </template>
   </AppShell>
 </template>
+
+<style scoped>
+.crash-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--md-space-2);
+  padding: var(--md-space-2) var(--md-space-3);
+  border-bottom: 1px solid var(--md-danger);
+  background: var(--md-bg-danger-soft);
+  color: var(--md-fg);
+  font-size: var(--md-text-sm);
+}
+
+.crash-banner strong {
+  flex: none;
+}
+
+.crash-banner .crash-message {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--md-fg-muted);
+}
+
+.crash-banner .banner-verb {
+  border: none;
+  background: transparent;
+  color: var(--md-danger);
+  font-size: var(--md-text-xs);
+  font-weight: 600;
+  padding: 0;
+}
+
+.crash-banner .banner-verb:hover {
+  text-decoration: underline;
+}
+</style>

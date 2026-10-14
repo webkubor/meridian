@@ -20,7 +20,14 @@ export function useRepositories() {
   const busy = computed(() => store.busy);
   const lastError = computed(() => store.lastError);
   const remotes = computed(() => store.remotes);
+  const remotesError = computed(() => store.remotesError);
   const defaultRemote = computed(() => store.defaultRemote);
+  /**
+   * True when HEAD moved but the repository could not be re-read. The toolbar
+   * publishes `selected.headBranch`, so push is disabled until HEAD is known
+   * again rather than publishing the branch that was checked out before.
+   */
+  const headStale = computed(() => store.headStale);
 
   /**
    * Opens a repository and returns it, so the caller can navigate straight to
@@ -97,7 +104,9 @@ export function useRepositories() {
     busy,
     lastError,
     remotes,
+    remotesError,
     defaultRemote,
+    headStale,
     open,
     init,
     clone,

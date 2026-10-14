@@ -13,10 +13,15 @@ import Icon from "../common/Icon.vue";
  * integration banner while an operation is in progress, and the active tab's
  * pane. The panes arrive through named slots so this screen stays a pure host.
  */
-const props = defineProps<{
-  summary: RepoSummaryModel | null;
-  tab: WorkspaceTab;
-}>();
+const props = withDefaults(
+  defineProps<{
+    summary: RepoSummaryModel | null;
+    tab: WorkspaceTab;
+    /** Tabs whose data failed to load, so the strip can say so without a dot that means nothing. */
+    failedTabs?: WorkspaceTab[];
+  }>(),
+  { failedTabs: () => [] },
+);
 
 const emit = defineEmits<{
   "update:tab": [tab: WorkspaceTab];
@@ -60,11 +65,12 @@ const stateLabel = computed<string | null>(() => {
         role="tab"
         :aria-selected="entry.id === tab"
         class="workspace-tab"
-        :class="{ active: entry.id === tab }"
+        :class="{ active: entry.id === tab, failed: failedTabs.includes(entry.id) }"
         @click="emit('update:tab', entry.id)"
       >
         <Icon :name="entry.icon" :size="13" />
         {{ $t(entry.labelKey) }}
+        <span v-if="failedTabs.includes(entry.id)" class="tab-failed" role="img" :aria-label="$t('shell.toast.tabFailed')" />
       </button>
     </nav>
 
@@ -133,6 +139,15 @@ const stateLabel = computed<string | null>(() => {
   color: var(--md-fg);
   background: var(--md-bg-hover);
 }
+
+.workspace-tab .tab-failed {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--md-danger);
+}
+
+.workspace-tab.failed { color: var(--md-danger); }
 
 .workspace-tab.active {
   color: var(--md-fg);

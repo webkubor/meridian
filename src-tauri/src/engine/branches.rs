@@ -87,9 +87,81 @@ pub fn load(repo: &git2::Repository, name: &str) -> Result<BranchInfo, ErrorPayl
     branch_info(repo, &branch, false)
 }
 
+/// Move the working copy and index to `commit`'s tree, refusing — before
+/// anything is written — when that would overwrite a local change.
+///
+/// **This must run before HEAD moves.** libgit2 compares the working copy with
+/// the tree HEAD points at when the checkout starts (the "baseline") and treats
+/// every difference as the user's own edit. Moving HEAD first makes the
+/// baseline equal the target, so nothing differs from it, no conflict is ever
+/// found, and files are left as they were: that is how a checkout used to
+/// report success while keeping the old branch's content, leave files the
+/// target lacks behind, and clobber edits. With the right order libgit2 does
+/// what `git checkout` does — carries unrelated edits (staged or not) across,
+/// removes what the target lacks (directories included), and refuses with
+/// `CheckoutConflicts` when an edit or an untracked file is in the way.
+///
+/// `name` is only used for the message. The conflicting paths are collected
+/// through libgit2's notification hook, so the refusal can name them.
+fn checkout_tree_safely(
+    repo: &git2::Repository,
+    commit: &git2::Commit<'_>,
+    name: &str,
+) -> Result<(), ErrorPayload> {
+    let conflicts = std::cell::RefCell::new(Vec::<String>::new());
+    let mut builder = git2::build::CheckoutBuilder::new();
+    builder
+        .safe()
+        .notify_on(git2::CheckoutNotificationType::CONFLICT)
+        .notify(|_why, path, _baseline, _target, _workdir| {
+            if let Some(path) = path {
+                conflicts.borrow_mut().push(path.display().to_string());
+            }
+            // Keep going: the refusal should list every blocker, not the first.
+            true
+        });
+
+    match repo.checkout_tree(commit.as_object(), Some(&mut builder)) {
+        Ok(()) => {
+            log::debug!(target: "meridian::engine", "checkout of '{name}' updated the working copy");
+            Ok(())
+        }
+        Err(error) if error.code() == git2::ErrorCode::Conflict => {
+            let mut paths = conflicts.borrow().clone();
+            paths.sort();
+            paths.dedup();
+            log::debug!(
+                target: "meridian::engine",
+                "checkout of '{name}' refused: {} conflicting path(s)",
+                paths.len()
+            );
+            let message = if paths.is_empty() {
+                // libgit2 refused without naming paths; its own count is the
+                // best statement of what it found.
+                format!("Local changes would be overwritten by checking out '{name}'")
+            } else {
+                format!(
+                    "{} local change(s) would be overwritten by checking out '{name}'",
+                    paths.len()
+                )
+            };
+            let payload = ErrorPayload::new(ErrorCode::CheckoutConflicts, message)
+                .with_domain(crate::domain::error::ErrorDomain::Git)
+                .with_param("name", name);
+            Err(if paths.is_empty() {
+                payload.with_detail(error.message().to_string())
+            } else {
+                payload.with_detail(paths.join(", "))
+            })
+        }
+        Err(error) => Err(error.into()),
+    }
+}
+
 /// `branch_create` (docs/03 §6): create at the resolved start point, optionally
 /// checking out with libgit2's *safe* strategy — local changes are never
-/// clobbered; a conflicting checkout surfaces as `CheckoutConflicts`.
+/// clobbered; a conflicting checkout surfaces as `CheckoutConflicts` and the new
+/// branch is not left behind, as with `git checkout -b`.
 pub fn create(
     repo: &git2::Repository,
     name: &str,
@@ -97,14 +169,15 @@ pub fn create(
     checkout: bool,
 ) -> Result<BranchInfo, ErrorPayload> {
     let commit = history::resolve(repo, start)?;
-    let branch = repo.branch(name, &commit, false)?;
+    let mut branch = repo.branch(name, &commit, false)?;
 
     if checkout {
         let refname = branch.get().name()?.to_string();
+        if let Err(error) = checkout_tree_safely(repo, &commit, name) {
+            let _ = branch.delete();
+            return Err(error);
+        }
         repo.set_head(&refname)?;
-        let mut builder = git2::build::CheckoutBuilder::new();
-        builder.safe();
-        repo.checkout_tree(commit.as_object(), Some(&mut builder))?;
     }
 
     branch_info(repo, &branch, false)
@@ -131,19 +204,18 @@ pub fn stacked_create(
     let parent_branch = repo
         .find_branch(parent, git2::BranchType::Local)
         .map_err(|_| missing_parent(parent))?;
-    let parent_oid = parent_branch.get().peel_to_commit()?.id();
+    let parent_commit = parent_branch.get().peel_to_commit()?;
+    let parent_oid = parent_commit.id();
 
-    let branch = repo.branch(name, &parent_branch.get().peel_to_commit()?, false)?;
+    let mut branch = repo.branch(name, &parent_commit, false)?;
 
     if checkout {
         let refname = branch.get().name()?.to_string();
+        if let Err(error) = checkout_tree_safely(repo, &parent_commit, name) {
+            let _ = branch.delete();
+            return Err(error);
+        }
         repo.set_head(&refname)?;
-        let mut builder = git2::build::CheckoutBuilder::new();
-        builder.safe();
-        repo.checkout_tree(
-            parent_branch.get().peel_to_commit()?.as_object(),
-            Some(&mut builder),
-        )?;
     }
 
     Ok(StackedBranchInfo {
@@ -233,72 +305,10 @@ pub fn resolve_branch(repo: &git2::Repository, name: &str) -> Result<ResolvedBra
 /// The name may be any form [`resolve_branch`] accepts, so the quick-open ids
 /// (`branch:` + the row's full refname) work. A local branch attaches HEAD; a
 /// remote-tracking ref cannot, so it detaches at that tip.
-/// What a checkout from the current HEAD to `target`'s tree would have to do to
-/// the working copy: the paths it would clobber, and the paths it should remove
-/// because the target no longer has them.
-fn checkout_plan<'repo>(
-    repo: &'repo git2::Repository,
-    target: &git2::Commit<'repo>,
-) -> Result<(Vec<String>, Vec<String>), ErrorPayload> {
-    let target_tree = target.tree()?;
-    let index = repo.index()?;
-    let mut git_opts = git2::StatusOptions::new();
-    git_opts
-        .include_untracked(true)
-        .include_ignored(false)
-        .include_unmodified(false)
-        .recurse_untracked_dirs(true)
-        .renames_head_to_index(true)
-        .renames_index_to_workdir(true);
-    let statuses = repo.statuses(Some(&mut git_opts))?;
-
-    let mut conflicts = Vec::new();
-    for entry in statuses.iter() {
-        let Ok(path) = entry.path() else { continue };
-        let flags = entry.status();
-        let tracked = index.get_path(std::path::Path::new(path), 0).is_some();
-        let target_has = target_tree.get_name(path).is_some();
-
-        let local_modified = flags.intersects(
-            git2::Status::WT_MODIFIED
-                | git2::Status::WT_DELETED
-                | git2::Status::WT_TYPECHANGE
-                | git2::Status::INDEX_MODIFIED
-                | git2::Status::INDEX_DELETED,
-        );
-        if tracked && local_modified && target_has {
-            conflicts.push(path.to_string());
-            continue;
-        }
-        if !tracked && flags.intersects(git2::Status::WT_NEW) && target_has {
-            conflicts.push(path.to_string());
-        }
-    }
-    conflicts.sort();
-
-    // Files HEAD tracks that the target does not. git removes an unmodified one
-    // and *keeps* a locally modified one, reporting it as deleted-and-modified
-    // rather than losing the edit.
-    let mut removals = Vec::new();
-    if let Some(head) = repo.head().ok().and_then(|h| h.peel_to_commit().ok()) {
-        let head_tree = head.tree()?;
-        for entry in head_tree.iter() {
-            let Ok(name) = entry.name() else { continue };
-            if target_tree.get_name(name).is_some() {
-                continue;
-            }
-            let deleted = statuses
-                .iter()
-                .any(|status| matches!(status.path(), Ok(path) if path == name));
-            if !deleted {
-                removals.push(name.to_string());
-            }
-        }
-    }
-    removals.sort();
-    Ok((conflicts, removals))
-}
-
+///
+/// The working copy moves first and HEAD second (see [`checkout_tree_safely`]),
+/// so a refusal is a no-op the user can retry after staging, committing or
+/// discarding.
 pub fn checkout(
     repo: &git2::Repository,
     name: &str,
@@ -314,31 +324,12 @@ pub fn checkout(
         .with_param("name", resolved.name.clone())
     })?;
 
-    let mut builder = git2::build::CheckoutBuilder::new();
-    builder.safe();
-
-    // Refuse before moving HEAD, so a refusal is a no-op the user can retry
-    // after staging, committing or discarding.
     let commit = repo.find_commit(oid)?;
-    let (conflicts, removals) = checkout_plan(repo, &commit)?;
-    if !conflicts.is_empty() {
-        return Err(ErrorPayload::new(
-            ErrorCode::CheckoutConflicts,
-            format!(
-                "{} local change(s) would be overwritten by checking out '{}'",
-                conflicts.len(),
-                resolved.name
-            ),
-        )
-        .with_domain(crate::domain::error::ErrorDomain::Git)
-        .with_detail(conflicts.join(", "))
-        .with_param("name", resolved.name.clone()));
-    }
+    checkout_tree_safely(repo, &commit, &resolved.name)?;
 
     if opts.detach || resolved.is_remote {
         // A remote-tracking ref cannot anchor HEAD — detach at its tip.
         repo.set_head_detached(oid)?;
-        repo.checkout_tree(commit.as_object(), Some(&mut builder))?;
         return Ok(CheckoutResult {
             branch: None,
             oid: oid.to_string(),
@@ -347,29 +338,6 @@ pub fn checkout(
     }
 
     repo.set_head(&resolved.full_name)?;
-    repo.checkout_tree(commit.as_object(), Some(&mut builder))?;
-    // `checkout_tree` writes the target tree but neither removes files the
-    // target lacks nor drops their index entries, so they survive as
-    // `INDEX_NEW` and make the tree look dirty for the next merge.
-    if let Some(workdir) = repo.workdir() {
-        for path in &removals {
-            let full = workdir.join(path);
-            if full.is_file() {
-                std::fs::remove_file(&full).map_err(|error| {
-                    ErrorPayload::new(
-                        ErrorCode::Io,
-                        format!(
-                            "Could not remove {} after checkout: {error}",
-                            full.display()
-                        ),
-                    )
-                })?;
-            }
-        }
-    }
-    // A mixed reset rewrites index entries to match HEAD. It does not touch the
-    // working tree, so the edits above and the checkout above are preserved.
-    repo.reset(commit.as_object(), git2::ResetType::Mixed, None)?;
     Ok(CheckoutResult {
         branch: Some(resolved.name),
         oid: oid.to_string(),
@@ -391,13 +359,11 @@ pub fn checkout_revision(
 ) -> Result<CheckoutResult, ErrorPayload> {
     let commit = history::resolve(repo, revision)?;
     let oid = commit.id();
-
-    let mut builder = git2::build::CheckoutBuilder::new();
-    builder.safe();
+    let label = oid.to_string();
 
     if detach {
+        checkout_tree_safely(repo, &commit, &label)?;
         repo.set_head_detached(oid)?;
-        repo.checkout_tree(commit.as_object(), Some(&mut builder))?;
         return Ok(CheckoutResult {
             branch: None,
             oid: oid.to_string(),
@@ -407,8 +373,8 @@ pub fn checkout_revision(
 
     match revision {
         Revision::Branch(name) => {
+            checkout_tree_safely(repo, &commit, name)?;
             repo.set_head(&format!("refs/heads/{name}"))?;
-            repo.checkout_tree(commit.as_object(), Some(&mut builder))?;
             Ok(CheckoutResult {
                 branch: Some(name.clone()),
                 oid: oid.to_string(),
@@ -578,15 +544,15 @@ pub fn fast_forward(
     }
 
     let is_head = branch.is_head();
+    // The checked-out branch moves its working copy first: once the ref moves,
+    // HEAD already points at the target and nothing is left to compare against
+    // (see `checkout_tree_safely`). A refusal leaves the branch where it was.
+    if is_head {
+        let commit = repo.find_commit(target)?;
+        checkout_tree_safely(repo, &commit, name)?;
+    }
     let mut reference = branch.into_reference();
     reference.set_target(target, &format!("meridian: fast-forward {name}"))?;
-
-    if is_head {
-        let mut builder = git2::build::CheckoutBuilder::new();
-        builder.safe();
-        let commit = repo.find_commit(target)?;
-        repo.checkout_tree(commit.as_object(), Some(&mut builder))?;
-    }
 
     load(repo, name)
 }
@@ -695,25 +661,20 @@ pub fn checkout_remote(
         .with_param("name", name));
     }
 
-    if repo.find_branch(&name, git2::BranchType::Local).is_ok() {
-        return Err(ErrorPayload::new(
-            ErrorCode::ReferenceExists,
-            format!("Branch '{name}' already exists"),
-        )
-        .with_param("name", name));
-    }
-
     let commit = remote_ref.get().peel_to_commit()?;
     let mut branch = repo.branch(&name, &commit, false)?;
+
+    // Check out first, and take the branch back if that is refused: nothing
+    // else (tracking configuration included) may be left behind by a no-op.
+    let refname = branch.get().name()?.to_string();
+    if let Err(error) = checkout_tree_safely(repo, &commit, &name) {
+        let _ = branch.delete();
+        return Err(error);
+    }
+    repo.set_head(&refname)?;
     if track {
         branch.set_upstream(Some(&shorthand))?;
     }
-
-    let refname = branch.get().name()?.to_string();
-    repo.set_head(&refname)?;
-    let mut builder = git2::build::CheckoutBuilder::new();
-    builder.safe();
-    repo.checkout_tree(commit.as_object(), Some(&mut builder))?;
 
     branch_info(repo, &branch, false)
 }

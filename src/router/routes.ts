@@ -96,6 +96,15 @@ export function diagnosticsPath(): string {
   return "/diagnostics";
 }
 
+/**
+ * The Diagnostics screen focused on one failure (`?failure=<id>`), so the
+ * "Details" control on a toast lands on the failure it was about instead of a
+ * collapsed list.
+ */
+export function diagnosticsFailurePath(failureId: string): string {
+  return `/diagnostics?failure=${encodeURIComponent(failureId)}`;
+}
+
 export function isWorkspaceTab(value: string | undefined): value is WorkspaceTab {
   return value === "working-copy" || value === "history" || value === "branches" || value === "compare";
 }

@@ -27,6 +27,48 @@ there is exactly one place that knows where the project is hosted.
 - **Diagnostic reports** — copy a redacted report, export it to Downloads, or
   prefill it into a bug report for review in GitHub. Meridian never submits the
   report or sends diagnostics elsewhere.
+- **Report confirmation** — the bug-report link is composed first and shown to
+  you, decoded, before anything is opened. The address reaches github.com when
+  that page loads, so the review happens before the content leaves the Mac, and
+  cancelling sends nothing.
+- **Crash reports that reach you** — a crash from the previous run, or a run
+  that did not shut down cleanly, is announced at launch with a route into
+  Diagnostics, instead of waiting to be discovered on a screen you have to know
+  about.
+- **A content-security policy** — the window now runs under one whose only
+  network destination is Meridian's own IPC bridge, so the no-telemetry promise
+  is enforced rather than reviewed.
+
+### Fixed
+
+- **Branch switching no longer loses local work, or fakes success.** Checking
+  out a branch with a dirty working copy now behaves like `git checkout`: a
+  conflict is refused before anything moves, the local edits are carried across
+  when the target branch does not touch them, and files the target branch lacks
+  are removed. Previously a checkout could report success while keeping the old
+  branch's files, and a refused checkout could still leave HEAD moved and the
+  index stale.
+- **Failures are no longer swallowed where nothing renders them.** A failed
+  history or branch load used to be marked handled because a pane would show
+  it — but that pane is only mounted on its own tab, so the sidebar went on to
+  claim "no commits yet". A failure is now quiet only while something on screen
+  is actually showing it; otherwise it reaches you as a toast.
+- **Remote failures say what happened.** An unreachable host, a refused
+  credential and a rejected push have their own error codes and sentences; a
+  merge stopped by conflicts is reported as stopped rather than as a success.
+- **A failed stage no longer clears the file list**, and a bulk stage is one
+  command, so a failure cannot be overwritten by a later success.
+- **After a branch switch that could not refresh the view**, the toolbar says so
+  and disables Push, instead of publishing the previously checked-out branch.
+- **Reports never carry source code.** A stale diff hunk error quoted the line
+  of the file it came from; it now quotes only the hunk's coordinates.
+- **Log rotation** keeps the live file plus two generations, as documented, and
+  **log, settings, crash note and exported report files** are readable by their
+  owner only. An unwritable log folder degrades to in-memory logging instead of
+  preventing Meridian from starting.
+- **A failing backend command always reaches the screen**, including failures
+  that arrive as a bare string from the Tauri layer, and including a panic,
+  which is now reported as an internal error rather than as a cancellation.
 
 ## [0.1.0] - 2026-10-14
 

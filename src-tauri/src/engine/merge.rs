@@ -410,6 +410,14 @@ pub fn start(
     }
 
     let (analysis, _) = repo.merge_analysis(&[&annotated])?;
+    log::debug!(
+        target: "meridian::engine",
+        "merge analysis: up_to_date={} fast_forward={} normal={} unborn={}",
+        analysis.is_up_to_date(),
+        analysis.is_fast_forward(),
+        analysis.is_normal(),
+        analysis.is_unborn()
+    );
     if analysis.is_up_to_date() {
         return Ok(IntegrationResult::new(IntegrationOutcome::UpToDate {
             head: head_commit(repo)?.id().to_string(),

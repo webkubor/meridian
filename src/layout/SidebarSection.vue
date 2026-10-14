@@ -61,7 +61,11 @@ const emit = defineEmits<{
         @options="emit('options', $event)"
         @contextmenu="(id, event) => emit('contextmenu', id, event)"
       />
-      <p v-if="section.rows.length === 0" class="section-empty">{{ section.emptyCaption }}</p>
+      <p v-if="section.rows.length === 0 && section.errorCaption" class="section-empty section-error">
+        <Icon name="exclamationmark.circle" :size="11" />
+        {{ section.errorCaption }}
+      </p>
+      <p v-else-if="section.rows.length === 0" class="section-empty">{{ section.emptyCaption }}</p>
     </div>
   </section>
 </template>
@@ -145,5 +149,17 @@ const emit = defineEmits<{
   padding: var(--md-space-1) var(--md-space-2) var(--md-space-1) var(--md-space-6);
   font-size: var(--md-text-xs);
   color: var(--md-fg-disabled);
+}
+
+.section-error {
+  display: flex;
+  align-items: center;
+  gap: var(--md-space-1);
+  color: var(--md-danger);
+  text-decoration: none;
+}
+
+.section-error :deep(svg) {
+  color: var(--md-danger);
 }
 </style>

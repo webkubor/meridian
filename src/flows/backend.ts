@@ -141,6 +141,16 @@ export class FakeBackend {
     this.handlers.set(name, handler);
   }
 
+  /**
+   * Replace the working-copy entries the status load returns.
+   *
+   * A test that needs a two-file selection needs two entries; the fixture
+   * ships one modified file and one untracked one.
+   */
+  setEntries(entries: EntryStatus[]): void {
+    this.entries = entries;
+  }
+
   /** Reject exactly the next invocation of `name`. */
   failNext(name: string, payload = makeError(name)): void {
     const queued = this.failures.get(name) ?? [];
@@ -334,8 +344,8 @@ export class FakeBackend {
       status: { currentVersion: "0.1.0", latestVersion: "0.1.0", notes: null, publishedAt: null, downloadBytes: null },
     }));
     this.handlers.set("app_feedback_compose", () => ({ url: "https://github.com/example/meridian/issues/new", prefilled: [] }));
-    this.handlers.set("diagnostics_debug_get", () => ({ enabled: false, source: "off", logDir: "~/Library/Logs/dev.meridian.app", logFile: "~/Library/Logs/dev.meridian.app/meridian.log", level: "info" }));
-    this.handlers.set("diagnostics_debug_set", (payload) => ({ enabled: this.commandArgs(payload).enabled === true, source: "setting", logDir: "~/Library/Logs/dev.meridian.app", logFile: "~/Library/Logs/dev.meridian.app/meridian.log", level: this.commandArgs(payload).enabled ? "debug" : "info" }));
+    this.handlers.set("diagnostics_debug_get", () => ({ enabled: false, source: "off", logDir: "~/Library/Logs/dev.meridian.app", logFile: "~/Library/Logs/dev.meridian.app/meridian.log", level: "info", devtoolsReady: false }));
+    this.handlers.set("diagnostics_debug_set", (payload) => ({ enabled: this.commandArgs(payload).enabled === true, source: "setting", logDir: "~/Library/Logs/dev.meridian.app", logFile: "~/Library/Logs/dev.meridian.app/meridian.log", level: this.commandArgs(payload).enabled ? "debug" : "info", devtoolsReady: false }));
     this.handlers.set("diagnostics_last_crash", () => null);
     this.handlers.set("diagnostics_log_tail", () => "[INFO] Flow fixture ready");
     this.handlers.set("diagnostics_log_write", () => undefined);

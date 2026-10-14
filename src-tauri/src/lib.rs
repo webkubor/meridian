@@ -208,7 +208,9 @@ pub fn run() {
         ]);
     tauri::Builder::default()
         .setup(|app| {
-            logging::initialize(app.handle()).map_err(std::io::Error::other)?;
+            // Infallible on purpose: a log directory that cannot be created
+            // must not be the reason the app does not start.
+            logging::initialize(app.handle());
             Ok(())
         })
         // Opener backs "open in browser / Finder"; process backs the relaunch
@@ -220,6 +222,12 @@ pub fn run() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(state::AppState::new())
         .invoke_handler(logging::log_invoke_handler(handler))
-        .run(context)
-        .expect("error while running meridian");
+        .build(context)
+        .expect("error while building meridian")
+        .run(|_app, event| {
+            // Without this the next launch would report every quit as a crash.
+            if let tauri::RunEvent::Exit = event {
+                logging::mark_clean_exit();
+            }
+        });
 }

@@ -74,20 +74,22 @@ body:
       label: Diagnostics report / 诊断报告
       description: |
         Optional, but often what turns "it fails" into something fixable.
-        In Meridian open About Meridian → Diagnostics and choose Copy report; the
-        app fills this box for you when you report a bug from there. If the
-        report is too long to fit, choose Export report instead and attach the
-        saved .txt file.
+        In Meridian open Diagnostics (工具栏「诊断」) and choose Copy diagnostic
+        report (复制诊断报告); the app fills this box for you when you report a bug
+        from there, after showing you exactly what will be in the link. If the
+        report is too long to fit, choose Export diagnostics file (导出诊断文件)
+        instead and attach the saved .txt file.
 
-        The report lists the app and macOS versions, recent failed commands with
-        their error codes, and the end of the log file. It never includes file
-        contents, diffs, commit messages or credentials. Home folders, logins
-        inside URLs and token-shaped strings are masked. Masking is automatic,
-        not perfect: read the report before you post it.
+        The report lists the app and macOS versions, the failure you were looking
+        at with its call and arguments, recent failed commands with their error
+        codes, and the end of the log file. It never includes file contents,
+        diffs, commit messages or credentials. Home folders, logins inside URLs
+        and token-shaped strings are masked. Masking is automatic, not perfect:
+        read the report before you post it.
 
-        这是选填项，但诊断报告往往能帮助我们定位问题。在 Meridian 中打开「关于 Meridian → 诊断」，选择「复制报告」；从应用内提交问题时，应用会自动填入此栏。报告太长而无法填入时，请选择「导出报告」并附上保存的 .txt 文件。
+        这是选填项，但诊断报告往往能帮助我们定位问题。在 Meridian 打开工具栏的「诊断」，选择「复制诊断报告」；从应用内报告问题时，应用会先显示将要进入链接的正文供你确认，再自动填入此栏。若报告太长而无法填入，请选择「导出诊断文件」并附上保存的 .txt 文件。
 
-        报告包含应用与 macOS 版本、最近失败的命令及错误码，以及日志末尾内容。报告不会包含文件内容、差异、提交说明或凭据；主目录路径、URL 中的登录信息和类似令牌的字符串会被遮盖。自动脱敏并不完美，发布前请先阅读报告。
+        报告包含应用与 macOS 版本、你正在查看的那次失败（含对应调用与参数）、最近失败的命令及错误码，以及日志末尾内容。报告不会包含文件内容、差异、提交说明或凭据；主目录路径、URL 中的登录信息和类似令牌的字符串会被遮盖。自动脱敏并不完美，发布前请先阅读报告。
       placeholder: Paste the report here / 在此粘贴诊断报告。
 
   - type: checkboxes
