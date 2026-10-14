@@ -1,0 +1,93 @@
+/*
+ * The Morandi atmosphere layer — Bloom's signature, and the reason the app
+ * doesn't read as "a native macOS window with a blue accent".
+ *
+ * Everything here is 气质轨 (mood track): the `--md-motion-*` trio at very low
+ * alpha over the canvas. Two rules from the upstream work, both learned the
+ * hard way and both easy to undo by accident:
+ *
+ *  1. **Never saturate.** `saturate(1.2)` on an already-blurred wash amplifies
+ *     the mud instead of the colour. Bloom learned this the expensive way on
+ *     the aurora variant and cut it.
+ *  2. **Blur hard and keep opacity low.** The layer's job is a sense of
+ *     breathing, not to tint the interface. If you can name the colour without
+ *     looking for it, it's too strong.
+ *
+ * `::before` on `body` rather than `background-image` on `body` itself: a
+ * gradient on body's own background repaints the whole viewport whenever the
+ * position animates, while a fixed pseudo-element gets its own compositing
+ * layer and moves on the GPU for free.
+ */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -30%;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(38% 34% at 22% 18%, var(--md-motion-1), transparent 68%),
+    radial-gradient(34% 32% at 82% 12%, var(--md-motion-3), transparent 70%),
+    radial-gradient(44% 40% at 68% 88%, var(--md-motion-2), transparent 72%);
+  background-size: 100% 100%;
+  filter: blur(90px);
+  opacity: 0.16;
+  will-change: transform;
+  animation: md-drift 40s ease-in-out infinite alternate;
+}
+
+/* One slow breath, forty seconds. Fast enough to notice if you watch for it,
+ * slow enough that you never catch it doing it. */
+@keyframes md-drift {
+  from {
+    transform: translate3d(-2%, -1.5%, 0);
+  }
+  to {
+    transform: translate3d(2.5%, 2%, 0);
+  }
+}
+
+/* `.theme-dark` lands on <html> (see useShell), so the descendant selector
+   is the only one that matches. */
+.theme-dark body::before {
+  /* Dark needs less, not more: the wash sits on an already-low canvas, and
+   * raising opacity here is what turns a deep blue into a glowing one. */
+  opacity: 0.22;
+}
+
+/* Reduced motion isn't "no animation" — it's the same picture, held still.
+   A frozen frame is the accessible version of the effect; removing it changes
+   the design rather than the motion. */
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+    transform: none;
+  }
+}
+
+/*
+ * Glass. Applied by the few structural containers that have the area for it
+ * (`.app-sidebar`, `.toolbar`, `.master`) — not globally. Frosting needs
+ * surface to read against; on a 34px strip it just looks like a coloured bar,
+ * which is why the upstream theme explicitly opts its tab strip out.
+ *
+ * Three things make glass, and it needs all three: a translucent fill so the
+ * hue behind shows through, a backdrop blur to frost the boundary, and a top
+ * inner highlight so the pane has an edge instead of a stain.
+ */
+.glass {
+  background: var(--md-glass-fill);
+  backdrop-filter: blur(var(--md-glass-blur));
+  -webkit-backdrop-filter: blur(var(--md-glass-blur));
+  box-shadow: inset 0 1px 0 var(--md-glass-rim);
+}
+
+/* Chromium refuses backdrop-filter without at least some opacity behind it,
+   and Safari needs the webkit prefix; both are declared on `.glass` above.
+   Where backdrop-filter is unsupported the fill alone still reads as glass,
+   which is why the fill is a real colour rather than fully transparent. */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass {
+    background: var(--md-bg-surface);
+    box-shadow: inset 0 1px 0 var(--md-glass-rim);
+  }
+}

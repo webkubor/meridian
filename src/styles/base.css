@@ -19,13 +19,24 @@ body,
   height: 100%;
 }
 
+/* The canvas colour lives on <html>, not <body>.
+ *
+ * `body::before` is the Morandi wash (atmosphere.css), a fixed element at
+ * z-index:-1. That lands it in the root stacking context's negative layer —
+ * above <html>'s background, but *below* <body>'s own background box. Give
+ * body a background and the wash is covered by it, which is precisely the
+ * mistake the upstream Bloom glass layer documents and guards against. */
+html {
+  background: var(--md-bg-canvas);
+}
+
 body {
   margin: 0;
   font-family: var(--md-font-ui);
   font-size: var(--md-text-md);
   line-height: var(--md-leading-normal);
   color: var(--md-fg);
-  background: var(--md-bg-canvas);
+  background: transparent;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
 }

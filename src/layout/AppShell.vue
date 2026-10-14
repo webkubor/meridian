@@ -44,7 +44,9 @@ withDefaults(
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  background: var(--md-bg-canvas);
+  /* Transparent on purpose: this is the element that would cover the Morandi
+   * wash on `body::before`. The canvas colour comes from <html>. */
+  background: transparent;
 }
 
 .app-frame {
@@ -59,7 +61,12 @@ withDefaults(
   min-width: 0;
   display: flex;
   flex-direction: column;
-  background: var(--md-bg-header);
+  /* Real glass — the sidebar is one of the three containers with enough area
+   * for frosting to read as an edge rather than as a tinted bar. */
+  background: var(--md-glass-fill);
+  backdrop-filter: blur(var(--md-glass-blur));
+  -webkit-backdrop-filter: blur(var(--md-glass-blur));
+  box-shadow: inset -1px 0 0 var(--md-border-inactive), inset 0 1px 0 var(--md-glass-rim);
   border-right: 1px solid var(--md-border);
 }
 
@@ -69,6 +76,10 @@ withDefaults(
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--md-bg-surface);
+  /* 88% rather than fully transparent: the wash tints the working area, but
+   * dense commit rows still need a crisp ground to sit on. */
+  background: color-mix(in oklch, var(--md-bg-surface) 88%, transparent);
+  backdrop-filter: blur(calc(var(--md-glass-blur) / 2));
+  -webkit-backdrop-filter: blur(calc(var(--md-glass-blur) / 2));
 }
 </style>

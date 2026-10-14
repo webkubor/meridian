@@ -1,18 +1,52 @@
 /*
- * Meridian design tokens (docs/04 §2).
+ * Meridian design tokens.
  *
- * Token NAMES are ours; the slot inventory is mapped to the evidence's
- * semantic colour slots (`docs/evidence/git-tower-asset-names.txt`) so no state
- * found in the evidence lacks a token. Every VALUE here is authored by us —
- * nothing is copied from any other product.
+ * Slot inventory is mapped to the evidence's semantic colour slots
+ * (`docs/evidence/git-tower-asset-names.txt`) so no state found in the
+ * evidence lacks a token. Token NAMES are ours.
  *
- * Structure: light values on `:root`, dark values on `.theme-dark`, and every
- * light token has a dark counterpart, no exceptions. The only raw colour
- * literals in the app live in this file.
+ * The VALUES come from the owner's own Bloom palette (青金 / lapis) — the same
+ * OKLCH system behind `dsh-bloom-theme` and `typora-Bloom-theme`, so Meridian
+ * reads as part of the same family of work rather than as a stranger.
+ *
+ * ── The one rule that makes Bloom look like Bloom: 双轨制 ────────────────
+ *
+ *   可读轨 (readable track) — accentL/accentD, bg/sf/tx. Text, button fills,
+ *     borders, anything a glyph has to be read against. Calibrated so
+ *     accent × bg clears WCAG AA (4.5:1). Don't tune these by eye.
+ *
+ *   气质轨 (mood track) — morandi + the motion trio. Low-chroma, low-alpha,
+ *     and ONLY ever as atmosphere: the body wash, glass rims, blame tints.
+ *     Every gradient in the original uses this track, never the readable one.
+ *
+ * Painting a large area with the readable track is what turns Morandi pink
+ * into neon magenta. Painting text with the mood track is what makes it
+ * illegible. That's the whole discipline.
+ *
+ * Consequences visible below, both learned the hard way upstream:
+ *   · Dark borders use morandi at low alpha, NOT color-mix with the text
+ *     colour. Dark-mode text is near-white; mixing it makes a white fog that
+ *     sits on top of the content instead of receding behind it.
+ *   · The canvas stays near-neutral (chroma ≤ 0.02). Colour belongs to the
+ *     accents. A tinted background at high lightness reads as old yellowed
+ *     paper, not as "designed".
+ *
+ * Structure: light values on `:root`, dark on `.theme-dark`, every light token
+ * has a dark counterpart. The only raw colour literals in the app live here.
  */
 
+/* Bloom 青金 (lapis) — hue 258, 《嫦娥》「碧海青天夜夜心」 */
 :root {
   color-scheme: light;
+
+  /* ---- Mood track (气质轨) ------------------------------------------------
+   * Atmosphere only. Kept as an rgb triplet because the dark border stack and
+   * the glass rims need rgba(); everything else goes through color-mix so the
+   * hue and chroma don't drift the way alpha-fading in sRGB would. */
+  --md-morandi: 47, 98, 172;
+  --md-motion-1: oklch(50% 0.13 258); /* 青金 · the signature blue */
+  --md-motion-2: oklch(50% 0.12 226); /* 天青偏蓝 */
+  --md-motion-3: oklch(50% 0.11 295); /* 青莲偏紫 */
 
   /* ---- Colour: surfaces ---------------------------------------------------
    * general_background_color / general_secondary_background_color /
@@ -20,165 +54,206 @@
    * general_header_background_color, general_secondary_header_background_color /
    * general_alternate_row_background_color / general_hover_selection_background_color /
    * selected_* + repository_pullrequests_conversation_selection_color
+   *
+   * Canvas and header carry the Morandi wash; surfaces stay near-white and
+   * crisp so dense rows keep their edges. `sunken` is the one genuinely
+   * receding plane.
    */
-  --md-bg-canvas: #f7f8fa;
-  --md-bg-surface: #ffffff;
-  --md-bg-sunken: #eef1f6;
-  --md-bg-header: #f2f4f8;
-  --md-bg-alt-row: #fafbfd;
-  --md-bg-hover: #e8ecf3;
-  --md-bg-selected: #dde7fd;
-  --md-bg-selected-muted: #eaf0fc;
-  /* general_header_background_color over scrolled content (sticky headers) */
-  --md-bg-header-translucent: rgba(242, 244, 248, 0.92);
+  --md-bg-canvas: oklch(97.4% 0.006 240);
+  --md-bg-surface: oklch(99.2% 0.003 240);
+  --md-bg-sunken: oklch(92.4% 0.013 244);
+  --md-bg-header: oklch(96.8% 0.008 241);
+  --md-bg-alt-row: oklch(98.4% 0.004 240);
+  --md-bg-hover: oklch(94.4% 0.014 244);
+  --md-bg-selected: oklch(92.8% 0.036 258);
+  --md-bg-selected-muted: oklch(95.4% 0.018 250);
+  /* general_header_background_color over scrolled content (sticky headers).
+   * Translucent on purpose: the wash behind it is the point. */
+  --md-bg-header-translucent: oklch(96.8% 0.008 241 / 0.82);
+
+  /* ---- Colour: glass ------------------------------------------------------
+   * Panels that sit ON the wash rather than replacing it: half a Morandi tint
+   * plus backdrop blur, with a top inner highlight so the panel reads as an
+   * edge of glass rather than a tinted rectangle. Applied by the few structural
+   * containers (`.app-sidebar`, `.toolbar`, `.master`), not globally — glass
+   * needs area to exist, and a 27px strip wearing it just looks like a bar. */
+  --md-glass-fill: oklch(99% 0.003 240 / 0.66);
+  --md-glass-blur: 22px;
+  --md-glass-rim: oklch(100% 0 0 / 0.7);
+  --md-glass-shadow: 0 8px 28px oklch(23% 0.02 249 / 0.1);
 
   /* ---- Colour: borders ----------------------------------------------------
+   * The Bloom border stack. Light mode mixes from the text colour (90/80/70/60
+   * upstream → 14/24/36/52 here, a touch stronger because a Git client's rows
+   * are denser than a prose column). Dark mode uses morandi instead — see the
+   * header note. Four steps, l1 faintest → l4 strongest.
+   *
    * general_border_color / general_inactive_border_color / text_view_page_separator_color
    */
-  --md-border: #dfe4ec;
-  --md-border-strong: #c6cedb;
-  --md-border-inactive: #eaedf3;
+  --md-border: oklch(23% 0.02 249 / 0.14); /* l1 */
+  --md-border-strong: oklch(23% 0.02 249 / 0.28); /* l2 — focus + inputs */
+  --md-border-emph: oklch(23% 0.02 249 / 0.42); /* l4 */
+  --md-border-inactive: oklch(23% 0.02 249 / 0.08); /* below l1: dividers only */
 
   /* ---- Colour: text -------------------------------------------------------
    * text_view_{primary,secondary}_disabled_text_color + observed text colours
+   * One ramp off the palette hue so the greys read as 青金's own neutrals
+   * rather than as default-browser grey.
    */
-  --md-fg: #101828;
-  --md-fg-muted: #5a6478;
-  --md-fg-subtle: #8a93a6;
-  --md-fg-disabled: #b3bbc9;
+  --md-fg: oklch(23% 0.02 249);
+  --md-fg-muted: oklch(46% 0.019 249);
+  --md-fg-subtle: oklch(60% 0.017 249);
+  --md-fg-disabled: oklch(72% 0.014 249);
 
   /* ---- Colour: accent -----------------------------------------------------
-   * accent_primary_color / accent_secondary_color, carrying the brand palette
-   * (aurora blue + cyan, see design/make-icon.py). Light mode uses a shade
-   * deeper than the brand mark so body-sized accent text holds contrast on
-   * white; --md-sun is the mark's amber, and is the only place the app puts
-   * "where HEAD is right now".
+   * accent_primary_color / accent_secondary_color, carrying the Bloom read of
+   * the brand mark. accentL is 5.63:1 against this canvas — it was calibrated
+   * against it, not picked and hoped for. `--md-sun` is the mark's amber and
+   * is the only place the app puts "where HEAD is right now".
    */
-  --md-accent: #2f6fe4;
-  --md-accent-strong: #1d51b8;
-  --md-accent-contrast: #ffffff;
-  --md-accent-secondary: #0b7f96;
-  --md-sun: #f59e0b;
-  --md-sun-strong: #a35c00;
+  --md-accent: oklch(50% 0.13 258);
+  --md-accent-strong: oklch(42% 0.13 258);
+  --md-accent-contrast: oklch(99% 0 0);
+  --md-accent-secondary: oklch(51% 0.12 226);
+  --md-accent-wash: oklch(50% 0.13 258 / 0.1);
+  --md-sun: oklch(62% 0.14 70);
+  --md-sun-strong: oklch(45% 0.11 70);
 
   /* ---- Colour: semantics --------------------------------------------------
    * success_tint_color / warning_tint_color / red_badge_background_color / hint backgrounds
+   * Git semantics, so these stay green/amber/red — but they're Morandi values
+   * (低彩度), not the saturated primaries, and their washes are the accent's
+   * own mixing recipe so all four hint banners sit in one family.
    */
-  --md-success: #2e9e5b;
-  --md-warning: #b57000;
-  --md-danger: #c43d2e;
-  --md-danger-contrast: #ffffff;
-  --md-info: #2f6fe4;
+  --md-success: oklch(50% 0.11 152);
+  --md-warning: oklch(55% 0.11 70);
+  --md-danger: oklch(51% 0.17 25);
+  --md-danger-contrast: oklch(99% 0 0);
+  --md-info: oklch(50% 0.13 258);
 
   /* Hint banners (translucent) — general_info_background_color, general_warning_bg_color,
    * {Blue,Green,Red,Yellow}HintBackgroundColor */
-  --md-bg-info-soft: rgba(47, 111, 228, 0.08);
-  --md-bg-success-soft: rgba(46, 158, 91, 0.1);
-  --md-bg-warning-soft: rgba(181, 112, 0, 0.1);
-  --md-bg-danger-soft: rgba(196, 61, 46, 0.09);
+  --md-bg-info-soft: oklch(50% 0.13 258 / 0.09);
+  --md-bg-success-soft: oklch(50% 0.11 152 / 0.11);
+  --md-bg-warning-soft: oklch(55% 0.11 70 / 0.12);
+  --md-bg-danger-soft: oklch(51% 0.17 25 / 0.09);
 
   /* ---- Colour: file-status families --------------------------------------
    * {blue,gray,green,red,yellow}_file_status_{background,text}_color +
    * default_file_status_text_color
+   * Foreground is the readable track; background is that same hue at ~10% so
+   * the chip is a tint of its own meaning rather than a pastel of nothing.
    */
-  --md-status-added-bg: #e3f3e8;
-  --md-status-added-fg: #1e7a43;
-  --md-status-copied-bg: #e8eef9;
-  --md-status-copied-fg: #3b5fa8;
-  --md-status-modified-bg: #fbf0dc;
-  --md-status-modified-fg: #8a6410;
-  --md-status-deleted-bg: #fbe4e1;
-  --md-status-deleted-fg: #a33124;
-  --md-status-untracked-bg: #eeebe5;
-  --md-status-untracked-fg: #57524a;
-  --md-status-unmerged-bg: #f9dedb;
-  --md-status-unmerged-fg: #982717;
-  --md-status-ignored-bg: #f0eee9;
-  --md-status-ignored-fg: #948e83;
+  --md-status-added-bg: oklch(50% 0.11 152 / 0.13);
+  --md-status-added-fg: oklch(45% 0.11 152);
+  --md-status-copied-bg: oklch(50% 0.13 258 / 0.11);
+  --md-status-copied-fg: oklch(45% 0.13 258);
+  --md-status-modified-bg: oklch(55% 0.11 70 / 0.15);
+  --md-status-modified-fg: oklch(48% 0.11 70);
+  --md-status-deleted-bg: oklch(51% 0.17 25 / 0.1);
+  --md-status-deleted-fg: oklch(48% 0.17 25);
+  --md-status-untracked-bg: oklch(23% 0.02 249 / 0.07);
+  --md-status-untracked-fg: oklch(42% 0.02 249);
+  --md-status-unmerged-bg: oklch(51% 0.17 25 / 0.17);
+  --md-status-unmerged-fg: oklch(45% 0.18 25);
+  --md-status-ignored-bg: oklch(23% 0.02 249 / 0.045);
+  --md-status-ignored-fg: oklch(62% 0.015 249);
 
   /* ---- Colour: badges -----------------------------------------------------
    * sidebarBadgeBackgroundColor / general_sidebar_badge_bg_color /
    * selected_badge_{background,text}_color / {red,yellow}_badge_glass_tint_color
    */
-  --md-badge-bg: #e6e2da;
-  --md-badge-fg: #57524a;
-  --md-badge-selected-bg: #2f6fe4;
-  --md-badge-selected-fg: #ffffff;
+  --md-badge-bg: oklch(23% 0.02 249 / 0.08);
+  --md-badge-fg: oklch(40% 0.02 249);
+  --md-badge-selected-bg: oklch(50% 0.13 258);
+  --md-badge-selected-fg: oklch(99% 0 0);
 
   /* ---- Colour: commit graph ----------------------------------------------
    * nine *_history_graph_line_color tokens; lane = palette[lane % 9]
+   * The nine are the Bloom family itself rather than a generic rainbow, with
+   * the blues holding the first slots — three cool blues are adjacent so a
+   * busy graph still reads as one system instead of a fruit salad.
    */
-  --md-graph-lane-1: #2f6fe4;
-  --md-graph-lane-2: #0b7f96;
-  --md-graph-lane-3: #2e9e5b;
-  --md-graph-lane-4: #8a7300;
-  --md-graph-lane-5: #c46a1e;
-  --md-graph-lane-6: #c43d2e;
-  --md-graph-lane-7: #b4437e;
-  --md-graph-lane-8: #7a4fbd;
-  --md-graph-lane-9: #4c5cb8;
+  --md-graph-lane-1: oklch(50% 0.13 258); /* 青金 */
+  --md-graph-lane-2: oklch(51% 0.12 226); /* 天青偏蓝 */
+  --md-graph-lane-3: oklch(51% 0.12 195); /* 天青 */
+  --md-graph-lane-4: oklch(54.1% 0.111 115); /* 竹青 */
+  --md-graph-lane-5: oklch(55.5% 0.12 70); /* 琥珀 */
+  --md-graph-lane-6: oklch(55% 0.18 25); /* 朱砂 */
+  --md-graph-lane-7: oklch(52% 0.11 295); /* 青莲 */
+  --md-graph-lane-8: oklch(50% 0.08 240); /* 黛蓝 */
+  --md-graph-lane-9: oklch(58% 0.22 350); /* 桃夭 */
   /* repository_history_commit_bubble_{bg,border}_color */
-  --md-graph-bubble-bg: #ffffff;
-  --md-graph-bubble-border: #b9b3a8;
+  --md-graph-bubble-bg: oklch(99.2% 0.003 240);
+  --md-graph-bubble-border: oklch(23% 0.02 249 / 0.28);
 
   /* ---- Colour: diff -------------------------------------------------------
    * repository_diff_{added,deleted}_block_{background,outline}_color
    */
-  --md-diff-added-bg: rgba(46, 158, 91, 0.14);
-  --md-diff-added-outline: rgba(46, 158, 91, 0.38);
-  --md-diff-deleted-bg: rgba(196, 61, 46, 0.14);
-  --md-diff-deleted-outline: rgba(196, 61, 46, 0.38);
-  --md-diff-word-added-bg: rgba(46, 158, 91, 0.28);
-  --md-diff-word-deleted-bg: rgba(196, 61, 46, 0.28);
+  --md-diff-added-bg: oklch(50% 0.11 152 / 0.13);
+  --md-diff-added-outline: oklch(50% 0.11 152 / 0.36);
+  --md-diff-deleted-bg: oklch(51% 0.17 25 / 0.1);
+  --md-diff-deleted-outline: oklch(51% 0.17 25 / 0.34);
+  --md-diff-word-added-bg: oklch(50% 0.11 152 / 0.26);
+  --md-diff-word-deleted-bg: oklch(51% 0.17 25 / 0.22);
   /* repository_diff_image_checkerboard_{background,square}_color */
-  --md-diff-checker-a: #ffffff;
-  --md-diff-checker-b: #e9e9e9;
+  --md-diff-checker-a: oklch(99.2% 0.003 240);
+  --md-diff-checker-b: oklch(92.4% 0.013 244);
 
   /* ---- Colour: conflicts --------------------------------------------------
    * repository_mergeconflict_tile_background_{light,dark}_color /
    * repository_workingcopy_unmerged_item_bg_color
    */
-  --md-conflict-tile: rgba(181, 112, 0, 0.14);
-  --md-conflict-tile-strong: rgba(181, 112, 0, 0.3);
+  --md-conflict-tile: oklch(55% 0.11 70 / 0.16);
+  --md-conflict-tile-strong: oklch(55% 0.11 70 / 0.32);
 
   /* ---- Colour: code (our own syntax register, docs/04 §S8) ---------------- */
-  --md-code-comment: #7c8672;
-  --md-code-string: #a1541c;
-  --md-code-keyword: #8a3bb8;
-  --md-code-number: #2f6bb0;
+  --md-code-comment: oklch(52% 0.014 130);
+  --md-code-string: oklch(48% 0.11 45);
+  --md-code-keyword: oklch(45% 0.13 295);
+  --md-code-number: oklch(46% 0.11 226);
 
   /* ---- Colour: blame ------------------------------------------------------
-   * our own addition for the blame view's per-hunk tint (alternating hunks)
+   * our own addition for the blame view's per-hunk tint (alternating hunks).
+   * Mood track, alternating across the motion trio rather than one hue at two
+   * alphas — two steps of a single colour read as a rendering bug.
    */
-  --md-blame-tint: rgba(47, 91, 224, 0.05);
-  --md-blame-tint-alt: rgba(14, 143, 168, 0.05);
+  --md-blame-tint: oklch(50% 0.13 258 / 0.06);
+  --md-blame-tint-alt: oklch(51% 0.12 226 / 0.06);
 
   /* ---- Colour: overlay ----------------------------------------------------
-   * dialogue scrims; part of our elevation system
+   * dialogue scrims; part of our elevation system. Tinted toward the palette
+   * hue so a modal doesn't drop a neutral grey over a Morandi screen.
    */
-  --md-overlay: rgba(27, 26, 23, 0.32);
+  --md-overlay: oklch(23.1% 0.019 249 / 0.34);
 
   /* ---- Colour: provider marks ---------------------------------------------
    * Our own neutral approximations of each provider's brand hue, used as the
    * background of the monogram tile only (docs/04 §3: our own marks, never
    * provider artwork).
    */
-  --md-provider-github: #24292f;
-  --md-provider-gitlab: #e24329;
-  --md-provider-bitbucket: #0052cc;
-  --md-provider-azuredevops: #0078d4;
-  --md-provider-stash: #172b4d;
-  --md-provider-beanstalk: #0b6e4f;
-  --md-provider-custom: #6e6960;
-  --md-provider-mark-fg: #ffffff;
+  --md-provider-github: oklch(26% 0.01 249);
+  --md-provider-gitlab: oklch(55% 0.16 30);
+  --md-provider-bitbucket: oklch(50% 0.13 258);
+  --md-provider-azuredevops: oklch(56% 0.13 230);
+  --md-provider-stash: oklch(45% 0.09 280);
+  --md-provider-beanstalk: oklch(48% 0.09 160);
+  --md-provider-custom: oklch(50% 0.012 249);
+  --md-provider-mark-fg: oklch(99% 0 0);
 
   /* ---- Elevation (values ours; two-layer hairline + soft blur) ----------- */
-  --md-shadow-1: 0 1px 2px rgba(20, 18, 12, 0.1), 0 0 0 1px rgba(20, 18, 12, 0.04);
-  --md-shadow-2: 0 8px 24px rgba(20, 18, 12, 0.18), 0 0 0 1px rgba(20, 18, 12, 0.06);
+  --md-shadow-1: 0 1px 2px oklch(23% 0.02 249 / 0.06), 0 0 0 1px oklch(23% 0.02 249 / 0.04);
+  --md-shadow-2: 0 8px 24px oklch(23% 0.02 249 / 0.12), 0 0 0 1px oklch(23% 0.02 249 / 0.06);
 
-  /* ---- Typography --------------------------------------------------------- */
-  --md-font-ui: system-ui, -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
-  --md-font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  /* ---- Typography ---------------------------------------------------------
+   * PingFang SC is named explicitly rather than left to system fallback: the
+   * app opens in Chinese, and a font stack that reaches for CJK by accident
+   * gets whatever the OS felt like that day. Latin first, then SC, then the
+   * generic — order matters, because a stack that starts with a CJK face
+   * renders Latin in it too. */
+  --md-font-ui: system-ui, -apple-system, "SF Pro Text", "PingFang SC", "Helvetica Neue",
+    "Microsoft YaHei", sans-serif;
+  --md-font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
   --md-text-xs: 11px;
   --md-text-sm: 12px;
   --md-text-md: 13px;
@@ -199,9 +274,9 @@
   --md-space-4: 16px;
   --md-space-5: 24px;
   --md-space-6: 32px;
-  --md-radius-sm: 5px;
-  --md-radius-md: 8px;
-  --md-radius-lg: 12px;
+  --md-radius-sm: 6px;
+  --md-radius-md: 9px;
+  --md-radius-lg: 13px;
   --md-row-compact: 24px;
   --md-row-regular: 28px;
   --md-row-comfortable: 34px;
@@ -209,7 +284,7 @@
   /* ---- Commit-graph geometry ---------------------------------------------- */
   --md-graph-lane-width: 14px;
   --md-graph-lane-width-compact: 10px;
-  --md-graph-bubble-radius: 4px;
+  --md-graph-bubble-radius: 5px;
 
   /* ---- Chrome geometry (ours; docs/04 §4.2 sizes are ours too) ------------ */
   --md-chrome-height: 38px;
@@ -232,109 +307,129 @@
   --md-motion-base: 150ms;
 }
 
+/*
+ * 青金 (lapis) dark. Same discipline, and the two places the rules bite:
+ *
+ *  · `bgD` 23.1% / 0.019 — lifted off upstream's 20% so a dense commit list
+ *    doesn't become a black hole, while staying dark enough that the near-white
+ *    text has somewhere to go.
+ *  · Borders are morandi at 10/18/28/40%. Mixing from `--md-fg` here would
+ *    paint a white fog over the content.
+ */
 .theme-dark {
   color-scheme: dark;
 
-  --md-bg-canvas: #0e131b;
-  --md-bg-surface: #151c28;
-  --md-bg-sunken: #090d14;
-  --md-bg-header: #1a232f;
-  --md-bg-alt-row: #121926;
-  --md-bg-hover: #212c3c;
-  --md-bg-selected: #23375c;
-  --md-bg-selected-muted: #1b2434;
-  --md-bg-header-translucent: rgba(26, 35, 47, 0.92);
+  --md-motion-1: oklch(74% 0.1 255);
+  --md-motion-2: oklch(74% 0.11 225);
+  --md-motion-3: oklch(74% 0.1 292);
 
-  --md-border: #26313f;
-  --md-border-strong: #384657;
-  --md-border-inactive: #1b2430;
+  --md-bg-canvas: oklch(23.1% 0.019 249);
+  --md-bg-surface: oklch(26.8% 0.021 250);
+  --md-bg-sunken: oklch(19% 0.018 249);
+  --md-bg-header: oklch(28.4% 0.022 251);
+  --md-bg-alt-row: oklch(24.8% 0.02 249);
+  --md-bg-hover: oklch(33% 0.026 251);
+  --md-bg-selected: oklch(36% 0.05 258);
+  --md-bg-selected-muted: oklch(30% 0.028 251);
+  --md-bg-header-translucent: oklch(28.4% 0.022 251 / 0.8);
 
-  --md-fg: #e5e9f0;
-  --md-fg-muted: #9aa5b8;
-  --md-fg-subtle: #6f7b8f;
-  --md-fg-disabled: #4c5666;
+  --md-glass-fill: oklch(28% 0.021 250 / 0.6);
+  --md-glass-blur: 24px;
+  --md-glass-rim: oklch(100% 0 0 / 0.09);
+  --md-glass-shadow: 0 8px 30px oklch(0% 0 0 / 0.4);
 
-  --md-accent: #6ea8ff;
-  --md-accent-strong: #93c0ff;
-  --md-accent-contrast: #0b1220;
-  --md-accent-secondary: #4dd0e8;
-  --md-sun: #ffb020;
-  --md-sun-strong: #ffc95c;
+  --md-border: rgb(var(--md-morandi) / 0.16); /* l1 */
+  --md-border-strong: rgb(var(--md-morandi) / 0.3); /* l2 */
+  --md-border-emph: rgb(var(--md-morandi) / 0.5); /* l4 */
+  --md-border-inactive: rgb(var(--md-morandi) / 0.1);
 
-  --md-success: #3fbf74;
-  --md-warning: #e5a32b;
-  --md-danger: #f0715f;
-  --md-danger-contrast: #0b1220;
-  --md-info: #6ea8ff;
+  --md-fg: oklch(96.1% 0.008 237);
+  --md-fg-muted: oklch(76% 0.014 245);
+  --md-fg-subtle: oklch(63% 0.016 247);
+  --md-fg-disabled: oklch(48% 0.018 249);
 
-  --md-bg-info-soft: rgba(110, 168, 255, 0.12);
-  --md-bg-success-soft: rgba(63, 191, 116, 0.12);
-  --md-bg-warning-soft: rgba(229, 163, 43, 0.12);
-  --md-bg-danger-soft: rgba(240, 113, 95, 0.12);
+  --md-accent: oklch(74% 0.1 255);
+  --md-accent-strong: oklch(82% 0.09 252);
+  --md-accent-contrast: oklch(21% 0.019 249);
+  --md-accent-secondary: oklch(74% 0.11 225);
+  --md-accent-wash: oklch(74% 0.1 255 / 0.12);
+  --md-sun: oklch(78% 0.11 70);
+  --md-sun-strong: oklch(86% 0.1 74);
 
-  --md-status-added-bg: #183225;
-  --md-status-added-fg: #7fd6a3;
-  --md-status-copied-bg: #1b2740;
-  --md-status-copied-fg: #93b1ef;
-  --md-status-modified-bg: #33290f;
-  --md-status-modified-fg: #e5bd62;
-  --md-status-deleted-bg: #381c19;
-  --md-status-deleted-fg: #f0958a;
-  --md-status-untracked-bg: #2a2d33;
-  --md-status-untracked-fg: #c9c5bc;
-  --md-status-unmerged-bg: #3d1b16;
-  --md-status-unmerged-fg: #ff9d8c;
-  --md-status-ignored-bg: #232529;
-  --md-status-ignored-fg: #7e7a72;
+  --md-success: oklch(74% 0.12 152);
+  --md-warning: oklch(78% 0.11 70);
+  --md-danger: oklch(72% 0.14 25);
+  --md-danger-contrast: oklch(21% 0.019 249);
+  --md-info: oklch(74% 0.1 255);
 
-  --md-badge-bg: #33373e;
-  --md-badge-fg: #cfcac1;
-  --md-badge-selected-bg: #6ea8ff;
-  --md-badge-selected-fg: #0b1220;
+  --md-bg-info-soft: oklch(74% 0.1 255 / 0.13);
+  --md-bg-success-soft: oklch(74% 0.12 152 / 0.14);
+  --md-bg-warning-soft: oklch(78% 0.11 70 / 0.14);
+  --md-bg-danger-soft: oklch(72% 0.14 25 / 0.14);
 
-  --md-graph-lane-1: #6ea8ff;
-  --md-graph-lane-2: #4dd0e8;
-  --md-graph-lane-3: #3fbf74;
-  --md-graph-lane-4: #c7a32b;
-  --md-graph-lane-5: #e58a45;
-  --md-graph-lane-6: #f0715f;
-  --md-graph-lane-7: #e36ba8;
-  --md-graph-lane-8: #a586e8;
-  --md-graph-lane-9: #7e8ee8;
-  --md-graph-bubble-bg: #1e2126;
-  --md-graph-bubble-border: #5a606a;
+  --md-status-added-bg: oklch(74% 0.12 152 / 0.16);
+  --md-status-added-fg: oklch(82% 0.11 152);
+  --md-status-copied-bg: oklch(74% 0.1 255 / 0.15);
+  --md-status-copied-fg: oklch(82% 0.09 255);
+  --md-status-modified-bg: oklch(78% 0.11 70 / 0.17);
+  --md-status-modified-fg: oklch(86% 0.1 74);
+  --md-status-deleted-bg: oklch(72% 0.14 25 / 0.15);
+  --md-status-deleted-fg: oklch(82% 0.12 25);
+  --md-status-untracked-bg: oklch(96.1% 0.008 237 / 0.08);
+  --md-status-untracked-fg: oklch(84% 0.01 237);
+  --md-status-unmerged-bg: oklch(72% 0.14 25 / 0.24);
+  --md-status-unmerged-fg: oklch(86% 0.12 25);
+  --md-status-ignored-bg: oklch(96.1% 0.008 237 / 0.05);
+  --md-status-ignored-fg: oklch(58% 0.015 247);
 
-  --md-diff-added-bg: rgba(63, 191, 116, 0.16);
-  --md-diff-added-outline: rgba(63, 191, 116, 0.4);
-  --md-diff-deleted-bg: rgba(240, 113, 95, 0.16);
-  --md-diff-deleted-outline: rgba(240, 113, 95, 0.4);
-  --md-diff-word-added-bg: rgba(63, 191, 116, 0.3);
-  --md-diff-word-deleted-bg: rgba(240, 113, 95, 0.3);
-  --md-diff-checker-a: #1e2126;
-  --md-diff-checker-b: #14161a;
+  --md-badge-bg: oklch(96.1% 0.008 237 / 0.1);
+  --md-badge-fg: oklch(84% 0.01 237);
+  --md-badge-selected-bg: oklch(74% 0.1 255);
+  --md-badge-selected-fg: oklch(21% 0.019 249);
 
-  --md-conflict-tile: rgba(229, 163, 43, 0.16);
-  --md-conflict-tile-strong: rgba(229, 163, 43, 0.3);
+  --md-graph-lane-1: oklch(74% 0.1 255); /* 青金 */
+  --md-graph-lane-2: oklch(74% 0.11 225); /* 天青偏蓝 */
+  --md-graph-lane-3: oklch(75% 0.12 195); /* 天青 */
+  --md-graph-lane-4: oklch(71.9% 0.12 115); /* 竹青 */
+  --md-graph-lane-5: oklch(78% 0.11 70); /* 琥珀 */
+  --md-graph-lane-6: oklch(72% 0.12 25); /* 朱砂 */
+  --md-graph-lane-7: oklch(75% 0.11 295); /* 青莲 */
+  --md-graph-lane-8: oklch(72% 0.12 240); /* 黛蓝 */
+  --md-graph-lane-9: oklch(75% 0.18 350); /* 桃夭 */
+  --md-graph-bubble-bg: oklch(26.8% 0.021 250);
+  --md-graph-bubble-border: rgb(var(--md-morandi) / 0.3);
 
-  --md-code-comment: #8f9a83;
-  --md-code-string: #e0a06a;
-  --md-code-keyword: #c792ea;
-  --md-code-number: #7fb3e8;
+  --md-diff-added-bg: oklch(74% 0.12 152 / 0.16);
+  --md-diff-added-outline: oklch(74% 0.12 152 / 0.42);
+  --md-diff-deleted-bg: oklch(72% 0.14 25 / 0.15);
+  --md-diff-deleted-outline: oklch(72% 0.14 25 / 0.4);
+  --md-diff-word-added-bg: oklch(74% 0.12 152 / 0.3);
+  --md-diff-word-deleted-bg: oklch(72% 0.14 25 / 0.28);
+  --md-diff-checker-a: oklch(26.8% 0.021 250);
+  --md-diff-checker-b: oklch(19% 0.018 249);
 
-  --md-blame-tint: rgba(108, 139, 255, 0.07);
-  --md-blame-tint-alt: rgba(47, 182, 206, 0.07);
+  --md-conflict-tile: oklch(78% 0.11 70 / 0.18);
+  --md-conflict-tile-strong: oklch(78% 0.11 70 / 0.36);
 
-  --md-overlay: rgba(0, 0, 0, 0.5);
+  --md-code-comment: oklch(66% 0.014 135);
+  --md-code-string: oklch(76% 0.1 50);
+  --md-code-keyword: oklch(75% 0.11 295);
+  --md-code-number: oklch(74% 0.11 225);
 
-  --md-provider-github: #8b949e;
-  --md-provider-gitlab: #f0796a;
-  --md-provider-bitbucket: #558cf0;
-  --md-provider-azuredevops: #4da3ff;
-  --md-provider-stash: #8f9dc4;
-  --md-provider-beanstalk: #4fbf94;
-  --md-provider-custom: #a5a199;
-  --md-provider-mark-fg: #0b1220;
+  --md-blame-tint: oklch(74% 0.1 255 / 0.08);
+  --md-blame-tint-alt: oklch(74% 0.11 225 / 0.08);
 
-  --md-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.04);
-  --md-shadow-2: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --md-overlay: oklch(12% 0.015 249 / 0.56);
+
+  --md-provider-github: oklch(72% 0.01 237);
+  --md-provider-gitlab: oklch(72% 0.14 30);
+  --md-provider-bitbucket: oklch(74% 0.1 255);
+  --md-provider-azuredevops: oklch(72% 0.12 230);
+  --md-provider-stash: oklch(75% 0.09 280);
+  --md-provider-beanstalk: oklch(74% 0.09 160);
+  --md-provider-custom: oklch(76% 0.012 247);
+  --md-provider-mark-fg: oklch(21% 0.019 249);
+
+  --md-shadow-1: 0 1px 2px oklch(0% 0 0 / 0.4), 0 0 0 1px rgb(var(--md-morandi) / 0.14);
+  --md-shadow-2: 0 10px 28px oklch(0% 0 0 / 0.5), 0 0 0 1px rgb(var(--md-morandi) / 0.2);
 }

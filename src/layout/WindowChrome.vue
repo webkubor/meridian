@@ -31,7 +31,14 @@ withDefaults(
 <style scoped>
 .chrome {
   flex: none;
-  background: var(--md-bg-header);
+  /* The window chrome is the one strip that sits over the wash for its whole
+   * life, so it gets real glass rather than a flat header colour — a 38px
+   * band can't carry frosting on its own, but it sits on top of the main
+   * area's translucency, which is exactly the boundary glass exists for. */
+  background: var(--md-bg-header-translucent);
+  backdrop-filter: blur(var(--md-glass-blur));
+  -webkit-backdrop-filter: blur(var(--md-glass-blur));
+  box-shadow: inset 0 1px 0 var(--md-glass-rim);
   user-select: none;
 }
 

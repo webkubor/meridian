@@ -4,6 +4,7 @@ import { createPinia } from "pinia";
 import App from "./App.vue";
 import { i18n, currentLocale } from "./i18n";
 import "./styles/tokens.css";
+import "./styles/atmosphere.css";
 import "./styles/base.css";
 
 // Before mount, so the very first paint is already in the right language and
