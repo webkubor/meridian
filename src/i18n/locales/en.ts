@@ -20,6 +20,7 @@ import type { ErrorCode } from "../../bridges/bindings";
 import diffEn from "./parts/en/diff";
 import panesEn from "./parts/en/panes";
 import shellEn from "./parts/en/shell";
+import diagnosticsEn from "./parts/en/diagnostics";
 
 const en = {
   // Slices, kept as their own files so three parts of the UI can be
@@ -27,6 +28,7 @@ const en = {
   ...diffEn,
   ...panesEn,
   ...shellEn,
+  ...diagnosticsEn,
 
   app: {
     name: "Meridian",

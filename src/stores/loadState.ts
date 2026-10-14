@@ -1,4 +1,5 @@
 import type { ErrorPayload } from "../bridges/bindings";
+import { markHandled } from "../diagnostics/failures";
 
 /**
  * The four states every asynchronous list renders (docs/04 §1.2):
@@ -16,5 +17,6 @@ export function dataState<T>(data: T[]): LoadState<T[]> {
 }
 
 export function errorState(error: unknown): LoadState<never> {
+  markHandled(error);
   return { status: "error", error: error as ErrorPayload };
 }

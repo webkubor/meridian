@@ -225,3 +225,22 @@ describe("AboutScreen — release notes", () => {
     expect(wrapper.text()).not.toContain("**");
   });
 });
+
+describe("AboutScreen — the diagnostics entry point", () => {
+  it("offers a way into the diagnostics screen, and navigates nothing itself", async () => {
+    // The screen is presentational: it reports the intent, the shell routes.
+    const wrapper = mountScreen();
+    const button = wrapper.findAll("button").find((candidate) => candidate.text() === "Open diagnostics");
+    expect(button).toBeDefined();
+
+    await button?.trigger("click");
+    expect(wrapper.emitted("openDiagnostics")).toHaveLength(1);
+  });
+
+  it("still offers the copy-diagnostics action beside it", async () => {
+    const wrapper = mountScreen();
+    const button = wrapper.findAll("button").find((candidate) => candidate.text() === "Copy diagnostics");
+    await button?.trigger("click");
+    expect(wrapper.emitted("copyDiagnostics")).toHaveLength(1);
+  });
+});

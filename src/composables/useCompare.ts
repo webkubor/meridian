@@ -26,6 +26,7 @@ import type {
   Revision,
 } from "../bridges/bindings";
 import type { Comparison, CompareEntry, LoadState, RefChoice } from "../components/contracts";
+import { markHandled } from "../diagnostics/failures";
 
 /**
  * A branch as a ref the compare screen can pick.
@@ -154,6 +155,9 @@ export function useCompare() {
       };
       state.value = { status: "data", data: comparison.value };
     } catch (error) {
+      // The compare pane renders this error in its `error` state (and drops a
+      // superseded request entirely), so the failure is already accounted for.
+      markHandled(error);
       if (token !== requestToken) return;
       comparison.value = null;
       state.value = { status: "error", error: error as ErrorPayload };

@@ -17,7 +17,8 @@ export type RouteName =
   | "activity"
   | "settings"
   | "account"
-  | "about";
+  | "about"
+  | "diagnostics";
 
 export interface RouteDefinition {
   name: RouteName;
@@ -33,6 +34,7 @@ export const ROUTE_DEFINITIONS: RouteDefinition[] = [
   { name: "settings", path: "/settings" },
   { name: "account", path: "/account" },
   { name: "about", path: "/about" },
+  { name: "diagnostics", path: "/diagnostics" },
 ];
 
 /** The workspace tabs of the repository screen (docs/04 §5, S6/S8/S9). */
@@ -88,6 +90,10 @@ export function accountPath(accountId?: string): string {
 
 export function aboutPath(): string {
   return "/about";
+}
+
+export function diagnosticsPath(): string {
+  return "/diagnostics";
 }
 
 export function isWorkspaceTab(value: string | undefined): value is WorkspaceTab {

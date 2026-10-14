@@ -101,12 +101,14 @@ describe("the invoke wrapper", () => {
     expect(payload?.onProgress).toBeInstanceOf(Channel);
   });
 
-  it("sends the Rust remote_fetch mode, not the repository fetch-preference enum", async () => {
+  it("sends the per-invocation fetch policy, not the stored refspec enum", async () => {
     invokeMock.mockResolvedValue(undefined as never);
     await commands.remoteFetch("repo-1", "origin");
 
+    // `mode` is the fetch policy object; the `all | specified` enum describes
+    // how a remote's refspecs are shaped and never travels on this command.
     expect(invokeMock).toHaveBeenCalledWith("remote_fetch", {
-      args: { repo: "repo-1", remote: "origin", refspecs: [], mode: "all" },
+      args: { repo: "repo-1", remote: "origin", refspecs: [], mode: {} },
     });
   });
 

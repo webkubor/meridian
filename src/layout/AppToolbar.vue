@@ -14,6 +14,7 @@ import ProgressTrack from "../components/common/ProgressTrack.vue";
  */
 const props = defineProps<{
   verbs: ToolbarVerbModel[];
+  debugEnabled?: boolean;
   activity: {
     count: number;
     busy: boolean;
@@ -28,6 +29,7 @@ const emit = defineEmits<{
   run: [id: string];
   choose: [verbId: string, optionId: string];
   openActivity: [];
+  openDiagnostics: [];
 }>();
 
 const globalVerbs = computed(() => props.verbs.filter((verb) => verb.group === "global"));
@@ -64,6 +66,13 @@ function choose(verbId: string, optionId: string): void {
     <span class="toolbar-spacer" />
 
     <div class="verb-group">
+      <button
+        v-if="debugEnabled"
+        type="button"
+        class="debug-chip"
+        :title="$t('diagnostics.open')"
+        @click="emit('openDiagnostics')"
+      >{{ $t('diagnostics.debug.chip') }}</button>
       <button
         v-for="verb in utilityVerbs"
         :key="verb.id"
@@ -140,6 +149,15 @@ function choose(verbId: string, optionId: string): void {
 .utility-button:hover:not(:disabled) {
   background: var(--md-bg-hover);
   color: var(--md-fg);
+}
+
+.debug-chip {
+  color: var(--md-warning);
+  background: var(--md-bg-warning-soft);
+  border: 1px solid var(--md-warning);
+  border-radius: var(--md-radius-sm);
+  padding: 1px var(--md-space-1);
+  font: var(--md-text-xs) var(--md-font-mono);
 }
 
 .activity-chip {

@@ -34,6 +34,7 @@ import {
 import { openExternal } from "../bridges/external";
 import type { LoadState } from "../stores/loadState";
 import { errorState } from "../stores/loadState";
+import { markHandled } from "../diagnostics/failures";
 import { currentLocale } from "../i18n";
 
 const AUTO_CHECK_KEY = "meridian.updates.autoCheck";
@@ -206,6 +207,8 @@ async function installUpdate(): Promise<void> {
       total: install.value.total,
       error: payload?.message ?? null,
     };
+    // The update panel states the failure itself; a second toast would repeat it.
+    markHandled(error);
   }
 }
 
@@ -227,8 +230,11 @@ async function composeFeedback(kind: FeedbackKind, title: string): Promise<Feedb
     feedbackTarget.value = target;
     await openExternal(target.url);
     return target;
-  } catch {
+  } catch (error) {
     feedbackTarget.value = null;
+    // The About screen shows `feedbackFailed`; claiming the error here keeps the
+    // fallback toast from saying the same thing twice.
+    markHandled(error);
     return null;
   } finally {
     feedbackBusy.value = false;

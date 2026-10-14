@@ -48,6 +48,7 @@ const emit = defineEmits<{
   install: [];
   restart: [];
   copyDiagnostics: [];
+  openDiagnostics: [];
   retryNotes: [];
   openLink: [url: string];
   feedback: [kind: FeedbackKind, title: string];
@@ -467,6 +468,9 @@ const projectUrl = computed(() => {
               <span class="row-label">{{ t("about.diagnostics") }}</span>
               <button type="button" class="action" @click="emit('copyDiagnostics')">
                 {{ t("about.copyDiagnostics") }}
+              </button>
+              <button type="button" class="action" @click="emit('openDiagnostics')">
+                {{ t("diagnostics.open") }}
               </button>
             </div>
             <p class="row-help">{{ t("about.copyDiagnosticsHint") }}</p>

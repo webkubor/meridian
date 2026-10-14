@@ -7,8 +7,13 @@ import Icon from "../components/common/Icon.vue";
  * shell; it renders whatever the shell's toast queue holds. Danger/warning
  * toasts persist until dismissed (the shell decides lifetime by kind), so this
  * component never auto-hides on its own.
+ *
+ * `detail` is the failure's machine code, shown small under the sentence: the
+ * code is what a bug report quotes, and it is the one part of a toast the user
+ * may need to read twice. It arrives from the caller rather than the shell's
+ * queue, so the shell keeps owning lifetimes and nothing else.
  */
-defineProps<{ toasts: ToastModel[] }>();
+defineProps<{ toasts: (ToastModel & { detail?: string })[] }>();
 
 const emit = defineEmits<{
   dismiss: [id: string];
@@ -28,7 +33,7 @@ const ICONS: Record<ToastModel["kind"], string> = {
     <div class="toast-host" role="status" aria-live="polite">
       <div v-for="toast in toasts" :key="toast.id" class="toast" :class="`kind-${toast.kind}`">
         <Icon :name="ICONS[toast.kind]" :size="14" class="toast-icon" />
-        <span class="toast-text">{{ toast.text }}</span>
+        <span class="toast-text">{{ toast.text }}<small v-if="toast.detail">{{ toast.detail }}</small></span>
         <button
           v-if="toast.actionLabel"
           type="button"
@@ -116,6 +121,13 @@ const ICONS: Record<ToastModel["kind"], string> = {
 .toast-text {
   flex: 1;
   min-width: 0;
+}
+
+.toast-text small {
+  display: block;
+  color: var(--md-fg-subtle);
+  font-family: var(--md-font-mono);
+  font-size: var(--md-text-xs);
 }
 
 .toast-action {

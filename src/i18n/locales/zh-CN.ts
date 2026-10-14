@@ -11,6 +11,7 @@
 import diffZh from "./parts/zh-CN/diff";
 import panesZh from "./parts/zh-CN/panes";
 import shellZh from "./parts/zh-CN/shell";
+import diagnosticsZh from "./parts/zh-CN/diagnostics";
 import type { Catalog } from "./en";
 
 const zhCN: Catalog = {
@@ -19,6 +20,7 @@ const zhCN: Catalog = {
   ...diffZh,
   ...panesZh,
   ...shellZh,
+  ...diagnosticsZh,
 
   app: {
     name: "Meridian",
