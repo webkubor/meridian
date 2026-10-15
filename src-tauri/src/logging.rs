@@ -872,6 +872,17 @@ pub fn log_dir() -> PathBuf {
 /// and update commands legitimately take seconds, so they get a longer fuse;
 /// everything else is local and a slow one is a symptom ("the app hung").
 fn slow_threshold(command: &str) -> Duration {
+    // Commands whose duration is set by how long a person takes, not by how
+    // fast the machine is. Warning about these produces a "slow" line every
+    // time the user simply reads the dialog, which trains everyone to ignore
+    // the only signal that distinguishes "still working" from "hung".
+    let waits_for_the_user = matches!(
+        command,
+        "app_pick_directory" | "app_feedback_compose" | "diagnostics_export"
+    );
+    if waits_for_the_user {
+        return Duration::from_secs(300);
+    }
     let networked = command.starts_with("remote_")
         || command.starts_with("submodule_")
         || matches!(

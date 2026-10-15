@@ -23,7 +23,7 @@ use crate::domain::app::{
     AppInfo, BuildProfile, FeedbackKind, FeedbackRequest, FeedbackTarget, NotesLocale,
     ReleaseNotes, UpdateCheck, UpdateStatus,
 };
-use crate::domain::error::{ErrorCode, ErrorPayload};
+use crate::domain::error::{ErrorCode, ErrorDomain, ErrorPayload};
 use crate::logging;
 
 /// The project slug, baked in by `build.rs` from the `origin` remote. Not a
@@ -640,7 +640,10 @@ pub fn app_feedback_compose<R: Runtime>(
 // --- error helpers ---------------------------------------------------------
 
 fn update_error(error: &tauri_plugin_updater::Error) -> ErrorPayload {
+    // Service, not Git: nothing about the repository failed. A report that says
+    // domain=git makes the reader look for a broken repo instead of a network.
     ErrorPayload::new(ErrorCode::Io, "Could not reach the update endpoint.")
+        .with_domain(ErrorDomain::Service)
         .with_detail(error.to_string())
 }
 
@@ -649,6 +652,7 @@ fn invalid_endpoint(error: &dyn std::fmt::Display) -> ErrorPayload {
         ErrorCode::Unclassified,
         "The update endpoint is not a valid URL.",
     )
+    .with_domain(ErrorDomain::Internal)
     .with_detail(error.to_string())
 }
 
