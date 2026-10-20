@@ -67,6 +67,9 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Verify Vue script and template type diagnostics
+        run: pnpm test:typecheck
+
       # Runs after the typecheck so a type error is reported once, as a type
       # error, rather than as a wall of test failures that all trace back to it.
       - name: Test

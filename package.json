@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "typecheck": "vue-tsc --noEmit",
+    "test:typecheck": "node scripts/check-vue-typecheck.mjs",
     "preview": "vite preview",
     "tauri": "tauri",
     "test": "vitest run",
