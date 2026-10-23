@@ -7,7 +7,11 @@ Meridian 的重要改动。格式遵循 [Keep a Changelog](https://keepachangelo
 `CHANGELOG.md`，`src-tauri/tests/changelog_parity.rs` 会断言两份文件列出的版本号完全
 一致 —— 因此不可能出现某个版本只写了一种语言的情况。
 
-## [Unreleased]
+## [0.1.1] - 2026-10-23
+
+### 变更
+
+- **依赖刷新** —— Tauri 工具链与前端框架依赖已更新至当前的次版本/补丁版本。
 
 ### 新增
 
@@ -45,6 +49,10 @@ Meridian 的重要改动。格式遵循 [Keep a Changelog](https://keepachangelo
   本人可读写。日志目录不可写时退回到仅内存记录，而不是让 Meridian 无法启动。
 - **后端命令的失败总会显示出来**，包括来自 Tauri 层的裸字符串失败，以及 panic —— panic
   现在报告为内部错误，而不是「已取消」。
+
+## [Unreleased]
+
+暂无内容。
 
 ## [0.1.0] - 2026-10-14
 

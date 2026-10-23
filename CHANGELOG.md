@@ -12,7 +12,11 @@ No repository URLs appear in this file on purpose: the project slug is derived
 from the git remote by `src-tauri/build.rs` and reaches the UI from there, so
 there is exactly one place that knows where the project is hosted.
 
-## [Unreleased]
+## [0.1.1] - 2026-10-23
+
+### Changed
+
+- **Dependencies refreshed** — the Tauri toolchain and frontend framework dependencies were updated to their current minor/patch releases.
 
 ### Added
 
@@ -69,6 +73,10 @@ there is exactly one place that knows where the project is hosted.
 - **A failing backend command always reaches the screen**, including failures
   that arrive as a bare string from the Tauri layer, and including a panic,
   which is now reported as an internal error rather than as a cancellation.
+
+## [Unreleased]
+
+Nothing yet.
 
 ## [0.1.0] - 2026-10-14
 
