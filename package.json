@@ -6,6 +6,7 @@
   "packageManager": "pnpm@11.20.0",
   "scripts": {
     "dev": "vite",
+    "dev:mock": "vite --mode mock",
     "build": "vite build",
     "typecheck": "vue-tsc --noEmit",
     "test:typecheck": "node scripts/check-vue-typecheck.mjs",

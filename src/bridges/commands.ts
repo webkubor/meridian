@@ -12,6 +12,11 @@ import type { DebugState, CrashNote } from "./bindings";
 import { captureFailure, normalizeError } from "../diagnostics/failures";
 import { recordCall, safeArgumentSummary } from "../diagnostics/recorder";
 
+// Browser mock mode (`vite --mode mock`): compile-time swapped, tree-shaken
+// out of production builds and test runs. The mock directory never imports
+// `@tauri-apps/*` (networkGuard whitelist, src/networkGuard.test.ts).
+import { mockInvoke } from "./mock/invoke";
+
 import type {
   AppInfo,
   BranchFilter,
@@ -76,7 +81,9 @@ export async function call<T>(name: string, args?: Record<string, unknown>): Pro
   const started = performance.now();
   const summary = safeArgumentSummary(args, name);
   try {
-    const value = await tauriInvoke<T>(name, args);
+    const value = await (import.meta.env.MODE === "mock"
+      ? mockInvoke<T>(name, args)
+      : tauriInvoke<T>(name, args));
     recordCall({ command: name, startedAt, durationMs: Math.round(performance.now() - started), ok: true, ...summary });
     return value;
   } catch (error) {

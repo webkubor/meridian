@@ -49,6 +49,12 @@ export async function openExternal(url: string): Promise<OpenResult> {
     return { opened: false, reason: i18n.global.t("shell.toast.linkFailed") };
   };
   if (!/^(https?:|mailto:)/i.test(trimmed)) return failed("refused: not an http(s) or mailto URL");
+  if (import.meta.env.MODE === "mock") {
+    // Browser mock mode has no system opener; log and report success so the
+    // flow (feedback links, reveal-in-finder toasts) stays exercisable.
+    console.info(`[mock] openExternal: ${trimmed}`);
+    return { opened: true };
+  }
   try {
     await openUrl(trimmed);
     return { opened: true };
